@@ -1,4 +1,0 @@
-# Filled-in SMTP credentials must never be committed (see deploy/mail.ini.example).
-mail.ini
-squaberry-mail.ini
-*.local.ini
