@@ -6,8 +6,12 @@ declare(strict_types=1);
  *
  * Validates the enquiry and sends it as a plain-text email over authenticated SMTP.
  * SMTP settings come from an INI file kept OUTSIDE the web root. Its path is read from the
- * SQUABERRY_MAIL_CONFIG environment/FastCGI parameter, falling back to ../squaberry-mail.ini.
+ * SQUABERRY_MAIL_CONFIG environment/FastCGI parameter, falling back to ../.squaberry/mail.ini.
  * See deploy/mail.ini.example and deploy/nginx-ploi.conf.
+ *
+ * If the email can't be sent (settings missing, SMTP down), the enquiry is appended to a private
+ * "held" file instead (SQUABERRY_FORM_HOLD, default ../.squaberry/held-enquiries.jsonl) and the
+ * visitor still gets a success message. Only if that save also fails does the visitor see an error.
  *
  * Responds with JSON when the request asks for it (the progressive-enhancement fetch in script.js),
  * otherwise redirects back to contact.html with ?sent=1 or ?error=<code>.
@@ -61,7 +65,7 @@ function load_config(): array
 {
     $path = getenv('SQUABERRY_MAIL_CONFIG') ?: ($_SERVER['SQUABERRY_MAIL_CONFIG'] ?? '');
     if ($path === '') {
-        $path = dirname(__DIR__) . '/squaberry-mail.ini';
+        $path = dirname(__DIR__) . '/.squaberry/mail.ini';
     }
     $ini = is_readable($path) ? parse_ini_file($path, false, INI_SCANNER_RAW) : false;
     if (!is_array($ini)) {
@@ -111,6 +115,29 @@ function rate_limited(string $ip): bool
     flock($handle, LOCK_UN);
     fclose($handle);
     return $limited;
+}
+
+/** Appends an enquiry that couldn't be emailed to a private file outside the web root. */
+function hold_enquiry(array $enquiry): ?string
+{
+    $path = getenv('SQUABERRY_FORM_HOLD') ?: ($_SERVER['SQUABERRY_FORM_HOLD'] ?? '');
+    if ($path === '') {
+        $path = dirname(__DIR__) . '/.squaberry/held-enquiries.jsonl';
+    }
+    $dir = dirname($path);
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true)) {
+        error_log('contact-submit: cannot create hold folder ' . $dir);
+        return null;
+    }
+    $line = json_encode($enquiry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    $previous = umask(0077);
+    $written = @file_put_contents($path, $line, FILE_APPEND | LOCK_EX);
+    umask($previous);
+    if ($written !== strlen($line)) {
+        error_log('contact-submit: cannot write held enquiry to ' . $path);
+        return null;
+    }
+    return $path;
 }
 
 function encode_header(string $text): string
@@ -237,41 +264,58 @@ if (rate_limited($_SERVER['REMOTE_ADDR'] ?? 'unknown')) {
     respond(false, 429, 'busy', 'You’ve sent several messages in a short time. Please try again later or email hello@squaberry.co.uk.');
 }
 
-$config = load_config();
-if (!$config) {
-    respond(false, 503, 'unavailable', 'The form isn’t available right now. Please email hello@squaberry.co.uk instead.');
-}
+// --- Compose and send (or hold) ------------------------------------------------------------
 
-// --- Compose and send -----------------------------------------------------------------------
-
+$received = gmdate('j F Y, H:i');
 $body = "New enquiry from the squaberry.co.uk contact form\n\n"
     . "Name:    $name\n"
     . "Email:   $email\n"
     . 'Company: ' . ($company !== '' ? $company : '—') . "\n"
     . 'Topic:   ' . ($topic !== '' ? $topic : '—') . "\n\n"
     . "Message:\n$message\n\n"
-    . '— Sent ' . gmdate('j F Y, H:i') . " UTC. Reply to this email to answer the sender directly.\n";
+    . "— Sent $received UTC. Reply to this email to answer the sender directly.\n";
 
-$fromDomain = substr(strrchr($config['from'], '@') ?: '@localhost', 1);
-$headers = [
-    'Date: ' . date(DATE_RFC2822),
-    'From: ' . encode_display_name($config['from_name']) . ' <' . $config['from'] . '>',
-    'To: <' . $config['to'] . '>',
-    'Reply-To: ' . encode_display_name($name) . " <$email>",
-    'Subject: ' . encode_header('Website enquiry from ' . $name),
-    'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $fromDomain . '>',
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    'X-Mailer: squaberry-contact-form',
-];
-$data = implode("\r\n", $headers) . "\r\n\r\n" . rtrim(chunk_split(base64_encode(str_replace("\n", "\r\n", $body)), 76, "\r\n"));
+$sent = false;
+$config = load_config();
+if ($config) {
+    $fromDomain = substr(strrchr($config['from'], '@') ?: '@localhost', 1);
+    $headers = [
+        'Date: ' . date(DATE_RFC2822),
+        'From: ' . encode_display_name($config['from_name']) . ' <' . $config['from'] . '>',
+        'To: <' . $config['to'] . '>',
+        'Reply-To: ' . encode_display_name($name) . " <$email>",
+        'Subject: ' . encode_header('Website enquiry from ' . $name),
+        'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $fromDomain . '>',
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: base64',
+        'X-Mailer: squaberry-contact-form',
+    ];
+    $data = implode("\r\n", $headers) . "\r\n\r\n" . rtrim(chunk_split(base64_encode(str_replace("\n", "\r\n", $body)), 76, "\r\n"));
 
-try {
-    smtp_send($config, $config['from'], $config['to'], $data);
-} catch (SmtpException $e) {
-    error_log('contact-submit: SMTP send failed: ' . $e->getMessage());
-    respond(false, 502, 'send', 'Sorry, your message couldn’t be sent. Please try again or email hello@squaberry.co.uk.');
+    try {
+        smtp_send($config, $config['from'], $config['to'], $data);
+        $sent = true;
+    } catch (SmtpException $e) {
+        error_log('contact-submit: SMTP send failed: ' . $e->getMessage());
+    }
+}
+
+if (!$sent) {
+    // Keep the enquiry so it isn't lost; the visitor's message has still been received.
+    $held = hold_enquiry([
+        'received_utc' => $received,
+        'name' => $name,
+        'email' => $email,
+        'company' => $company,
+        'topic' => $topic,
+        'message' => $message,
+        'reason' => $config ? 'smtp_failed' : 'mail_config_missing',
+    ]);
+    if ($held === null) {
+        respond(false, 503, 'unavailable', 'Sorry, your message couldn’t be sent. Please try again or email hello@squaberry.co.uk.');
+    }
+    error_log('contact-submit: enquiry could not be emailed and was saved to ' . $held);
 }
 
 respond(true, 200, 'ok', 'Thanks — your message is on its way. We’ll reply by email.');

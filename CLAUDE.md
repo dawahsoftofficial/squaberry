@@ -19,7 +19,7 @@ php -l contact-submit.php          # syntax-check the form handler
 The Node preview server cannot run PHP, so the contact form shows its error message there. To exercise the form end to end, serve the repo with PHP's built-in server and point it at a local mail config (never the real one):
 
 ```bash
-SQUABERRY_MAIL_CONFIG=/path/to/test-mail.ini php -S 127.0.0.1:8000
+SQUABERRY_MAIL_CONFIG=/path/to/test-mail.ini SQUABERRY_FORM_HOLD=/tmp/held.jsonl php -S 127.0.0.1:8000
 ```
 
 A test config can use `host = 127.0.0.1`, a local port, `secure = none` and an empty `username` to send to a local fake SMTP listener.
@@ -58,7 +58,7 @@ Hand-written, densely formatted (one long line per block). Design tokens are CSS
 
 `contact-submit.php` validates the enquiry, drops spam quietly (the `website` honeypot field, or a submission less than 3s after `started`), allows 5 submissions per hashed IP per hour, and sends a plain-text email over authenticated SMTP using its own small SMTP client (SSL on 465 or STARTTLS on 587). The visitor's address goes in `Reply-To`; `From` is always the authenticated mailbox, because Zoho rejects anything else. The `<select name="topic">` options must match the `TOPICS` list in the PHP file exactly.
 
-SMTP credentials live in an INI file outside the web root. Its path comes from the `SQUABERRY_MAIL_CONFIG` FastCGI/env parameter, falling back to `../squaberry-mail.ini`. The template is `deploy/mail.ini.example`. Filled-in configs are gitignored and must never be committed.
+SMTP credentials live in an INI file outside the web root. Its path comes from the `SQUABERRY_MAIL_CONFIG` FastCGI/env parameter, falling back to `../.squaberry/mail.ini`. If the settings are missing or SMTP fails, the enquiry is appended to `../.squaberry/held-enquiries.jsonl` (override with `SQUABERRY_FORM_HOLD`) and the visitor still sees success. Only a failed save returns an error. The privacy policy describes this, so keep the two in step. The template is `deploy/mail.ini.example`. Filled-in configs are gitignored and must never be committed.
 
 The site is deployed on Ploi as a static site. `deploy/nginx-ploi.conf` is the full site config pasted into Ploi. It serves files directly from the deploy folder (`root`, no proxy), and it runs only `/contact-submit.php` through PHP-FPM (POST only), return 404 for every other `.php` file, and hide dotfiles (except `/.well-known/`) plus `deploy/`, the docs and the dev server. Because the repo root is the web root, any new tooling or doc file needs to be added to that deny list.
 

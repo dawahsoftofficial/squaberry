@@ -6,7 +6,9 @@
 ;   cp /home/squaberry-wzh0k/squaberry.co.uk/deploy/mail.ini.example /home/squaberry-wzh0k/.squaberry/mail.ini
 ;   nano /home/squaberry-wzh0k/.squaberry/mail.ini
 ;   chmod 600 /home/squaberry-wzh0k/.squaberry/mail.ini
-; The nginx snippet in deploy/nginx-ploi.conf passes this path to PHP as SQUABERRY_MAIL_CONFIG.
+; deploy/nginx-ploi.conf passes this path to PHP as SQUABERRY_MAIL_CONFIG, and the handler also
+; looks here by default. Enquiries that can't be emailed are saved next to it in
+; held-enquiries.jsonl, so check that file if the inbox seems quiet.
 ; Never commit the filled-in copy.
 
 ; Zoho Mail for a custom domain (organisation account). Use the host for the data centre
