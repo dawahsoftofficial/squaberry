@@ -60,7 +60,7 @@ Hand-written, densely formatted (one long line per block). Design tokens are CSS
 
 SMTP credentials live in an INI file outside the web root. Its path comes from the `SQUABERRY_MAIL_CONFIG` FastCGI/env parameter, falling back to `../squaberry-mail.ini`. The template is `deploy/mail.ini.example`. Filled-in configs are gitignored and must never be committed.
 
-The site is deployed on Ploi as a static site. `deploy/nginx-ploi.conf` has the server-block additions: run only `/contact-submit.php` through PHP-FPM (POST only), return 404 for every other `.php` file, and hide dotfiles (except `/.well-known/`) plus `deploy/`, the docs and the dev server. Because the repo root is the web root, any new tooling or doc file needs to be added to that deny list.
+The site is deployed on Ploi as a static site. `deploy/nginx-ploi.conf` is the full site config pasted into Ploi. It serves files directly from the deploy folder (`root`, no proxy), and it runs only `/contact-submit.php` through PHP-FPM (POST only), return 404 for every other `.php` file, and hide dotfiles (except `/.well-known/`) plus `deploy/`, the docs and the dev server. Because the repo root is the web root, any new tooling or doc file needs to be added to that deny list.
 
 ### Content constraints
 

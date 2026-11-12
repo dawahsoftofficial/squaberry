@@ -1,10 +1,11 @@
 ; SMTP settings for contact-submit.php.
 ;
-; Copy this file to the server OUTSIDE the web root, fill in the password, and lock it down:
-;   mkdir -p /home/ploi/.squaberry
-;   cp deploy/mail.ini.example /home/ploi/.squaberry/mail.ini
-;   nano /home/ploi/.squaberry/mail.ini
-;   chmod 600 /home/ploi/.squaberry/mail.ini
+; Copy this file to the server OUTSIDE the web root, fill in the password, and lock it down.
+; Run these as the site's own user (squaberry-wzh0k), which PHP-FPM runs as, so it can read the file:
+;   mkdir -p /home/squaberry-wzh0k/.squaberry
+;   cp /home/squaberry-wzh0k/squaberry.co.uk/deploy/mail.ini.example /home/squaberry-wzh0k/.squaberry/mail.ini
+;   nano /home/squaberry-wzh0k/.squaberry/mail.ini
+;   chmod 600 /home/squaberry-wzh0k/.squaberry/mail.ini
 ; The nginx snippet in deploy/nginx-ploi.conf passes this path to PHP as SQUABERRY_MAIL_CONFIG.
 ; Never commit the filled-in copy.
 
