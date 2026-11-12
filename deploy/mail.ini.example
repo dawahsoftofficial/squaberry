@@ -1,0 +1,29 @@
+; SMTP settings for contact-submit.php.
+;
+; Copy this file to the server OUTSIDE the web root, fill in the password, and lock it down:
+;   mkdir -p /home/ploi/.squaberry
+;   cp deploy/mail.ini.example /home/ploi/.squaberry/mail.ini
+;   nano /home/ploi/.squaberry/mail.ini
+;   chmod 600 /home/ploi/.squaberry/mail.ini
+; The nginx snippet in deploy/nginx-ploi.conf passes this path to PHP as SQUABERRY_MAIL_CONFIG.
+; Never commit the filled-in copy.
+
+; Zoho Mail for a custom domain (organisation account). Use the host for the data centre
+; the account lives in: smtppro.zoho.com (US), smtppro.zoho.eu (EU), smtppro.zoho.in (India),
+; smtppro.zoho.com.au (Australia). Personal zoho.com accounts use smtp.zoho.* instead.
+host = smtppro.zoho.com
+; 465 with secure = ssl, or 587 with secure = tls (STARTTLS)
+port = 465
+secure = ssl
+
+; The Zoho mailbox that sends the email. Zoho only accepts a From address that matches it.
+username = shoaib@squaberry.com
+; If two-factor authentication is on, generate an app-specific password in Zoho
+; (Account > Security > App Passwords) and use that here instead of the login password.
+password = "REPLACE_WITH_ZOHO_APP_PASSWORD"
+
+; Where enquiries are delivered.
+to = shoaib@squaberry.com
+
+; Optional: sender name shown in the inbox (the From address is always the username above).
+from_name = Squaberry website

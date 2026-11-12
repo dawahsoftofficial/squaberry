@@ -8,12 +8,21 @@ Project rules (brand kit, accessibility requirements, site-structure constraints
 
 ## Commands
 
-There is no build step, package manager, linter, or test suite. The site is plain HTML/CSS/JS served as-is.
+There is no build step, package manager, linter, or test suite. The site is plain HTML/CSS/JS served as-is, plus one dependency-free PHP file for the contact form.
 
 ```bash
 node preview-server.cjs            # serves the repo root at http://127.0.0.1:4173/
 PORT=8080 node preview-server.cjs  # override the port
+php -l contact-submit.php          # syntax-check the form handler
 ```
+
+The Node preview server cannot run PHP, so the contact form shows its error message there. To exercise the form end to end, serve the repo with PHP's built-in server and point it at a local mail config (never the real one):
+
+```bash
+SQUABERRY_MAIL_CONFIG=/path/to/test-mail.ini php -S 127.0.0.1:8000
+```
+
+A test config can use `host = 127.0.0.1`, a local port, `secure = none` and an empty `username` to send to a local fake SMTP listener.
 
 `preview-server.cjs` binds to `127.0.0.1` only, sends `Cache-Control: no-store`, and blocks path traversal outside the repo root. It only maps `.html`, `.css`, `.js` and `.svg` to content types; anything else is served as `application/octet-stream`, so add an entry to `contentTypes` if you introduce new asset types (PNG, WOFF2, etc.).
 
@@ -43,6 +52,16 @@ The services accordion uses native `<details>/<summary>` and needs no JS.
 
 Hand-written, densely formatted (one long line per block). Design tokens are CSS custom properties on `:root` (`--acid`, `--ink`, `--paper`, `--white`, `--muted`, `--line`, `--pad`, `--ease`); use them instead of raw colour values. Typography is system fonts only (Arial Black for headings, Courier New for the `.mono` label style) — no web fonts are loaded. Page-specific styles are grouped by prefix: homepage sections (`.hero`, `.ticker`, `.services`, `.manifesto`, `.process`, `.contact`), `.legal-*` for terms/privacy, and `.contact-page-*`/`.contact-card`/`.contact-detail*` for the contact page. The `prefers-reduced-motion` block disables all animations and transitions globally. The homepage ticker repeats its `.ticker-group` twice so the `marquee` animation loops seamlessly — keep both copies in sync.
 
+- **Contact form (`contact.html` only):** `#contactForm` posts to `contact-submit.php`. The script stamps the hidden `started` field, submits with `fetch` (`Accept: application/json`), shows the JSON `message` in `#formStatus`, and marks fields named in `errors` with `aria-invalid` and a `.field-error` note. Without JS the form still posts normally and the handler redirects back to `contact.html?sent=1` or `?error=<code>`.
+
+### Contact form handler and deployment
+
+`contact-submit.php` validates the enquiry, drops spam quietly (the `website` honeypot field, or a submission less than 3s after `started`), allows 5 submissions per hashed IP per hour, and sends a plain-text email over authenticated SMTP using its own small SMTP client (SSL on 465 or STARTTLS on 587). The visitor's address goes in `Reply-To`; `From` is always the authenticated mailbox, because Zoho rejects anything else. The `<select name="topic">` options must match the `TOPICS` list in the PHP file exactly.
+
+SMTP credentials live in an INI file outside the web root. Its path comes from the `SQUABERRY_MAIL_CONFIG` FastCGI/env parameter, falling back to `../squaberry-mail.ini`. The template is `deploy/mail.ini.example`. Filled-in configs are gitignored and must never be committed.
+
+The site is deployed on Ploi as a static site. `deploy/nginx-ploi.conf` has the server-block additions: run only `/contact-submit.php` through PHP-FPM (POST only), return 404 for every other `.php` file, and hide dotfiles (except `/.well-known/`) plus `deploy/`, the docs and the dev server. Because the repo root is the web root, any new tooling or doc file needs to be added to that deny list.
+
 ### Content constraints
 
-The privacy policy states the site sets no cookies, runs no analytics, and collects no enquiry data through forms (contact is by `mailto:` only; `contact.html` repeats this). Adding analytics, cookies, embeds or a form requires updating `privacy.html` (and likely `contact.html`) to match.
+The privacy policy states the site sets no cookies and runs no analytics. Its `#form` section describes exactly what the contact form collects and the one-hour hashed-IP rate limit. Changing the form fields, the rate limiting, or adding analytics, cookies or embeds requires updating `privacy.html` (and the note on `contact.html`) to match.

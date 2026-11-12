@@ -2,6 +2,7 @@
 
 ## Site structure
 - Keep the site static and dependency-free: HTML pages, shared `styles.css`, and small progressive enhancements in `script.js`.
+- The one server-side exception is `contact-submit.php`, the dependency-free contact form handler. Keep SMTP credentials out of the repository (see `deploy/mail.ini.example`) and keep `deploy/nginx-ploi.conf` in step with any new server-side or private files.
 - Keep the homepage, contact page, terms page, and privacy page linked through the shared navigation and footer.
 - Put brand artwork in `assets/` and use the supplied Squaberry logo artwork without altering its proportions.
 
