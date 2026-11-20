@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "squaberry",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["preview-server.cjs"],
-      "port": 4173,
-      "url": "http://127.0.0.1:4173"
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "url": "http://127.0.0.1:3000"
     }
   ]
 }

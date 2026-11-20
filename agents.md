@@ -1,10 +1,10 @@
 # Squaberry project guide
 
 ## Site structure
-- Keep the site static and dependency-free: HTML pages, shared `styles.css`, and small progressive enhancements in `script.js`.
-- The contact form posts to FormSubmit (formsubmit.co), so the site needs no server-side code. Keep `deploy/nginx-ploi.conf` in step with any new private files.
-- Keep the homepage, contact page, terms page, and privacy page linked through the shared navigation and footer.
-- Put brand artwork in `assets/` and use the supplied Squaberry logo artwork without altering its proportions.
+- The site is a Next.js app (App Router, TypeScript). Keep dependencies minimal: no CSS or UI frameworks; the hand-written stylesheets in `app/` carry the design.
+- Enquiries are stored in MySQL and managed in the password-protected admin panel at `/admin`. Never commit credentials; they live in `.env.local` / `.env` (see `.env.example`).
+- Keep the homepage, service pages, contact page, terms page, and privacy page linked through the shared navigation and footer.
+- Put brand artwork in `public/assets/` and use the supplied Squaberry logo artwork without altering its proportions.
 
 ## Visual system
 - Follow the supplied brand kit: Acid Yellow `#E6FF00`, Ink `#101010`, Paper `#F4F3EC`, White `#FFFFFF`, and Muted `#55554F`.
@@ -17,5 +17,5 @@
 - Preserve readable contrast, useful heading order, and working links across all pages.
 
 ## Local preview
-- Start the preview from the project root with `node preview-server.cjs` and open the URL printed by the script.
-- Keep the preview server bound to loopback; do not expose it to the local network.
+- Start the dev server from the project root with `npm run dev` and open http://127.0.0.1:3000.
+- Keep the dev server bound to loopback; do not expose it to the local network.

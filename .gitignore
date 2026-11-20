@@ -1,0 +1,16 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Local secrets (database credentials, admin password). Never commit these.
+.env
+.env.local
+.env.*.local
+*.pem
+
+# OS / editor
+.DS_Store
+Thumbs.db

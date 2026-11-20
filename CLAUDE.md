@@ -8,51 +8,46 @@ Project rules (brand kit, accessibility requirements, site-structure constraints
 
 ## Commands
 
-There is no build step, package manager, linter, or test suite. The site is plain HTML/CSS/JS served as-is.
-
 ```bash
-node preview-server.cjs            # serves the repo root at http://127.0.0.1:4173/
-PORT=8080 node preview-server.cjs  # override the port
-node --check script.js             # syntax-check the script
+npm install
+npm run dev          # http://127.0.0.1:3000 (loopback only)
+npm run build        # production build; also type-checks
+npm run start        # serve the build on 127.0.0.1:${PORT:-3090} (production, behind nginx)
+npm run typecheck    # tsc --noEmit
+npm run db:migrate   # apply db/schema.sql (CREATE TABLE IF NOT EXISTS; safe to re-run)
+npm run db:samples          # add 12 labelled sample portfolio projects (skips existing)
+npm run db:samples:remove   # delete every sample project
 ```
 
-`preview-server.cjs` binds to `127.0.0.1` only, sends `Cache-Control: no-store`, and blocks path traversal outside the repo root. It only maps `.html`, `.css`, `.js` and `.svg` to content types; anything else is served as `application/octet-stream`, so add an entry to `contentTypes` if you introduce new asset types (PNG, WOFF2, etc.).
+There is no test suite or linter. Verify by running the dev server and checking pages at desktop and narrow phone widths (CSS breakpoints are 900px, 720px and 370px) for horizontal overflow, keyboard focus and reduced motion.
 
-Verification is manual: load each page in the preview at desktop and narrow phone widths (the CSS has breakpoints at 900px, 720px and 370px) and check for horizontal overflow, keyboard focus, and reduced-motion behaviour. Submitting the contact form sends a real email through FormSubmit, so test form states by stubbing `fetch` in the browser rather than submitting.
+Configuration comes from `.env.local` (development) or `.env` (Ploi production); `.env.example` lists every variable. Both env files are gitignored and must never be committed. The local env points at the **real** DigitalOcean database, so anything you submit locally lands in production data: clean up test enquiries and portfolio items afterwards.
 
 ## Architecture
 
-Four pages — `index.html`, `contact.html`, `terms.html`, `privacy.html` — share one stylesheet (`styles.css`) and one script (`script.js`, loaded with `defer`). There is no templating, so **the header, nav and footer markup is duplicated in every page**; a change to shared chrome must be made in all four files. The copies differ deliberately:
+Next.js 16 App Router, TypeScript, React 19, MySQL via `mysql2`. No CSS framework: the original hand-written stylesheet is kept.
 
-- On `index.html` the nav uses in-page anchors (`#services`, `#about`, `#process`); other pages link to `index.html#services` etc.
-- The current page's nav link carries `aria-current="page"` (e.g. Contact on `contact.html`).
-- On `contact.html` the "Let's talk" nav CTA is a `mailto:` link rather than a link to `contact.html`.
-- The homepage footer ends with "Back to top ↑" (`#top`, the wrapper around header + hero); the other pages end with "Home".
-- Each page has its own `<title>`, meta description and `canonical` URL under `https://squaberry.co.uk/`. Pages use `lang="en-GB"` and UK spelling.
+- **Pages:** `app/page.tsx` (home), `app/about`, `app/contact`, `app/terms`, `app/privacy` (both via `components/LegalPage.tsx`), `app/services/[slug]` (six service pages), `app/not-found.tsx`, plus `sitemap.ts`/`robots.ts`. Old `*.html` URLs redirect permanently in `next.config.ts`.
+- **Service content** lives in `lib/services.ts`: names, slugs, homepage accordion copy, service-page copy, and `topics` (the enquiry form's topic options and the server-side allowlist). Service hero images are `public/assets/services/<slug>.png` (generated with Higgsfield to match the brand).
+- **Shared chrome:** `components/SiteHeader.tsx` (client: mobile menu toggle, Escape to close; `home` switches the section links to in-page anchors, `current` marks About/Contact, `ctaHref` makes the contact page's CTA an email link). The menu has six items; `site.css` tightens header spacing between 721px and 900px so they stay on one line. and `components/SiteFooter.tsx` (`home` swaps "Home" for "Back to top"). The homepage wraps the header in `#top`, and `.top` (acid background) wraps the hero.
+- **Interactive bits:** `components/ProcessTabs.tsx` (WAI-ARIA tabs with arrow/Home/End keys) and `components/EnquiryForm.tsx`. Services accordion is native `<details>`.
 
-### `script.js` hooks
+### Enquiries and admin
 
-A single IIFE that progressively enhances markup by ID/class/attribute. Keep these hooks intact when editing HTML:
+- `components/EnquiryForm.tsx` posts to the server action `app/actions/enquiry.ts` with `useActionState`. It works without JS; with JS, `onSubmit` calls the action in a transition so React 19 doesn't reset the fields on validation errors. The action validates, drops spam quietly (`website` honeypot, or submitted < 3s after the `started` stamp), rate-limits 5/hour per IP **in memory** (nginx overwrites `X-Forwarded-For`), and inserts into `enquiries`. IPs are never stored.
+- `lib/db.ts` is a pooled `mysql2` connection (TLS always on; `DB_CA_CERT_PATH` adds certificate verification). `lib/data.ts` holds all SQL. Both import `server-only`.
+- Admin (`/admin`) is a single shared password (`ADMIN_PASSWORD`). `lib/auth.ts` issues an HMAC-signed, expiring, httpOnly cookie (`ADMIN_SESSION_SECRET`) scoped to `/admin`. **Every admin page and server action calls `requireAdmin()` itself**; there is no proxy/middleware, so a new admin page or action must do the same. Admin actions live in `app/admin/actions.ts`; panel pages are in the `app/admin/(panel)` route group, whose layout adds the admin bar. Admin pages are `noindex` (metadata, `X-Robots-Tag` header, robots.txt).
+- Portfolio items (`portfolio_items`) are managed in the admin and shown on their service page (`listPublishedPortfolio`). `image_url` is either a site path into `public/` (rendered with `next/image`, so it's resized and compressed) or a full external URL (plain `<img>`). Sample projects (from `scripts/seed-sample-portfolio.mjs`) are labelled "Sample project · …" and use images in `public/assets/portfolio/samples/`; that path is how the remove command finds them. Service pages call `connection()` so they render per request and show new items immediately; they fall back to an empty state if the database is unreachable.
 
-- **Mobile menu:** `#menuButton` toggles `#navigation` via `aria-expanded` and the `.is-open` class, swaps the `<b>` glyph between `+` and `−`, closes on nav-link click and on Escape (returning focus to the button).
-- **Process tabs (homepage only):** `.process-tab` buttons follow the WAI-ARIA tabs pattern — each tab's `aria-controls` must name an existing `.process-panel` id; the script manages `aria-selected`, roving `tabindex`, the panels' `hidden` attribute, and Arrow/Home/End keys. The initial state is also hard-coded in the HTML so the page works without JS.
-- **Contact form (`contact.html` only):** see below.
-- **Footer year:** any element with `[data-year]` gets the current year.
+### Styles
 
-The services accordion uses native `<details>/<summary>` and needs no JS.
-
-### Contact form (FormSubmit)
-
-The site has no server-side code. `#contactForm` posts to FormSubmit (formsubmit.co), which emails each submission to the address in the form's `action`. The hidden fields are FormSubmit options: `_honey` (honeypot), `_subject`, `_template` and `_next` (where FormSubmit redirects after a non-JS post: `contact.html?sent=1#enquiry`). With JS, the script posts the same fields as JSON to the form's `data-ajax-action` (the `/ajax/` endpoint), treats `success: "true"` as sent, and shows the result in `#formStatus`. The `action` and `data-ajax-action` must always name the same address; if FormSubmit's random alias replaces the email, update both.
-
-### `styles.css`
-
-Hand-written, densely formatted (one long line per block). Design tokens are CSS custom properties on `:root` (`--acid`, `--ink`, `--paper`, `--white`, `--muted`, `--line`, `--pad`, `--ease`); use them instead of raw colour values. Typography is system fonts only (Arial Black for headings, Courier New for the `.mono` label style) — no web fonts are loaded. Page-specific styles are grouped by prefix: homepage sections (`.hero`, `.ticker`, `.services`, `.manifesto`, `.process`, `.contact`), `.legal-*` for terms/privacy, and `.contact-page-*`/`.contact-card`/`.contact-detail*`/`.contact-form*`/`.field*` for the contact page. The `prefers-reduced-motion` block disables all animations and transitions globally. The homepage ticker repeats its `.ticker-group` twice so the `marquee` animation loops seamlessly — keep both copies in sync.
-
-### Deployment
-
-The site is deployed on Ploi. `deploy/nginx-ploi.conf` is the full site config pasted into Ploi. It serves files straight from the repo root (no `/public`), returns 404 for any `.php` file, and hides dotfiles (except `/.well-known/`) plus `deploy/`, the docs and the dev server. Because the repo root is the web root, any new tooling or doc file needs to be added to that deny list.
+- `app/globals.css` is the original site stylesheet: dense, one rule block per line, tokens on `:root` (`--acid`, `--ink`, `--paper`, `--white`, `--muted`, `--line`, `--pad`, `--ease`). Keep class names in JSX identical to it so the layout stays pixel-identical to the original static site.
+- `app/site.css` adds service pages, the homepage's `.service-links` and the 404 page. `app/admin/admin.css` is imported only by admin pages. Use the tokens, not raw colours.
 
 ### Content constraints
 
-The privacy policy states the site sets no cookies and runs no analytics. Its `#form` section names FormSubmit and describes exactly what the contact form collects. Changing the form fields or the form service, or adding analytics, cookies or embeds, requires updating `privacy.html` (and the note on `contact.html`) to match.
+The privacy policy (`app/privacy/page.tsx`, `#form` section) states exactly what the enquiry form collects, that enquiries are stored in a DigitalOcean database in Singapore, and that IPs are only held in memory. It also says the site sets no tracking cookies (only the admin sign-in cookie). Changing form fields, storage, rate limiting, or adding analytics/cookies/embeds requires updating it to match.
+
+## Deployment
+
+Ploi: a daemon runs `npm run start` on 127.0.0.1:3090 and nginx proxies to it. Full steps are in `deploy/ploi-deploy.md`; the nginx config is `deploy/nginx-ploi.conf`.

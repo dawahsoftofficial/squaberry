@@ -1,0 +1,31 @@
+{
+  "name": "squaberry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Squaberry website and enquiry admin, built with Next.js.",
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3000",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p ${PORT:-3090}",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/migrate.mjs",
+    "db:samples": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-sample-portfolio.mjs",
+    "db:samples:remove": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-sample-portfolio.mjs --remove"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "mysql2": "^3.24.6",
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}
