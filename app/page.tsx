@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import EnquiryForm from '@/components/EnquiryForm';
 import ProcessTabs from '@/components/ProcessTabs';
 import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
-import { services } from '@/lib/services';
+import { inSentence, services } from '@/lib/services';
 
 export const metadata: Metadata = {
   title: { absolute: 'Squaberry — Fresh ideas. Solid tech. | squaberry.co.uk' },
@@ -42,19 +43,13 @@ export default function HomePage() {
               <h1 id="heroTitle"><span>Fresh ideas.</span><span className="accent">Solid tech.</span></h1>
               <p>From the first sketch to the systems behind it, we make technology feel clear, useful and full of possibility.</p>
               <div className="actions">
-                <Link className="button" href="/contact">Tell us what you’re building <span className="arrow" aria-hidden="true">↗</span></Link>
+                <a className="button hero-start" href="#start">Tell us what you’re building <span className="arrow" aria-hidden="true">↗</span></a>
                 <a className="text-link" href="#services">Explore what we do <span className="arrow" aria-hidden="true">↓</span></a>
               </div>
               <p className="mono hero-note">DESIGN / DEVELOPMENT / CLOUD / AUTOMATION / IT</p>
             </div>
-            <div className="hero-art" aria-label="The geometric Squaberry SB berry mark">
-              <div className="art-grid" aria-hidden="true"></div>
-              <div className="orbit" aria-hidden="true"></div>
-              <span className="mono art-label tl">SQ—01 / THE SQUARE BERRY</span>
-              <span className="mono art-label tr">[ SB ]</span>
-              <div className="mark-frame"><img className="hero-mark" src="/assets/squaberry-mark.svg" alt="Fused S and B initials form a square berry with angled leaves" /></div>
-              <span className="mono art-label bl">ROOTED IN LOGIC.</span>
-              <span className="mono art-label br">GROWN WITH IMAGINATION.</span>
+            <div className="hero-form">
+              <EnquiryForm variant="compact" source="Homepage" id="start" />
             </div>
           </section>
           <div className="wrap baseline mono"><span>INDEPENDENT THINKING. CONNECTED TECHNOLOGY.</span><a href="#services">TAKE A LOOK <b aria-hidden="true">↓</b></a></div>
@@ -81,7 +76,7 @@ export default function HomePage() {
                 <p>{service.summary}</p>
                 <div className="mono tags">{service.tags.join(' / ').toUpperCase()}</div>
                 <div className="service-links">
-                  <Link href={`/services/${service.slug}`}>Explore {service.name.toLowerCase()} <span aria-hidden="true">↗</span></Link>
+                  <Link href={`/services/${service.slug}`}>Explore {inSentence(service.name)} <span aria-hidden="true">↗</span></Link>
                   <Link href={`/services/${service.slug}#enquiry`}>Let’s talk {service.shortName} <span aria-hidden="true">↗</span></Link>
                 </div>
               </div>

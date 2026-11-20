@@ -137,6 +137,12 @@ export const services: Service[] = [
 export const otherTopic = 'Something else';
 export const topics = [...services.map(service => service.name), otherTopic];
 
+/** Service name for use mid-sentence: "web & app development", but keeps acronyms ("AI & …", "IT support …"). */
+export function inSentence(name: string): string {
+  const firstWord = name.split(' ')[0];
+  return firstWord.length > 1 && firstWord === firstWord.toUpperCase() ? name : name.charAt(0).toLowerCase() + name.slice(1);
+}
+
 export function getService(slug: string): Service | undefined {
   return services.find(service => service.slug === slug);
 }

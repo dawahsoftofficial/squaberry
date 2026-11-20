@@ -19,7 +19,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
+    // data-scroll-behavior lets Next.js turn off the stylesheet's smooth scrolling while it resets the
+    // scroll position on navigation. Without it, Next 16 animates that reset and can stop at the footer.
+    <html lang="en-GB" data-scroll-behavior="smooth">
       <body>
         <a className="skip" href="#main">Skip to content</a>
         {children}

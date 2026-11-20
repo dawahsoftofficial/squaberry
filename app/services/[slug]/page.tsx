@@ -7,7 +7,7 @@ import EnquiryForm from '@/components/EnquiryForm';
 import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
 import { listPublishedPortfolio, type PortfolioItem } from '@/lib/data';
-import { getService, services } from '@/lib/services';
+import { getService, inSentence, services } from '@/lib/services';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -115,7 +115,7 @@ export default async function ServicePage({ params }: Props) {
         <section className="wrap section portfolio-section" id="work" aria-labelledby="workTitle">
           <div className="section-heading is-split">
             <div><p className="mono">03 / SELECTED WORK</p><h2 id="workTitle">Work we’re proud of.</h2></div>
-            <p>A look at {service.name.toLowerCase()} projects we’ve delivered.</p>
+            <p>A look at {inSentence(service.name)} projects we’ve delivered.</p>
           </div>
           {portfolio.length ? (
             <ul className="portfolio-grid">
@@ -149,7 +149,7 @@ export default async function ServicePage({ params }: Props) {
               <img src="/assets/squaberry-mark.svg" alt="" aria-hidden="true" />
               <div>
                 <h3>New work is on its way.</h3>
-                <p>We’re adding recent {service.name.toLowerCase()} projects here. Ask for examples when you get in touch and we’ll share work relevant to you.</p>
+                <p>We’re adding recent {inSentence(service.name)} projects here. Ask for examples when you get in touch and we’ll share work relevant to you.</p>
               </div>
             </div>
           )}
