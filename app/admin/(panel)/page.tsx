@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import AdminIcon from './AdminIcon';
 import { formatDate } from './format';
 import { requireAdmin } from '@/lib/auth';
 import { countEnquiries, listEnquiries, type Enquiry, type EnquiryStatus } from '@/lib/data';
@@ -16,6 +17,10 @@ const filters: { value: Filter; label: string }[] = [
 ];
 
 type Props = { searchParams: Promise<{ status?: string; deleted?: string }> };
+
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(0, 2).map(part => Array.from(part)[0]).join('').toUpperCase();
+}
 
 export default async function EnquiriesPage({ searchParams }: Props) {
   await requireAdmin();
@@ -35,47 +40,58 @@ export default async function EnquiriesPage({ searchParams }: Props) {
 
   return (
     <>
-      <div className="admin-head">
-        <div>
-          <p className="mono">ENQUIRIES</p>
-          <h1>Inbox.</h1>
-        </div>
-        <p className="admin-muted">{counts.new} new · {counts.all} total</p>
+      <div className="admin-head inbox-head">
+        <h1>Inbox</h1>
+        <dl className="inbox-summary">
+          <div><dt>New enquiries</dt><dd>{failed ? '—' : counts.new}</dd></div>
+          <div><dt>Total enquiries</dt><dd>{failed ? '—' : counts.all}</dd></div>
+        </dl>
       </div>
 
       {deleted && <p className="admin-flash" role="status">Enquiry deleted.</p>}
       {failed && <p className="admin-flash is-error" role="alert">The database couldn’t be reached. Check the DB_* settings and try again.</p>}
 
-      <nav className="admin-tabs" aria-label="Filter enquiries">
-        {filters.map(item => (
-          <Link key={item.value} href={item.value === 'inbox' ? '/admin' : `/admin?status=${item.value}`} aria-current={filter === item.value ? 'page' : undefined}>
-            {item.label} <span>{countFor(item.value)}</span>
-          </Link>
-        ))}
-      </nav>
-
-      {enquiries.length ? (
-        <ul className="enquiry-list">
-          {enquiries.map(enquiry => (
-            <li key={enquiry.id} className={`enquiry-row is-${enquiry.status}`}>
-              <Link href={`/admin/enquiries/${enquiry.id}`}>
-                <span className={`status-badge is-${enquiry.status}`}>{enquiry.status}</span>
-                <span className="enquiry-who">
-                  <strong>{enquiry.name}</strong>
-                  <span>{enquiry.email}{enquiry.company ? ` · ${enquiry.company}` : ''}</span>
-                </span>
-                <span className="enquiry-excerpt">
-                  {enquiry.topic && <span className="mono">{enquiry.topic}</span>}
-                  <span>{enquiry.message.length > 140 ? `${enquiry.message.slice(0, 140)}…` : enquiry.message}</span>
-                </span>
-                <time dateTime={new Date(enquiry.created_at).toISOString()}>{formatDate(enquiry.created_at)}</time>
-              </Link>
-            </li>
+      <div className="inbox-card">
+        <nav className="admin-tabs" aria-label="Filter enquiries">
+          {filters.map(item => (
+            <Link key={item.value} href={item.value === 'inbox' ? '/admin' : `/admin?status=${item.value}`} aria-current={filter === item.value ? 'page' : undefined}>
+              {item.label} {!failed && <span>{countFor(item.value)}</span>}
+            </Link>
           ))}
-        </ul>
-      ) : (
-        !failed && <div className="admin-empty"><h2>Nothing here yet.</h2><p>New enquiries from the contact page and service pages appear here.</p></div>
-      )}
+        </nav>
+
+        {enquiries.length ? (
+          <>
+            <div className="enquiry-columns" aria-hidden="true">
+              <span>Sender</span><span>Enquiry</span><span>Status</span><span>Received</span>
+            </div>
+            <ul className="enquiry-list">
+              {enquiries.map(enquiry => (
+                <li key={enquiry.id} className={`enquiry-row is-${enquiry.status}`}>
+                  <Link href={`/admin/enquiries/${enquiry.id}`}>
+                    <span className="enquiry-sender">
+                      <span className="enquiry-avatar" aria-hidden="true">{initials(enquiry.name)}</span>
+                      <span className="enquiry-who">
+                        <strong>{enquiry.name}</strong>
+                        <span>{enquiry.email}{enquiry.company ? ` · ${enquiry.company}` : ''}</span>
+                      </span>
+                    </span>
+                    <span className="enquiry-excerpt">
+                      {enquiry.topic && <strong>{enquiry.topic}</strong>}
+                      <span>{enquiry.message.length > 140 ? `${enquiry.message.slice(0, 140)}…` : enquiry.message}</span>
+                    </span>
+                    <span className={`status-badge is-${enquiry.status}`}>{enquiry.status}</span>
+                    <time dateTime={new Date(enquiry.created_at).toISOString()}>{formatDate(enquiry.created_at)}</time>
+                    <AdminIcon name="right" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          !failed && <div className="admin-empty"><AdminIcon name="inbox" /><h2>Nothing here yet.</h2><p>New enquiries from the website appear in your inbox.</p></div>
+        )}
+      </div>
     </>
   );
 }

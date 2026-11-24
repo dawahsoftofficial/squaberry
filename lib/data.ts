@@ -1,5 +1,6 @@
 import 'server-only';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { cache } from 'react';
 import { db } from './db';
 
 export type EnquiryStatus = 'new' | 'read' | 'archived';
@@ -51,7 +52,7 @@ export async function listEnquiries(status: EnquiryStatus | 'inbox' | 'all'): Pr
   return rows;
 }
 
-export async function countEnquiries(): Promise<Record<EnquiryStatus | 'all', number>> {
+export const countEnquiries = cache(async (): Promise<Record<EnquiryStatus | 'all', number>> => {
   const [rows] = await db().query<Row<{ status: EnquiryStatus; total: number }>[]>(
     'SELECT status, COUNT(*) AS total FROM enquiries GROUP BY status',
   );
@@ -61,7 +62,7 @@ export async function countEnquiries(): Promise<Record<EnquiryStatus | 'all', nu
     counts.all += Number(row.total);
   }
   return counts;
-}
+});
 
 export async function getEnquiry(id: number): Promise<Enquiry | null> {
   const [rows] = await db().execute<Row<Enquiry>[]>(
