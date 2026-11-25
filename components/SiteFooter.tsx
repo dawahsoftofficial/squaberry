@@ -2,22 +2,24 @@ import Link from 'next/link';
 import Icon from './Icon';
 import { services } from '@/lib/services';
 
-const talk = ['web', 'design', 'marketing', 'SEO', 'apps', 'IT'];
+// Two crossing ribbons: what we do (lime, front) and who we are (lavender, behind).
+const offerWords = ['Websites', 'Web apps', 'Branding', 'UI & UX', 'SEO', 'Paid social', 'IT support', 'Start a project'];
+const brandWords = ['Fresh ideas', 'Solid tech', 'Square thinking', 'Berry character', 'Built to last'];
 
-function TalkRow({ reverse = false }: { reverse?: boolean }) {
-  const words = reverse ? [...talk].reverse() : talk;
+function Ribbon({ words, tone, reverse = false }: { words: string[]; tone: 'lime' | 'lav'; reverse?: boolean }) {
   const group = (hidden: boolean) => (
     <div className="marquee-group" aria-hidden={hidden || undefined}>
-      {words.map(word => (
-        <span className="talk-item" key={word}>
-          Let’s talk {word}
-          <Icon name="chat" className="talk-icon" size={56} />
+      {[...words, ...words].map((word, index) => (
+        <span className="ribbon-item" key={`${word}-${index}`}>
+          {word}
+          {word === 'Start a project' && <Icon name="arrow-up-right" className="ribbon-go" />}
+          <span className="ribbon-mark" />
         </span>
       ))}
     </div>
   );
   return (
-    <div className={`marquee talk-marquee${reverse ? ' is-reverse' : ''}`}>
+    <div className={`ribbon is-${tone}${reverse ? ' is-reverse' : ''}`}>
       <div className="marquee-track">{group(false)}{group(true)}</div>
     </div>
   );
@@ -26,10 +28,10 @@ function TalkRow({ reverse = false }: { reverse?: boolean }) {
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
-      <Link href="/contact#enquiry" className="talk-link" aria-label="Let’s talk: start a project">
-        <span aria-hidden="true">
-          <TalkRow />
-          <TalkRow reverse />
+      <Link href="/contact#enquiry" className="ribbons" aria-label="Start a project with Squaberry">
+        <span className="ribbons-inner" aria-hidden="true">
+          <Ribbon words={brandWords} tone="lav" reverse />
+          <Ribbon words={offerWords} tone="lime" />
         </span>
       </Link>
 

@@ -28,13 +28,16 @@ export default async function HomePage() {
           <span className="pill rise">Independent thinking. Connected technology.</span>
           <h1 id="heroTitle" className="display-xl rise d1">Fresh ideas.<br />Solid tech.</h1>
           <p className="lead rise d2">From the first sketch to the systems behind it, we make technology feel clear, useful and full of possibility.</p>
-          <div className="unite rise d3">
-            <span>We bring</span>
-            <Link className="chip" href="/services/design-digital-experiences">Design</Link>
-            <Link className="chip" href="/services/web-app-development">Development</Link>
-            <Link className="chip" href="/services/digital-marketing">Marketing</Link>
-            <span>together</span>
-          </div>
+          <ul className="hero-services rise d3" aria-label="What we do">
+            {services.map(service => (
+              <li key={service.slug}>
+                <Link href={`/services/${service.slug}`} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
+                  <span className="hero-svc-icon"><Icon name={serviceStyle[service.slug].icon} size={18} /></span>
+                  {service.shortName === 'IT' ? 'IT support' : service.shortName.charAt(0).toUpperCase() + service.shortName.slice(1)}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <div className="hero-actions rise d4">
             <Link className="btn is-lg" href="/work"><span>See our work</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
             <Link className="text-link" href="/services">Explore services</Link>

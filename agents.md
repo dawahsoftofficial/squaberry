@@ -7,9 +7,9 @@
 - Put brand artwork in `public/assets/` and use the supplied Squaberry logo artwork without altering its proportions (on dark backgrounds it is shown in white via a CSS filter).
 
 ## Visual system (public site)
-- Soft, dark and rounded, modelled on i3media.net: charcoal background `#1C1C1C` with `#272727`/`#303030` cards, off-white text `#FFFFFD`, lavender `#B3A8FF` (violet `#6A5BB5`), soft lime accent `#ECFF95`, and cream `#F9F8F3` light panels with pastel lilac, mint and peach cards. Tokens live on `:root` in `app/globals.css`.
-- Headings use Bricolage Grotesque, body text uses Figtree (both via `next/font`). Use pill buttons and tags, 24px card radius, generous spacing and the section-intro pattern (rule with tick, pill label, large heading).
-- Motion is gentle: Lenis inertia scrolling, scroll-driven reveals and marquees, all disabled under `prefers-reduced-motion`.
+- Soft, dark and rounded, inspired by i3media.net (mood only: don't copy its layouts, components or wording): charcoal background `#1C1C1C` with `#272727`/`#303030` cards, off-white text `#FFFFFD`, lavender `#B3A8FF` (violet `#6A5BB5`), soft lime accent `#ECFF95`, and cream `#F9F8F3` light panels with pastel lilac, mint and peach cards. Tokens live on `:root` in `app/globals.css`.
+- Headings use Bricolage Grotesque, body text uses Figtree (both via `next/font`). Use soft-square buttons and navigation (14px radius: the "square" in Squaberry), pill tags, 24px card radius, generous spacing and the section-intro pattern (rule with tick, pill label, large heading).
+- Motion is gentle: Lenis inertia scrolling, scroll-driven reveals and marquee ribbons, all disabled under `prefers-reduced-motion`.
 - The admin panel keeps its own original style (`app/admin/admin-base.css` + `admin.css`).
 - Check desktop and mobile rendering after layout changes. Prevent horizontal overflow and keep interactive targets comfortable to use.
 

@@ -103,7 +103,7 @@ export default async function ProjectPage({ params }: Props) {
                 <img src={project.image_url} alt={`${project.title} project artwork`} />
               )}
             </div>
-            <ul className="case-notch tag-row" aria-label="Project tags">
+            <ul className="case-cover-tags tag-row" aria-label="Project tags">
               {project.client && <li className="tag">{project.client}</li>}
               {service && <li className="tag">{service.name}</li>}
             </ul>
@@ -201,7 +201,7 @@ export default async function ProjectPage({ params }: Props) {
 
       <section className="section-tight" aria-labelledby="ctaTitle">
         <div className="panel panel-lav cta-panel reveal">
-          <h2 id="ctaTitle" className="display-l">Like what you see? Let’s talk.</h2>
+          <h2 id="ctaTitle" className="display-l">Have something similar in mind?</h2>
           <div className="cta-side">
             <p>Tell us about your project. Three quick steps and we’ll reply by email, or write to <a className="text-link" href="mailto:hello@squaberry.co.uk">hello@squaberry.co.uk</a>.</p>
             <Link className="btn is-dark is-lg" href="/contact#enquiry"><span>Start a project</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
@@ -211,7 +211,7 @@ export default async function ProjectPage({ params }: Props) {
 
       {related.length > 0 && (
         <section className="container section" aria-labelledby="relatedTitle">
-          <SectionIntro label="Related projects" title="More projects like this" id="relatedTitle" />
+          <SectionIntro label="More work" title="Keep exploring" id="relatedTitle" />
           <div className="bento case-related">
             {related.map(item => <ProjectCard key={item.id} project={item} className="span-4" />)}
           </div>

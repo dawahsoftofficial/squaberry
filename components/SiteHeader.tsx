@@ -82,7 +82,6 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('mega-open', mega);
     if (!mega) return;
     const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') closeMega(true);
@@ -96,7 +95,6 @@ export default function SiteHeader() {
     return () => {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
-      document.documentElement.classList.remove('mega-open');
     };
   }, [mega, closeMega]);
 
@@ -149,16 +147,17 @@ export default function SiteHeader() {
 
   return (
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${mega ? ' is-mega' : ''}`} onPointerLeave={event => event.pointerType === 'mouse' && mega && closeMegaSoon()}>
-      <div className="container site-header-inner">
+      <div className="dock">
         <Link href="/" className="brand" aria-label="Squaberry home" onPointerEnter={() => mega && closeMegaSoon()}>
           <img src="/assets/squaberry-logo.svg" alt="Squaberry" width={152} height={50} />
         </Link>
+        <span className="dock-divider" aria-hidden="true" />
 
-        <nav className="nav-pills" aria-label="Main navigation">
+        <nav className="dock-nav" aria-label="Main navigation">
           <button
             ref={servicesRef}
             type="button"
-            className={`nav-pill${isCurrent('/services') ? ' is-current' : ''}`}
+            className={`dock-link${isCurrent('/services') ? ' is-current' : ''}`}
             aria-expanded={mega}
             aria-controls="services-menu"
             onClick={onServicesClick}
@@ -166,12 +165,13 @@ export default function SiteHeader() {
             onPointerEnter={event => event.pointerType === 'mouse' && openMega()}
           >
             Services
+            <Icon name="chevron-down" size={16} className="dock-chevron" />
           </button>
           {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className="nav-pill"
+              className="dock-link"
               aria-current={isCurrent(link.href) ? 'page' : undefined}
               onPointerEnter={() => mega && closeMegaSoon()}
             >
@@ -180,7 +180,8 @@ export default function SiteHeader() {
           ))}
         </nav>
 
-        <Link href="/contact#enquiry" className="btn header-cta" onPointerEnter={() => mega && closeMegaSoon()}>
+        <a href="mailto:hello@squaberry.co.uk" className="dock-mail" onPointerEnter={() => mega && closeMegaSoon()}>hello@squaberry.co.uk</a>
+        <Link href="/contact#enquiry" className="btn is-lime header-cta" onPointerEnter={() => mega && closeMegaSoon()}>
           <span>Start a project</span>
           <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
         </Link>
@@ -201,6 +202,9 @@ export default function SiteHeader() {
         </button>
       </div>
 
+      {/* The dim layer is inside the header, so leaving the panel onto it doesn't fire the header's pointerleave. */}
+      <div className="nav-scrim" aria-hidden="true" onPointerEnter={event => event.pointerType === 'mouse' && mega && closeMegaSoon()} />
+
       <div
         ref={megaRef}
         id="services-menu"
@@ -212,50 +216,52 @@ export default function SiteHeader() {
         onBlur={onMegaBlur}
       >
         <div className="mega-grid">
-          <ul className="mega-features">
-            {services.map(service => {
-              const [highlight, rest] = featureCopy[service.slug] ?? ['', service.summary];
-              const style = serviceStyle[service.slug];
-              return (
-                <li key={service.slug}>
-                  <Link href={`/services/${service.slug}`} className="mega-feature" style={{ ['--accent' as string]: style.accent }}>
-                    <span className="mega-feature-icon"><Icon name={style.icon} size={44} /></span>
-                    <span className="mega-feature-text">
-                      <span className="mega-feature-title">{service.name}</span>
-                      <span className="mega-feature-sub"><em>{highlight}</em> {rest}</span>
-                    </span>
-                    <span className="mega-feature-go" aria-hidden="true"><Icon name="arrow-up-right" size={16} /></span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <div className="mega-col">
+            <p className="mega-label">Services</p>
+            <ul className="mega-features">
+              {services.map(service => {
+                const [highlight, rest] = featureCopy[service.slug] ?? ['', service.summary];
+                const style = serviceStyle[service.slug];
+                return (
+                  <li key={service.slug}>
+                    <Link href={`/services/${service.slug}`} className="mega-feature" style={{ ['--accent' as string]: style.accent }}>
+                      <span className="mega-feature-icon"><Icon name={style.icon} size={22} /></span>
+                      <span className="mega-feature-text">
+                        <span className="mega-feature-title">{service.name}</span>
+                        <span className="mega-feature-sub"><em>{highlight}</em> {rest}</span>
+                      </span>
+                      <Icon name="arrow-right" size={18} className="mega-feature-go" />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-          <div className="mega-all">
-            <Link href="/services" className="mega-all-title">All services</Link>
+          <div className="mega-col">
+            <p className="mega-label">Popular</p>
             <ul className="mega-offers" style={{ gridTemplateRows: `repeat(${Math.ceil(visibleOffers.length / 2)}, auto)` }}>
               {visibleOffers.map(offer => (
                 <li key={offer.label}><Link href={`/services/${offer.slug}`}>{offer.label}</Link></li>
               ))}
             </ul>
+            <Link href="/services" className="mega-all">All services <Icon name="arrow-right" size={16} /></Link>
           </div>
 
-          <Link href="/work" className="mega-work">
-            <span className="mega-work-label">Recent work</span>
+          <Link href="/work/muntada-aid" className="mega-work">
             <span className="mega-work-media">
               <img src="/assets/portfolio/muntada-aid.png" alt="" width={1168} height={880} loading="lazy" />
+              <span className="mega-work-label">Case study</span>
             </span>
             <span className="mega-work-title">Muntada Aid</span>
             <span className="mega-work-text">A giving platform that turns urgent appeals into donations.</span>
-            <span className="mega-work-more">See all projects <Icon name="arrow-right" size={16} /></span>
           </Link>
         </div>
 
-        <Link href="/contact#enquiry" className="mega-bar">
-          <span>Have you seen enough now?</span>
-          <strong>Let’s start a project</strong>
-          <span className="mega-bar-icon" aria-hidden="true"><Icon name="arrow-up-right" size={16} /></span>
-        </Link>
+        <div className="mega-foot">
+          <p>Not sure which service fits? Tell us the problem and we’ll suggest the right mix.</p>
+          <Link href="/contact#enquiry" className="text-link">Start a conversation <Icon name="arrow-right" size={16} /></Link>
+        </div>
       </div>
 
       <div className="mobile-menu" id="mobile-menu" hidden={!open}>
@@ -283,7 +289,7 @@ export default function SiteHeader() {
           </ul>
         </nav>
         <div className="mobile-menu-foot">
-          <Link href="/contact#enquiry" className="btn">
+          <Link href="/contact#enquiry" className="btn is-lime">
             <span>Start a project</span>
             <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
           </Link>
