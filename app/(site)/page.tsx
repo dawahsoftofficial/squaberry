@@ -48,27 +48,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container section-tight" aria-label="Selected projects">
+      <section className="container section-tight home-work" aria-labelledby="workTitle">
+        <SectionIntro label="Selected work" title="Built for people who rely on it." id="workTitle">
+          <p>Charities, shops, apps and platforms we’ve designed and built. <Link className="text-link" href="/work">See all {projects.length || ''} projects</Link></p>
+        </SectionIntro>
         <div className="bento">
-          {p0 && <ProjectCard project={p0} className="span-7" priority />}
-          {p1 && <ProjectCard project={p1} className="span-5" />}
-          <div className="list-card span-4 tilt-in">
-            <span className="pill">Our services</span>
-            <ul>
-              {services.map(service => (
-                <li key={service.slug}>
-                  <Link href={`/services/${service.slug}`}>{service.name}<Icon name="arrow-right" size={20} /></Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {p2 && <ProjectCard project={p2} className="span-4" />}
-          {p3 && <ProjectCard project={p3} className="span-4" />}
-          {p4 && <ProjectCard project={p4} className="span-8 is-wide" />}
-          <div className="more-card span-4 tilt-in">
-            <h3>{projects.length > 5 ? `${projects.length - 5} more projects to explore` : 'See every project'}</h3>
-            <Link className="btn" href="/work"><span>All projects</span><span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span></Link>
-          </div>
+          {p0 && <ProjectCard project={p0} className="span-12" featured priority />}
+          {p1 && <ProjectCard project={p1} className="span-6" />}
+          {p2 && <ProjectCard project={p2} className="span-6" />}
+          {p3 && <ProjectCard project={p3} className="span-6" />}
+          {p4 && <ProjectCard project={p4} className="span-6" />}
         </div>
       </section>
 
