@@ -103,6 +103,14 @@ export async function listPublishedPortfolio(serviceSlug: string): Promise<Portf
   return rows.map(toItem);
 }
 
+/** Every published project, in display order (homepage and the Projects page). */
+export async function listAllPublishedPortfolio(): Promise<PortfolioItem[]> {
+  const [rows] = await db().query<Row<PortfolioItem>[]>(
+    `SELECT ${portfolioColumns} FROM portfolio_items WHERE published = 1 ORDER BY sort_order, id`,
+  );
+  return rows.map(toItem);
+}
+
 export async function getPortfolioItem(id: number): Promise<PortfolioItem | null> {
   const [rows] = await db().execute<Row<PortfolioItem>[]>(`SELECT ${portfolioColumns} FROM portfolio_items WHERE id = ?`, [id]);
   return rows[0] ? toItem(rows[0]) : null;

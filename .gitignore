@@ -14,3 +14,6 @@ next-env.d.ts
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Local browser-testing output
+.playwright-mcp/

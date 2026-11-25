@@ -1,63 +1,294 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import Icon from './Icon';
+import { services, serviceStyle } from '@/lib/services';
 
-type Props = {
-  /** Homepage uses in-page anchors; every other page links back to the homepage sections. */
-  home?: boolean;
-  /** Marks the matching nav link with aria-current. */
-  current?: 'about' | 'contact';
-  /** On the contact page the "Let's talk" call to action opens email instead. */
-  ctaHref?: string;
+const links = [
+  { href: '/work', label: 'Projects' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+// Mega-menu copy: a short subtitle per featured service, with one highlighted word.
+const featureCopy: Record<string, [string, string]> = {
+  'web-app-development': ['Seamless', 'sites, apps & software'],
+  'design-digital-experiences': ['Memorable', 'brands & interfaces'],
+  'digital-marketing': ['Revenue-driven', 'campaigns'],
+  'it-support-security': ['Reliable', 'support, kept secure'],
+  'cloud-infrastructure': ['Solid', 'foundations to grow on'],
+  'ai-workflow-automation': ['Less', 'busywork, more done'],
+  'strategy-consulting': ['Clear', 'plans, sensible steps'],
 };
 
-export default function SiteHeader({ home = false, current, ctaHref = '/contact' }: Props) {
+// "All services" list: specific offers, each linking to the service that covers it.
+const offers: { label: string; slug: string }[] = [
+  { label: 'Websites', slug: 'web-app-development' },
+  { label: 'E-commerce', slug: 'web-app-development' },
+  { label: 'Web applications', slug: 'web-app-development' },
+  { label: 'Brand identity', slug: 'design-digital-experiences' },
+  { label: 'UI & UX design', slug: 'design-digital-experiences' },
+  { label: 'SEO', slug: 'digital-marketing' },
+  { label: 'Paid search & social', slug: 'digital-marketing' },
+  { label: 'Content & email', slug: 'digital-marketing' },
+  { label: 'IT support', slug: 'it-support-security' },
+  { label: 'Cybersecurity', slug: 'it-support-security' },
+  { label: 'Cloud hosting', slug: 'cloud-infrastructure' },
+  { label: 'Automation', slug: 'ai-workflow-automation' },
+];
+
+export default function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const prefix = home ? '' : '/';
+  const servicesRef = useRef<HTMLButtonElement>(null);
+  const megaRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<number | undefined>(undefined);
+
+  const visibleSlugs = new Set(services.map(service => service.slug));
+  const visibleOffers = offers.filter(offer => visibleSlugs.has(offer.slug));
+  const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close both menus on navigation.
+  useEffect(() => {
+    setOpen(false);
+    setMega(false);
+  }, [pathname]);
+
+  // ---- Services mega menu (desktop) ----
+  const openMega = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    setMega(true);
+  }, []);
+  const closeMegaSoon = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setMega(false), 180);
+  }, []);
+  const closeMega = useCallback((returnFocus = false) => {
+    window.clearTimeout(closeTimer.current);
+    setMega(false);
+    if (returnFocus) servicesRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('mega-open', mega);
+    if (!mega) return;
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') closeMega(true);
+    };
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!megaRef.current?.contains(target) && !servicesRef.current?.contains(target)) closeMega();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointer);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointer);
+      document.documentElement.classList.remove('mega-open');
+    };
+  }, [mega, closeMega]);
+
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  // The mega menu only exists on wide screens: close it if the window narrows to the phone layout.
+  useEffect(() => {
+    const narrow = window.matchMedia('(max-width: 960px)');
+    const onChange = () => narrow.matches && setMega(false);
+    narrow.addEventListener('change', onChange);
+    return () => narrow.removeEventListener('change', onChange);
+  }, []);
+
+  const onServicesKey = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      openMega();
+      window.setTimeout(() => megaRef.current?.querySelector<HTMLElement>('a')?.focus(), 30);
+    }
+  };
+  const onServicesClick = () => {
+    if (mega) return closeMega();
+    openMega();
+  };
+  // Leaving the panel by keyboard closes it.
+  const onMegaBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget as Node | null;
+    if (next && !megaRef.current?.contains(next) && next !== servicesRef.current) closeMega();
+  };
+
+  // ---- Full-screen menu (phones and tablets) ----
+  useEffect(() => {
     if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
+    const lenis = window.squaberryLenis;
+    lenis?.stop();
+    document.documentElement.classList.add('menu-open');
+    const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') {
         setOpen(false);
         buttonRef.current?.focus();
       }
     };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      lenis?.start();
+      document.documentElement.classList.remove('menu-open');
+      document.removeEventListener('keydown', onKey);
+    };
   }, [open]);
 
-  const close = () => setOpen(false);
-
   return (
-    <header className="header">
-      <div className="wrap header-inner">
-        <Link href="/" aria-label="Squaberry home">
-          <img className="logo" src="/assets/squaberry-logo.svg" alt="Squaberry" />
+    <header className={`site-header${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${mega ? ' is-mega' : ''}`} onPointerLeave={event => event.pointerType === 'mouse' && mega && closeMegaSoon()}>
+      <div className="container site-header-inner">
+        <Link href="/" className="brand" aria-label="Squaberry home" onPointerEnter={() => mega && closeMegaSoon()}>
+          <img src="/assets/squaberry-logo.svg" alt="Squaberry" width={152} height={50} />
         </Link>
+
+        <nav className="nav-pills" aria-label="Main navigation">
+          <button
+            ref={servicesRef}
+            type="button"
+            className={`nav-pill${isCurrent('/services') ? ' is-current' : ''}`}
+            aria-expanded={mega}
+            aria-controls="services-menu"
+            onClick={onServicesClick}
+            onKeyDown={onServicesKey}
+            onPointerEnter={event => event.pointerType === 'mouse' && openMega()}
+          >
+            Services
+          </button>
+          {links.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="nav-pill"
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+              onPointerEnter={() => mega && closeMegaSoon()}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <Link href="/contact#enquiry" className="btn header-cta" onPointerEnter={() => mega && closeMegaSoon()}>
+          <span>Start a project</span>
+          <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
+        </Link>
+
         <button
           ref={buttonRef}
-          className="menu-button"
-          id="menuButton"
           type="button"
+          className="menu-toggle"
           aria-expanded={open}
-          aria-controls="navigation"
-          onClick={() => setOpen(value => !value)}
+          aria-controls="mobile-menu"
+          onClick={() => {
+            setMega(false);
+            setOpen(value => !value);
+          }}
         >
-          MENU <b aria-hidden="true">{open ? '−' : '+'}</b>
+          <span>{open ? 'Close' : 'Menu'}</span>
+          <Icon name={open ? 'close' : 'menu'} size={20} />
         </button>
-        <nav className={`nav${open ? ' is-open' : ''}`} id="navigation" aria-label="Main navigation">
-          <a href={`${prefix}#services`} onClick={close}>What we do</a>
-          <Link href="/about" onClick={close} aria-current={current === 'about' ? 'page' : undefined}>About us</Link>
-          <a href={`${prefix}#about`} onClick={close}>Our DNA</a>
-          <a href={`${prefix}#process`} onClick={close}>How we work</a>
-          <Link href="/contact" onClick={close} aria-current={current === 'contact' ? 'page' : undefined}>Contact</Link>
-          <a href={ctaHref} className="nav-cta" onClick={close}>
-            Let’s talk <span className="arrow" aria-hidden="true">↗</span>
-          </a>
+      </div>
+
+      <div
+        ref={megaRef}
+        id="services-menu"
+        className="mega"
+        role="region"
+        aria-label="Services"
+        inert={!mega}
+        onPointerEnter={event => event.pointerType === 'mouse' && openMega()}
+        onBlur={onMegaBlur}
+      >
+        <div className="mega-grid">
+          <ul className="mega-features">
+            {services.map(service => {
+              const [highlight, rest] = featureCopy[service.slug] ?? ['', service.summary];
+              const style = serviceStyle[service.slug];
+              return (
+                <li key={service.slug}>
+                  <Link href={`/services/${service.slug}`} className="mega-feature" style={{ ['--accent' as string]: style.accent }}>
+                    <span className="mega-feature-icon"><Icon name={style.icon} size={44} /></span>
+                    <span className="mega-feature-text">
+                      <span className="mega-feature-title">{service.name}</span>
+                      <span className="mega-feature-sub"><em>{highlight}</em> {rest}</span>
+                    </span>
+                    <span className="mega-feature-go" aria-hidden="true"><Icon name="arrow-up-right" size={16} /></span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mega-all">
+            <Link href="/services" className="mega-all-title">All services</Link>
+            <ul className="mega-offers" style={{ gridTemplateRows: `repeat(${Math.ceil(visibleOffers.length / 2)}, auto)` }}>
+              {visibleOffers.map(offer => (
+                <li key={offer.label}><Link href={`/services/${offer.slug}`}>{offer.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <Link href="/work" className="mega-work">
+            <span className="mega-work-label">Recent work</span>
+            <span className="mega-work-media">
+              <img src="/assets/portfolio/muntada-aid.png" alt="" width={1168} height={880} loading="lazy" />
+            </span>
+            <span className="mega-work-title">Muntada Aid</span>
+            <span className="mega-work-text">A giving platform that turns urgent appeals into donations.</span>
+            <span className="mega-work-more">See all projects <Icon name="arrow-right" size={16} /></span>
+          </Link>
+        </div>
+
+        <Link href="/contact#enquiry" className="mega-bar">
+          <span>Have you seen enough now?</span>
+          <strong>Let’s start a project</strong>
+          <span className="mega-bar-icon" aria-hidden="true"><Icon name="arrow-up-right" size={16} /></span>
+        </Link>
+      </div>
+
+      <div className="mobile-menu" id="mobile-menu" hidden={!open}>
+        <nav aria-label="Mobile navigation">
+          <ul>
+            <li><Link href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</Link></li>
+            <li>
+              <Link href="/services" aria-current={pathname === '/services' ? 'page' : undefined}>Services</Link>
+              <ul className="mobile-sub">
+                {services.map(service => (
+                  <li key={service.slug}>
+                    <Link href={`/services/${service.slug}`} aria-current={pathname === `/services/${service.slug}` ? 'page' : undefined} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
+                      <Icon name={serviceStyle[service.slug].icon} size={20} />
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+            {links.map(link => (
+              <li key={link.href}>
+                <Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>{link.label}</Link>
+              </li>
+            ))}
+          </ul>
         </nav>
+        <div className="mobile-menu-foot">
+          <Link href="/contact#enquiry" className="btn">
+            <span>Start a project</span>
+            <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
+          </Link>
+          <a href="mailto:hello@squaberry.co.uk" className="text-link">hello@squaberry.co.uk</a>
+        </div>
       </div>
     </header>
   );

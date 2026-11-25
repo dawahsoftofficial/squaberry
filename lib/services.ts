@@ -1,4 +1,5 @@
-// The six services: homepage accordion copy, service-page content, and the enquiry form's topics.
+// Services: card and service-page copy, and the enquiry form's topics.
+// Set `hidden: true` to take a service off the site (its page redirects to /services) without losing its content.
 
 export type Service = {
   slug: string;
@@ -15,9 +16,11 @@ export type Service = {
   intro: string;
   deliverables: { title: string; text: string }[];
   fit: string[];
+  /** Hidden services are kept here but not shown, linked or offered as a form topic. */
+  hidden?: boolean;
 };
 
-export const services: Service[] = [
+const allServices: Service[] = [
   {
     slug: 'web-app-development',
     number: '01',
@@ -57,7 +60,27 @@ export const services: Service[] = [
     fit: ['Your brand feels dated or doesn’t match the business you’ve become', 'People struggle to find their way around your site or product', 'You have an idea that needs shaping before development starts'],
   },
   {
+    slug: 'digital-marketing',
+    number: '',
+    name: 'Digital marketing',
+    shortName: 'marketing',
+    summary: 'Get found, get chosen. SEO, paid campaigns and social that bring the right people to you, measured so you know what works.',
+    tags: ['SEO', 'Paid search & social', 'Content & email'],
+    headline: ['Be seen by the people', 'who are looking for you.'],
+    intro: 'A great website only works if people find it. We plan and run marketing that puts you in front of the right audience, then measure every step so your budget goes where it earns its keep.',
+    deliverables: [
+      { title: 'Search engine optimisation', text: 'Technical fixes, useful content and local search so the right people find you on Google.' },
+      { title: 'Paid search', text: 'Google Ads campaigns built around intent, with careful keyword choice and spend you can track.' },
+      { title: 'Paid social', text: 'Targeted campaigns on Meta, Instagram, LinkedIn and TikTok, tested and refined as they run.' },
+      { title: 'Social media management', text: 'A consistent, on-brand presence: planning, content and community management.' },
+      { title: 'Content & email', text: 'Articles, landing pages and email campaigns that build trust and bring people back.' },
+      { title: 'Analytics & reporting', text: 'Clear tracking and plain-English reports, so you can see what is working and what to change.' },
+    ],
+    fit: ['Your website gets little traffic, or the wrong kind of visitors', 'You’re spending on ads but can’t tell what’s actually working', 'You want a steady flow of enquiries instead of quiet months'],
+  },
+  {
     slug: 'cloud-infrastructure',
+    hidden: true,
     number: '03',
     name: 'Cloud & infrastructure',
     shortName: 'cloud',
@@ -77,6 +100,7 @@ export const services: Service[] = [
   },
   {
     slug: 'ai-workflow-automation',
+    hidden: true,
     number: '04',
     name: 'AI & workflow automation',
     shortName: 'automation',
@@ -115,6 +139,7 @@ export const services: Service[] = [
   },
   {
     slug: 'strategy-consulting',
+    hidden: true,
     number: '06',
     name: 'Strategy & consulting',
     shortName: 'strategy',
@@ -133,6 +158,25 @@ export const services: Service[] = [
     fit: ['You know things could work better but aren’t sure where to start', 'You’re about to choose new software or start a big project', 'You want a second opinion before committing budget'],
   },
 ];
+
+/** Services shown on the site, numbered in display order. */
+export const services: Service[] = allServices
+  .filter(service => !service.hidden)
+  .map((service, index) => ({ ...service, number: String(index + 1).padStart(2, '0') }));
+
+/** Slugs of hidden services, redirected to /services in next.config.ts. */
+export const hiddenServiceSlugs = allServices.filter(service => service.hidden).map(service => service.slug);
+
+/** Outline icon (components/Icon.tsx) and accent colour used for each service across the site. */
+export const serviceStyle: Record<string, { icon: string; accent: string }> = {
+  'web-app-development': { icon: 'web', accent: '#b3a8ff' },
+  'design-digital-experiences': { icon: 'design', accent: '#ffb38a' },
+  'cloud-infrastructure': { icon: 'cloud', accent: '#8fd3e8' },
+  'ai-workflow-automation': { icon: 'automation', accent: '#ecff95' },
+  'digital-marketing': { icon: 'marketing', accent: '#f5a8d4' },
+  'it-support-security': { icon: 'security', accent: '#9fe6b8' },
+  'strategy-consulting': { icon: 'strategy', accent: '#f5a8d4' },
+};
 
 export const otherTopic = 'Something else';
 export const topics = [...services.map(service => service.name), otherTopic];

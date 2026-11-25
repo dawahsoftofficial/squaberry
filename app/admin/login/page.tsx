@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import '../admin-base.css';
 import '../admin.css';
 import LoginForm from './LoginForm';
 import { isAdmin } from '@/lib/auth';

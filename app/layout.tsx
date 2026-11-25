@@ -1,27 +1,29 @@
 import type { Metadata, Viewport } from 'next';
+import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import './globals.css';
-import './site.css';
+
+// Self-hosted at build time by next/font: no requests to Google from visitors' browsers.
+const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
+const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://squaberry.co.uk'),
   title: {
-    default: 'Squaberry — Fresh ideas. Solid tech. | squaberry.co.uk',
-    template: '%s — squaberry.co.uk',
+    default: 'Squaberry — Fresh ideas. Solid tech.',
+    template: '%s — Squaberry',
   },
-  description: 'Squaberry brings thoughtful design, web development, cloud, automation and IT support together. Fresh ideas. Solid tech.',
+  description: 'Squaberry brings thoughtful design, web development, digital marketing and IT support together. Fresh ideas. Solid tech.',
   icons: { icon: { url: '/assets/squaberry-logo.svg', type: 'image/svg+xml' } },
   openGraph: { type: 'website', siteName: 'Squaberry', locale: 'en_GB' },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#E6FF00',
+  themeColor: '#1c1c1c',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // data-scroll-behavior lets Next.js turn off the stylesheet's smooth scrolling while it resets the
-    // scroll position on navigation. Without it, Next 16 animates that reset and can stop at the footer.
-    <html lang="en-GB" data-scroll-behavior="smooth">
+    <html lang="en-GB" className={`${bricolage.variable} ${figtree.variable}`}>
       <body>
         <a className="skip" href="#main">Skip to content</a>
         {children}

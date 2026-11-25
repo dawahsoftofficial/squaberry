@@ -1,0 +1,37 @@
+/* Base styles the admin panel was built on (originally the public site's stylesheet).
+   The public site now has its own design system, so these are kept here and scoped to the
+   admin's two roots (.admin, .admin-login) so they never affect public pages. */
+
+:root{--acid:#e6ff00;--ink:#101010;--paper:#f4f3ec;--white:#fff;--muted:#55554f;--line:rgba(16,16,16,.22)}
+
+body:has(.admin),body:has(.admin-login){margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+
+:is(.admin,.admin-login) *{box-sizing:border-box}
+:is(.admin,.admin-login) a{color:inherit;text-decoration:none}
+:is(.admin,.admin-login) button{font:inherit;color:inherit;cursor:pointer}
+:is(.admin,.admin-login) :is(button,a){touch-action:manipulation}
+:is(.admin,.admin-login) :is(button,a):focus-visible{outline:3px solid currentColor;outline-offset:5px}
+:is(.admin,.admin-login) :is(h1,h2,h3,p){margin:0}
+:is(.admin,.admin-login) :is(h1,h2,h3){font-family:'Arial Black',Arial,Helvetica,sans-serif;font-weight:900;letter-spacing:-.065em;line-height:.99}
+:is(.admin,.admin-login) p{line-height:1.65}
+:is(.admin,.admin-login) .mono{font:700 11px/1.5 'Courier New',monospace;letter-spacing:.1em;text-transform:uppercase}
+:is(.admin,.admin-login) .arrow{display:inline-block;transition:transform .25s}
+:is(.admin,.admin-login) .button{display:inline-flex;align-items:center;justify-content:space-between;gap:34px;padding:18px 22px;background:var(--ink);color:var(--acid);font-size:13px;font-weight:700;border:1px solid var(--ink);transition:background .2s,color .2s,transform .2s}
+:is(.admin,.admin-login) .button:hover{background:transparent;color:var(--ink);transform:translateY(-2px)}
+:is(.admin,.admin-login) .button:hover .arrow{transform:translate(3px,-3px)}
+:is(.admin,.admin-login) .button .arrow{font-size:21px}
+:is(.admin,.admin-login) .button:disabled{opacity:.6;cursor:progress;transform:none}
+:is(.admin,.admin-login) .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:is(.admin,.admin-login) .field{display:grid;gap:8px;align-content:start}
+:is(.admin,.admin-login) .field-wide{grid-column:1/-1}
+:is(.admin,.admin-login) .field label{font-size:13px;font-weight:700}
+:is(.admin,.admin-login) .optional{font-weight:400;color:var(--muted)}
+:is(.admin,.admin-login) .field :is(input,select,textarea){width:100%;min-height:52px;padding:14px 16px;border:1px solid var(--muted);border-radius:0;background:var(--white);color:var(--ink);font:inherit;font-size:16px;line-height:1.4;transition:border-color .2s}
+:is(.admin,.admin-login) .field textarea{min-height:170px;resize:vertical}
+:is(.admin,.admin-login) .field select{appearance:none;padding-right:44px;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 23px) 50%,calc(100% - 17px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+:is(.admin,.admin-login) .field :is(input,select,textarea):hover{border-color:var(--ink)}
+:is(.admin,.admin-login) .field :is(input,select,textarea):focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-color:var(--ink)}
+:is(.admin,.admin-login) .field :is(:user-invalid,[aria-invalid=true]){border-color:#b3261e;box-shadow:inset 4px 0 0 #b3261e}
+:is(.admin,.admin-login) .field-hint{font-size:13px;color:var(--muted)}
+:is(.admin,.admin-login) .field-error{font-size:13px;font-weight:700;color:#b3261e}
+:is(.admin,.admin-login) .form-footer{display:flex;align-items:center;flex-wrap:wrap;gap:18px 28px;margin-top:6px}

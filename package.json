@@ -9,13 +9,13 @@
     "start": "next start -H 127.0.0.1 -p ${PORT:-3090}",
     "typecheck": "tsc --noEmit",
     "db:migrate": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/migrate.mjs",
-    "db:samples": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-sample-portfolio.mjs",
-    "db:samples:remove": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-sample-portfolio.mjs --remove"
+    "db:portfolio": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-portfolio.mjs"
   },
   "engines": {
     "node": ">=20.9"
   },
   "dependencies": {
+    "lenis": "^1.3.28",
     "mysql2": "^3.24.6",
     "next": "^16.4.6",
     "react": "^19.3.1",

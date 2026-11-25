@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import '../admin-base.css';
 import '../admin.css';
 import { AdminHeader, AdminSidebar } from './AdminNavigation';
 import { requireAdmin } from '@/lib/auth';

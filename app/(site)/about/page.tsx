@@ -1,0 +1,123 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Icon from '@/components/Icon';
+import SectionIntro from '@/components/SectionIntro';
+import { processSteps } from '@/lib/process';
+import { services, serviceStyle } from '@/lib/services';
+
+export const metadata: Metadata = {
+  title: 'About us',
+  description: 'Squaberry brings structure and character to technology: thoughtful design, careful engineering and a human touch, from the first conversation.',
+  alternates: { canonical: '/about' },
+};
+
+const beliefs = [
+  { title: 'Make the complicated feel simple.', text: 'Technology should make work easier, not add another layer to manage. We explain things plainly and design for the people who use them every day.' },
+  { title: 'Care about the small things.', text: 'The details are where good work shows: a page that loads fast, a form that makes sense, a system that quietly does its job.' },
+  { title: 'Build for what comes next.', text: 'We make choices that leave room to grow, so today’s project becomes a solid foundation for tomorrow’s ideas.' },
+];
+
+const promises = [
+  { label: 'Plain language', icon: 'chat', accent: '#b3a8ff', text: 'No jargon for the sake of it. You’ll always know what we’re doing and why.' },
+  { label: 'One partner', icon: 'web', accent: '#8fd3e8', text: 'Design, development, marketing and IT support under one roof, joined up.' },
+  { label: 'Shared decisions', icon: 'strategy', accent: '#ecff95', text: 'A clear path, agreed together, with progress you can see along the way.' },
+  { label: 'In it for the long run', icon: 'evolve', accent: '#ffb38a', text: 'Launch is a beginning. We stay on hand to support and improve what we build.' },
+];
+
+export default function AboutPage() {
+  return (
+    <main id="main">
+      <section className="container page-hero" aria-labelledby="pageTitle">
+        <span className="pill rise">About Squaberry</span>
+        <h1 id="pageTitle" className="display-xl rise d1">A little square.<br />A lot of possibility.</h1>
+        <p className="lead rise d2">We’re a technology partner for organisations that want things to work better. From the first sketch to the systems behind it, we bring design, development, digital marketing and IT support together.</p>
+        <div className="hero-actions rise d3">
+          <Link className="btn is-lg" href="/contact#enquiry"><span>Start a conversation</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
+          <Link className="text-link" href="/work">See our work</Link>
+        </div>
+      </section>
+
+      <section className="container section statement" aria-labelledby="storyTitle">
+        <SectionIntro label="Our story" title="Square roots. Fresh thinking." id="storyTitle" />
+        <div style={{ marginTop: 'clamp(40px,5vw,72px)' }}>
+          <p className="text-reveal">Square gives us structure. Berry gives us character. Together, they’re a reminder that good technology takes clear thinking and a bit of imagination.</p>
+          <p className="reveal">The square stands for the logic underneath everything we build: sound engineering, sensible security and systems that hold up. The berry is the part people feel: design with personality, experiences that are easy to use, and ideas that make work a little more enjoyable.</p>
+          <p className="reveal">Whether it’s a new website, a campaign that brings in new customers or support that keeps your team running, we treat it as part of a bigger picture: your organisation, and where it’s heading.</p>
+        </div>
+      </section>
+
+      <section className="panel panel-cream section" aria-labelledby="beliefsTitle">
+        <div className="container">
+          <SectionIntro label="What we believe" title="Three things we live by." id="beliefsTitle" tone="light" />
+          <ol className="pastel-grid">
+            {beliefs.map((belief, index) => (
+              <li className="pastel-card reveal" key={belief.title}>
+                <span className="num">0{index + 1}</span>
+                <h3>{belief.title}</h3>
+                <p>{belief.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="container section" aria-labelledby="promisesTitle">
+        <SectionIntro label="Working with us" title="What you can expect." id="promisesTitle">
+          <p>However big or small the project, this is how it feels to work with Squaberry.</p>
+        </SectionIntro>
+        <ul className="feature-grid cols-4">
+          {promises.map(promise => (
+            <li className="feature-card reveal" key={promise.label} style={{ ['--accent' as string]: promise.accent }}>
+              <span className="feature-icon"><Icon name={promise.icon} size={28} /></span>
+              <h3>{promise.label}</h3>
+              <p>{promise.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="panel panel-lav section" aria-labelledby="processTitle">
+        <div className="container">
+          <SectionIntro label="How we work" title="From “what if” to “it works.”" id="processTitle" tone="light">
+            <p>A clear path, shared decisions and a team that stays connected to the detail.</p>
+          </SectionIntro>
+          <ol className="feature-grid cols-4">
+            {processSteps.map((step, index) => (
+              <li className="feature-card reveal" key={step.name} style={{ ['--accent' as string]: step.accent }}>
+                <span className="feature-icon"><Icon name={step.icon} size={28} /></span>
+                <span className="pill">Step 0{index + 1}</span>
+                <h3>{step.name}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <nav className="container section" aria-labelledby="servicesTitle">
+        <SectionIntro label="What we do" title="One partner. Every piece." id="servicesTitle" />
+        <ul className="link-list">
+          {services.map(service => (
+            <li key={service.slug}>
+              <Link href={`/services/${service.slug}`} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
+                <span className="link-icon"><Icon name={serviceStyle[service.slug].icon} size={22} /></span>
+                <span className="link-name">{service.name}</span>
+                <span className="link-go" aria-hidden="true"><Icon name="arrow-up-right" size={18} /></span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <section className="section-tight">
+        <div className="panel panel-cream cta-panel reveal">
+          <h2 className="display-l">Let’s make IT happen.</h2>
+          <div className="cta-side">
+            <p>You don’t need a perfect brief. A little curiosity is a great start.</p>
+            <Link className="btn is-dark is-lg" href="/contact#enquiry"><span>Start a project</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
