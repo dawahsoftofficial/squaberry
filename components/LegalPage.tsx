@@ -1,3 +1,5 @@
+import PageHero from './PageHero';
+
 type Props = {
   eyebrow: string;
   title: string;
@@ -10,11 +12,7 @@ type Props = {
 export default function LegalPage({ eyebrow, title, lead, sections, children }: Props) {
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="pageTitle">
-        <span className="pill rise">{eyebrow}</span>
-        <h1 id="pageTitle" className="display-xl rise d1">{title}</h1>
-        <p className="lead rise d2">{lead}</p>
-      </section>
+      <PageHero label={eyebrow} title={title} lead={lead} />
       <div className="container legal-layout">
         <nav className="legal-nav" aria-label="On this page">
           {sections.map(section => <a key={section.id} href={`#${section.id}`}>{section.label}</a>)}

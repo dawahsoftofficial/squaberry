@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 import SectionIntro from '@/components/SectionIntro';
 import { processSteps } from '@/lib/process';
 import { services, serviceStyle } from '@/lib/services';
@@ -27,15 +28,17 @@ const promises = [
 export default function AboutPage() {
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="pageTitle">
-        <span className="pill rise">About Squaberry</span>
-        <h1 id="pageTitle" className="display-xl rise d1">A little square.<br />A lot of possibility.</h1>
-        <p className="lead rise d2">We’re a technology partner for organisations that want things to work better. From the first sketch to the systems behind it, we bring design, development, digital marketing and IT support together.</p>
-        <div className="hero-actions rise d3">
-          <Link className="btn is-lg" href="/contact#enquiry"><span>Start a conversation</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
-          <Link className="text-link" href="/work">See our work</Link>
-        </div>
-      </section>
+      <PageHero
+        label="About Squaberry"
+        title={<>A little square.<br />A lot of possibility.</>}
+        lead="We’re a technology partner for organisations that want things to work better. From the first sketch to the systems behind it, we bring design, development, digital marketing and IT support together."
+        actions={(
+          <>
+            <Link className="btn is-lg" href="/contact#enquiry"><span>Start a conversation</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
+            <Link className="text-link" href="/work">See our work</Link>
+          </>
+        )}
+      />
 
       <section className="container section statement" aria-labelledby="storyTitle">
         <SectionIntro label="Our story" title="Square roots. Fresh thinking." id="storyTitle" />

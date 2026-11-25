@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 import SectionIntro from '@/components/SectionIntro';
 import { processSteps } from '@/lib/process';
 import { services, serviceStyle } from '@/lib/services';
@@ -14,14 +15,24 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="pageTitle">
-        <span className="pill rise">What we do</span>
-        <h1 id="pageTitle" className="display-xl rise d1">One partner. Every piece.</h1>
-        <p className="lead rise d2">Your website, your workflows and the systems behind the scenes. Pick a starting point, or tell us the challenge and we’ll shape the right mix.</p>
-        <div className="hero-actions rise d3">
-          <Link className="btn is-lg" href="/contact#enquiry"><span>Start a project</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>
-        </div>
-      </section>
+      <PageHero
+        label="What we do"
+        title={<>One partner.<br />Every piece.</>}
+        lead="Your website, your workflows and the systems behind the scenes. Pick a starting point, or tell us the challenge and we’ll shape the right mix."
+        aside={(
+          <ul className="hero-services" aria-label="Our services">
+            {services.map(service => (
+              <li key={service.slug}>
+                <Link href={`/services/${service.slug}`} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
+                  <span className="hero-svc-icon"><Icon name={serviceStyle[service.slug].icon} size={18} /></span>
+                  {service.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        actions={<Link className="btn is-lg" href="/contact#enquiry"><span>Start a project</span><span className="btn-icon"><Icon name="arrow-up-right" size={20} /></span></Link>}
+      />
 
       <section className="panel panel-lav section" aria-labelledby="listTitle">
         <div className="container">

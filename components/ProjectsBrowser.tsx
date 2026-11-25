@@ -10,7 +10,7 @@ type Props = { filters: Filter[]; projects: CardProject[] };
 // Card widths repeat in this rhythm so rows always fill the 12-column grid.
 const pattern = ['span-7', 'span-5', 'span-4', 'span-4', 'span-4', 'span-5', 'span-7'];
 
-/** Filter chips (with counts) above the project grid, like the reference's Our Work page. */
+/** Segmented service filter (with count badges) above the project grid. */
 export default function ProjectsBrowser({ filters, projects }: Props) {
   const [active, setActive] = useState('all');
   const visible = projects.filter(project => active === 'all' || project.service_slug === active);
@@ -26,17 +26,19 @@ export default function ProjectsBrowser({ filters, projects }: Props) {
 
   return (
     <>
-      <div className="filter-chips" role="group" aria-label="Filter projects by service">
-        <button type="button" className="filter-chip" aria-pressed={active === 'all'} onClick={() => setActive('all')}>
-          All<sup>{projects.length}</sup>
-        </button>
-        {filters.map(filter => (
-          <button key={filter.value} type="button" className="filter-chip" aria-pressed={active === filter.value} onClick={() => setActive(filter.value)}>
-            {filter.label}<sup>{filter.count}</sup>
+      <div className="work-toolbar">
+        <div className="filter-seg" role="group" aria-label="Filter projects by service">
+          <button type="button" className="filter-btn" aria-pressed={active === 'all'} onClick={() => setActive('all')}>
+            All projects<span className="filter-count">{projects.length}</span>
           </button>
-        ))}
+          {filters.map(filter => (
+            <button key={filter.value} type="button" className="filter-btn" aria-pressed={active === filter.value} onClick={() => setActive(filter.value)}>
+              {filter.label}<span className="filter-count">{filter.count}</span>
+            </button>
+          ))}
+        </div>
+        <p className="work-count" role="status" aria-live="polite">Showing {visible.length} of {projects.length}</p>
       </div>
-      <p className="work-count muted" role="status" aria-live="polite">Showing {visible.length} of {projects.length} projects</p>
       <div className="bento work-grid">
         {visible.map((project, index) => (
           <ProjectCard key={project.id} project={project} className={spanFor(index)} priority={index < 2} />

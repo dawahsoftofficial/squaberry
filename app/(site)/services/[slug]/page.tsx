@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import EnquiryForm from '@/components/EnquiryForm';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { safeServiceProjects } from '@/lib/portfolio';
@@ -43,15 +44,18 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="serviceTitle">
-        <span className="pill rise"><Link href="/services">Services</Link> <span aria-hidden="true">/</span> {service.number}</span>
-        <h1 id="serviceTitle" className="display-xl rise d1">{service.name}</h1>
-        <p className="lead rise d2">{service.intro}</p>
-        <div className="hero-actions rise d3">
-          <a className="btn is-lg" href="#enquiry"><span>Start a conversation</span><span className="btn-icon"><Icon name="arrow-down" size={20} /></span></a>
-          {projects.length > 0 && <a className="text-link" href="#work">See our work</a>}
-        </div>
-      </section>
+      <PageHero
+        titleId="serviceTitle"
+        label={<><Link href="/services">Services</Link> <span aria-hidden="true">/</span> {service.number}</>}
+        title={service.name}
+        lead={service.intro}
+        actions={(
+          <>
+            <a className="btn is-lg" href="#enquiry"><span>Start a conversation</span><span className="btn-icon"><Icon name="arrow-down" size={20} /></span></a>
+            {projects.length > 0 && <a className="text-link" href="#work">See our work</a>}
+          </>
+        )}
+      />
 
       <section className="container section-tight" aria-labelledby="overviewTitle">
         <div className="split">

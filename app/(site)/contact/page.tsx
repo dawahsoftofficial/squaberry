@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import EnquiryForm from '@/components/EnquiryForm';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 
 export const metadata: Metadata = {
   title: { absolute: 'Contact — Squaberry' },
@@ -12,11 +13,17 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="pageTitle">
-        <span className="pill rise">Contact</span>
-        <h1 id="pageTitle" className="display-xl rise d1">Let’s make something work.</h1>
-        <p className="lead rise d2">Tell us what you’re thinking about: a project, an opportunity, or a question you haven’t quite worked out yet. A perfect brief is not required.</p>
-      </section>
+      <PageHero
+        label="Contact"
+        title="Let’s make something work."
+        lead="Tell us what you’re thinking about: a project, an opportunity, or a question you haven’t quite worked out yet. A perfect brief is not required."
+        actions={(
+          <>
+            <a className="btn is-lg" href="#enquiry"><span>Send a message</span><span className="btn-icon"><Icon name="arrow-down" size={20} /></span></a>
+            <a className="text-link" href="mailto:hello@squaberry.co.uk">hello@squaberry.co.uk</a>
+          </>
+        )}
+      />
 
       <section className="container section-tight" id="enquiry" aria-labelledby="formTitle">
         <div className="form-layout">

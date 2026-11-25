@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { connection } from 'next/server';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 import ProjectsBrowser from '@/components/ProjectsBrowser';
 import { safeAllProjects } from '@/lib/portfolio';
 import { services } from '@/lib/services';
@@ -19,14 +20,22 @@ export default async function WorkPage() {
   const filters = services
     .map(service => ({ value: service.slug, label: service.name, count: projects.filter(project => project.service_slug === service.slug).length }))
     .filter(filter => filter.count > 0);
+  const sectors = new Set(projects.map(project => project.client).filter(Boolean)).size;
 
   return (
     <main id="main">
-      <section className="container page-hero" aria-labelledby="pageTitle" style={{ paddingBottom: 0 }}>
-        <span className="pill rise">Selected work</span>
-        <h1 id="pageTitle" className="display-xl rise d1">Our work</h1>
-        <p className="lead rise d2">Real projects for real organisations: charities, shops, apps and platforms. Open any project to see how we built it.</p>
-      </section>
+      <PageHero
+        label="Selected work"
+        title={<>Work we’re<br />proud of.</>}
+        lead="Real projects for real organisations: charities, shops, apps and platforms. Open any project to see how we built it."
+        aside={projects.length > 0 && (
+          <dl className="hero-stats">
+            <div><dt>Projects</dt><dd>{projects.length}</dd></div>
+            <div><dt>Sectors</dt><dd>{sectors}</dd></div>
+            <div><dt>Services</dt><dd>{filters.length}</dd></div>
+          </dl>
+        )}
+      />
 
       <section className="container section-tight" aria-label="Projects">
         {projects.length ? (
