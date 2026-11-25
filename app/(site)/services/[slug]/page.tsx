@@ -96,7 +96,7 @@ export default async function ServicePage({ params }: Props) {
 
       <section className="container section" id="work" aria-labelledby="workTitle">
         <SectionIntro label="Selected work" title="Work we’re proud of." id="workTitle">
-          <p>{projects.length ? `A look at ${inSentence(service.name)} projects we’ve delivered. Every card opens the live site.` : `We’re adding recent ${inSentence(service.name)} projects here.`}</p>
+          <p>{projects.length ? `A look at ${inSentence(service.name)} projects we’ve delivered. Open one to see how we built it.` : `We’re adding recent ${inSentence(service.name)} projects here.`}</p>
         </SectionIntro>
         {projects.length ? (
           <div className="bento work-grid">

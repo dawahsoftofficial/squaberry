@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import ProjectCard from './ProjectCard';
-import type { PortfolioItem } from '@/lib/data';
+import type { CardProject } from '@/lib/case-study';
 
 type Filter = { value: string; label: string; count: number };
-type Props = { filters: Filter[]; projects: PortfolioItem[] };
+type Props = { filters: Filter[]; projects: CardProject[] };
 
 // Card widths repeat in this rhythm so rows always fill the 12-column grid.
 const pattern = ['span-7', 'span-5', 'span-4', 'span-4', 'span-4', 'span-5', 'span-7'];

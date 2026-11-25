@@ -1,14 +1,16 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import Icon from './Icon';
-import type { PortfolioItem } from '@/lib/data';
+import { projectHref, type CardProject } from '@/lib/case-study';
 import { getService } from '@/lib/services';
 
-type Props = { project: PortfolioItem; className?: string; priority?: boolean };
+type Props = { project: CardProject; className?: string; priority?: boolean; headingLevel?: 'h2' | 'h3' };
 
-/** Rounded project cover: full-bleed image, tags and headline over a soft top scrim. */
-export default function ProjectCard({ project, className = '', priority = false }: Props) {
+/** Rounded project cover: full-bleed image, tags and headline over a soft top scrim. Opens the project page. */
+export default function ProjectCard({ project, className = '', priority = false, headingLevel: Heading = 'h3' }: Props) {
   const service = getService(project.service_slug);
   const tags = [project.title, project.client].filter(Boolean) as string[];
+  const target = projectHref(project);
   const content = (
     <>
       <div className="project-media">
@@ -23,20 +25,25 @@ export default function ProjectCard({ project, className = '', priority = false 
           {tags.map(tag => <li className="tag" key={tag}>{tag}</li>)}
           {service && <li className="tag is-ghost">{service.name}</li>}
         </ul>
-        <h3>{project.summary || project.title}</h3>
+        <Heading>{project.summary || project.title}</Heading>
       </div>
-      {project.site_url && (
+      {target && (
         <span className="project-go" aria-hidden="true"><Icon name="arrow-up-right" size={20} /></span>
       )}
     </>
   );
 
+  const label = `${project.title}: ${project.summary ?? ''}`;
   return (
     <article className={`project-card tilt-in ${className}`}>
-      {project.site_url ? (
-        <a href={project.site_url} target="_blank" rel="noopener noreferrer" aria-label={`${project.title}: ${project.summary ?? ''} (opens the live site in a new tab)`}>
+      {target?.external ? (
+        <a href={target.href} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens the live site in a new tab)`}>
           {content}
         </a>
+      ) : target ? (
+        <Link href={target.href} aria-label={`${label}. View the project`}>
+          {content}
+        </Link>
       ) : (
         <div>{content}</div>
       )}

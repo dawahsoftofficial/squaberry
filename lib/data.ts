@@ -28,6 +28,19 @@ export type PortfolioItem = {
   image_url: string | null;
   sort_order: number;
   published: boolean;
+  /** Case-study page fields (/work/[slug]). Long text fields hold paragraphs separated by blank lines. */
+  slug: string | null;
+  intro: string | null;
+  scope: string | null;
+  overview: string | null;
+  challenge: string | null;
+  solution: string | null;
+  results: string | null;
+  /** One image per line: "path-or-url | alt text". */
+  gallery: string | null;
+  quote: string | null;
+  quote_name: string | null;
+  quote_role: string | null;
 };
 
 type Row<T> = T & RowDataPacket;
@@ -82,7 +95,12 @@ export async function deleteEnquiry(id: number): Promise<void> {
 
 // --- Portfolio ------------------------------------------------------------------------------
 
-const portfolioColumns = 'id, service_slug, title, client, summary, site_url, image_url, sort_order, published';
+const portfolioColumns =
+  'id, service_slug, title, client, summary, site_url, image_url, sort_order, published, slug, intro, scope, overview, challenge, solution, results, gallery, quote, quote_name, quote_role';
+const portfolioFields = [
+  'service_slug', 'title', 'client', 'summary', 'site_url', 'image_url', 'sort_order', 'published',
+  'slug', 'intro', 'scope', 'overview', 'challenge', 'solution', 'results', 'gallery', 'quote', 'quote_name', 'quote_role',
+] as const;
 
 function toItem(row: Row<PortfolioItem>): PortfolioItem {
   return { ...row, published: Boolean(row.published) };
@@ -116,19 +134,30 @@ export async function getPortfolioItem(id: number): Promise<PortfolioItem | null
   return rows[0] ? toItem(rows[0]) : null;
 }
 
+export async function getPublishedPortfolioBySlug(slug: string): Promise<PortfolioItem | null> {
+  const [rows] = await db().execute<Row<PortfolioItem>[]>(
+    `SELECT ${portfolioColumns} FROM portfolio_items WHERE slug = ? AND published = 1 LIMIT 1`,
+    [slug],
+  );
+  return rows[0] ? toItem(rows[0]) : null;
+}
+
+/** True when another project (not `exceptId`) already uses this slug. */
+export async function portfolioSlugTaken(slug: string, exceptId: number | null): Promise<boolean> {
+  const [rows] = await db().execute<Row<{ id: number }>[]>('SELECT id FROM portfolio_items WHERE slug = ? AND id <> ? LIMIT 1', [slug, exceptId ?? 0]);
+  return rows.length > 0;
+}
+
 export type PortfolioInput = Omit<PortfolioItem, 'id'>;
 
 export async function savePortfolioItem(id: number | null, input: PortfolioInput): Promise<number> {
-  const values = [input.service_slug, input.title, input.client, input.summary, input.site_url, input.image_url, input.sort_order, input.published ? 1 : 0];
+  const values = portfolioFields.map(field => (field === 'published' ? (input.published ? 1 : 0) : input[field]));
   if (id) {
-    await db().execute(
-      'UPDATE portfolio_items SET service_slug = ?, title = ?, client = ?, summary = ?, site_url = ?, image_url = ?, sort_order = ?, published = ? WHERE id = ?',
-      [...values, id],
-    );
+    await db().execute(`UPDATE portfolio_items SET ${portfolioFields.map(field => `${field} = ?`).join(', ')} WHERE id = ?`, [...values, id]);
     return id;
   }
   const [result] = await db().execute<ResultSetHeader>(
-    'INSERT INTO portfolio_items (service_slug, title, client, summary, site_url, image_url, sort_order, published) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    `INSERT INTO portfolio_items (${portfolioFields.join(', ')}) VALUES (${portfolioFields.map(() => '?').join(', ')})`,
     values,
   );
   return result.insertId;

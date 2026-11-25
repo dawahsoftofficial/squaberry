@@ -273,6 +273,9 @@
 
 .portfolio-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 24px;max-width:900px;padding:28px}
 .portfolio-form .field > :is(input,textarea,select){min-width:0;border-radius:8px}
+.case-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 24px;min-width:0;margin:8px 0;padding:22px;border:1px solid var(--admin-border);border-radius:var(--admin-radius)}
+.case-fields legend{padding:0 8px;font-weight:700}
+.case-fields > .field-hint{grid-column:1/-1;margin:0}
 .checkbox-field{display:flex;align-items:center;align-self:end;gap:12px;min-height:52px}
 .checkbox-field input{width:22px;height:22px;min-height:0;padding:0;accent-color:var(--ink)}
 .admin-group{margin-top:16px}
@@ -350,7 +353,7 @@
   .enquiry-row time{grid-area:time}
   .enquiry-row a > .admin-icon{grid-area:arrow;justify-self:end}
   .enquiry-message,.enquiry-meta{padding:18px}
-  .portfolio-form{grid-template-columns:minmax(0,1fr);padding:16px}
+  .portfolio-form,.case-fields{grid-template-columns:minmax(0,1fr);padding:16px}
   .admin-group-head,.portfolio-admin-list a,.admin-group-empty{padding-inline:14px}
   .admin-group-head h2{font-size:19px}
   .portfolio-admin-list a{grid-template-columns:62px minmax(0,1fr) auto;gap:8px}

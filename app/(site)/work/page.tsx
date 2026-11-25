@@ -5,6 +5,7 @@ import Icon from '@/components/Icon';
 import ProjectsBrowser from '@/components/ProjectsBrowser';
 import { safeAllProjects } from '@/lib/portfolio';
 import { services } from '@/lib/services';
+import { toCardProject } from '@/lib/case-study';
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function WorkPage() {
   await connection();
-  const projects = await safeAllProjects();
+  const projects = (await safeAllProjects()).map(toCardProject);
   const filters = services
     .map(service => ({ value: service.slug, label: service.name, count: projects.filter(project => project.service_slug === service.slug).length }))
     .filter(filter => filter.count > 0);
@@ -24,7 +25,7 @@ export default async function WorkPage() {
       <section className="container page-hero" aria-labelledby="pageTitle" style={{ paddingBottom: 0 }}>
         <span className="pill rise">Selected work</span>
         <h1 id="pageTitle" className="display-xl rise d1">Our work</h1>
-        <p className="lead rise d2">Real projects for real organisations: charities, shops, apps and platforms. Every card opens the live site.</p>
+        <p className="lead rise d2">Real projects for real organisations: charities, shops, apps and platforms. Open any project to see how we built it.</p>
       </section>
 
       <section className="container section-tight" aria-label="Projects">

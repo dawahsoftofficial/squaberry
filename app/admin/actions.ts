@@ -8,11 +8,13 @@ import {
   deleteEnquiry,
   deletePortfolioItem,
   enquiryStatuses,
+  portfolioSlugTaken,
   savePortfolioItem,
   setEnquiryStatus,
   type EnquiryStatus,
 } from '@/lib/data';
 import { getService } from '@/lib/services';
+import { galleryImages, slugify } from '@/lib/case-study';
 
 // --- Session --------------------------------------------------------------------------------
 
@@ -79,7 +81,10 @@ export async function removeEnquiry(formData: FormData): Promise<void> {
 
 // --- Portfolio ------------------------------------------------------------------------------
 
-export type PortfolioFormState = { error: string; fields: Partial<Record<'title' | 'service_slug' | 'site_url' | 'image_url', string>> };
+export type PortfolioFormState = {
+  error: string;
+  fields: Partial<Record<'title' | 'service_slug' | 'site_url' | 'image_url' | 'slug' | 'gallery', string>>;
+};
 
 function text(formData: FormData, name: string, max: number): string {
   return String(formData.get(name) ?? '').trim().slice(0, max);
@@ -102,13 +107,20 @@ export async function savePortfolio(_previous: PortfolioFormState, formData: For
   const siteUrl = text(formData, 'site_url', 500);
   const imageUrl = text(formData, 'image_url', 500);
 
+  const slug = slugify(text(formData, 'slug', 140) || title);
+  const gallery = text(formData, 'gallery', 6000);
+
   const fields: PortfolioFormState['fields'] = {};
   if (!getService(serviceSlug)) fields.service_slug = 'Choose a service.';
   if (!title) fields.title = 'Add a project title.';
   if (siteUrl && !validUrl(siteUrl)) fields.site_url = 'Use a full address starting with https://';
-  // Images may be full addresses or files in /public (e.g. /assets/portfolio/samples/shop.png).
+  // Images may be full addresses or files in /public (e.g. /assets/portfolio/shop.png).
   const sitePath = /^\/(?!\/)[\w\-./]+$/.test(imageUrl);
   if (imageUrl && !sitePath && !validUrl(imageUrl)) fields.image_url = 'Use a full image address starting with https://, or a site path starting with /';
+  if (title && !slug) fields.slug = 'Use letters or numbers in the page address.';
+  else if (slug && (await portfolioSlugTaken(slug, id))) fields.slug = 'Another project already uses this page address.';
+  const galleryLines = gallery.split('\n').filter(line => line.trim());
+  if (galleryLines.length !== galleryImages(gallery).length) fields.gallery = 'Each line needs an image address (https://… or a site path starting with /), optionally followed by | and a description.';
   if (Object.keys(fields).length) return { error: 'Please fix the highlighted fields.', fields };
 
   await savePortfolioItem(id, {
@@ -120,9 +132,21 @@ export async function savePortfolio(_previous: PortfolioFormState, formData: For
     image_url: imageUrl || null,
     sort_order: Number.parseInt(String(formData.get('sort_order') ?? '0'), 10) || 0,
     published: formData.get('published') === 'on',
+    slug,
+    intro: text(formData, 'intro', 600) || null,
+    scope: text(formData, 'scope', 600) || null,
+    overview: text(formData, 'overview', 8000) || null,
+    challenge: text(formData, 'challenge', 8000) || null,
+    solution: text(formData, 'solution', 8000) || null,
+    results: text(formData, 'results', 8000) || null,
+    gallery: gallery || null,
+    quote: text(formData, 'quote', 2000) || null,
+    quote_name: text(formData, 'quote_name', 120) || null,
+    quote_role: text(formData, 'quote_role', 120) || null,
   });
   revalidatePath('/admin', 'layout');
   revalidatePath(`/services/${serviceSlug}`);
+  revalidatePath('/work', 'layout');
   redirect('/admin/portfolio?saved=1');
 }
 
