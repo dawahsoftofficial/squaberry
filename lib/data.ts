@@ -14,9 +14,17 @@ export type Enquiry = {
   topic: string | null;
   message: string;
   source_page: string | null;
+  /** Product slug (lib/products.ts) for product signups; null for project enquiries. */
+  product: string | null;
+  phone: string | null;
   status: EnquiryStatus;
   created_at: Date;
 };
+
+/** Project enquiries come from the general form; product enquiries from a product page's signup form. */
+export type EnquiryKind = 'all' | 'project' | 'product';
+const enquiryColumns = 'id, name, email, company, topic, message, source_page, product, phone, status, created_at';
+const kindClause = (kind: EnquiryKind) => (kind === 'product' ? 'product IS NOT NULL' : kind === 'project' ? 'product IS NULL' : '');
 
 export type PortfolioItem = {
   id: number;
@@ -49,25 +57,29 @@ type Row<T> = T & RowDataPacket;
 
 export async function createEnquiry(input: Omit<Enquiry, 'id' | 'status' | 'created_at'>): Promise<number> {
   const [result] = await db().execute<ResultSetHeader>(
-    'INSERT INTO enquiries (name, email, company, topic, message, source_page) VALUES (?, ?, ?, ?, ?, ?)',
-    [input.name, input.email, input.company, input.topic, input.message, input.source_page],
+    'INSERT INTO enquiries (name, email, company, topic, message, source_page, product, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [input.name, input.email, input.company, input.topic, input.message, input.source_page, input.product, input.phone],
   );
   return result.insertId;
 }
 
-export async function listEnquiries(status: EnquiryStatus | 'inbox' | 'all'): Promise<Enquiry[]> {
-  const where = status === 'all' ? '' : status === 'inbox' ? "WHERE status <> 'archived'" : 'WHERE status = ?';
+export async function listEnquiries(status: EnquiryStatus | 'inbox' | 'all', kind: EnquiryKind = 'all'): Promise<Enquiry[]> {
+  const conditions = [
+    status === 'all' ? '' : status === 'inbox' ? "status <> 'archived'" : 'status = ?',
+    kindClause(kind),
+  ].filter(Boolean);
   const params = status === 'all' || status === 'inbox' ? [] : [status];
   const [rows] = await db().execute<Row<Enquiry>[]>(
-    `SELECT id, name, email, company, topic, message, source_page, status, created_at FROM enquiries ${where} ORDER BY created_at DESC, id DESC LIMIT 500`,
+    `SELECT ${enquiryColumns} FROM enquiries ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''} ORDER BY created_at DESC, id DESC LIMIT 500`,
     params,
   );
   return rows;
 }
 
-export const countEnquiries = cache(async (): Promise<Record<EnquiryStatus | 'all', number>> => {
+export const countEnquiries = cache(async (kind: EnquiryKind = 'all'): Promise<Record<EnquiryStatus | 'all', number>> => {
+  const where = kindClause(kind);
   const [rows] = await db().query<Row<{ status: EnquiryStatus; total: number }>[]>(
-    'SELECT status, COUNT(*) AS total FROM enquiries GROUP BY status',
+    `SELECT status, COUNT(*) AS total FROM enquiries ${where ? `WHERE ${where}` : ''} GROUP BY status`,
   );
   const counts = { new: 0, read: 0, archived: 0, all: 0 };
   for (const row of rows) {
@@ -79,7 +91,7 @@ export const countEnquiries = cache(async (): Promise<Record<EnquiryStatus | 'al
 
 export async function getEnquiry(id: number): Promise<Enquiry | null> {
   const [rows] = await db().execute<Row<Enquiry>[]>(
-    'SELECT id, name, email, company, topic, message, source_page, status, created_at FROM enquiries WHERE id = ?',
+    `SELECT ${enquiryColumns} FROM enquiries WHERE id = ?`,
     [id],
   );
   return rows[0] ?? null;

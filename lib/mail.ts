@@ -1,5 +1,6 @@
 import 'server-only';
 import nodemailer, { type Transporter } from 'nodemailer';
+import { getProduct } from './products';
 
 // Enquiry notifications over SMTP (Zoho Mail). Configured by SMTP_* and MAIL_* in the environment;
 // with no SMTP_HOST, sending is skipped and enquiries are only saved to the database.
@@ -43,7 +44,12 @@ export type EnquiryMail = {
   topic: string | null;
   message: string;
   source_page: string | null;
+  /** Product slug for product signups. */
+  product: string | null;
+  phone: string | null;
 };
+
+const productName = (enquiry: EnquiryMail) => (enquiry.product ? getProduct(enquiry.product)?.name ?? enquiry.product : null);
 
 const oneLine = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
 const escapeHtml = (value: string) =>
@@ -58,18 +64,21 @@ export async function sendEnquiryEmail(enquiry: EnquiryMail): Promise<void> {
   if (!to || !from) return;
 
   const adminUrl = `${SITE_URL}/admin/enquiries/${enquiry.id}`;
+  const product = productName(enquiry);
   const rows: [string, string][] = [
+    ...(product ? [['Product', product] as [string, string]] : []),
     ['Name', enquiry.name],
     ['Email', enquiry.email],
-    ['Company', enquiry.company || '–'],
-    ['Topic', enquiry.topic || '–'],
+    ...(enquiry.phone ? [['Phone', enquiry.phone] as [string, string]] : []),
+    [product ? 'Business' : 'Company', enquiry.company || '–'],
+    [product ? 'Wants to' : 'Topic', enquiry.topic || '–'],
     ['Sent from', enquiry.source_page || '–'],
   ];
 
   const text = [
     ...rows.map(([label, value]) => `${label}: ${value}`),
     '',
-    enquiry.message,
+    enquiry.message || '(No message)',
     '',
     `Reply to this email to answer ${enquiry.name}, or open it in the admin: ${adminUrl}`,
   ].join('\n');
@@ -78,7 +87,7 @@ export async function sendEnquiryEmail(enquiry: EnquiryMail): Promise<void> {
   <table cellpadding="6" cellspacing="0" style="border-collapse:collapse">
     ${rows.map(([label, value]) => `<tr><td style="color:#666;vertical-align:top">${label}</td><td><strong>${escapeHtml(value)}</strong></td></tr>`).join('\n    ')}
   </table>
-  <p style="white-space:pre-wrap;margin:20px 0;padding:16px;border-radius:8px;background:#f4f2ff">${escapeHtml(enquiry.message)}</p>
+  <p style="white-space:pre-wrap;margin:20px 0;padding:16px;border-radius:8px;background:#f4f2ff">${escapeHtml(enquiry.message || '(No message)')}</p>
   <p style="color:#666">Reply to this email to answer ${escapeHtml(enquiry.name)}, or <a href="${adminUrl}">open it in the admin</a>.</p>
 </div>`;
 
@@ -87,7 +96,9 @@ export async function sendEnquiryEmail(enquiry: EnquiryMail): Promise<void> {
       from,
       to,
       replyTo: { name: oneLine(enquiry.name), address: enquiry.email },
-      subject: oneLine(`New enquiry${enquiry.topic ? `: ${enquiry.topic}` : ''} from ${enquiry.name}`).slice(0, 180),
+      subject: oneLine(product
+        ? `New product enquiry: ${product}${enquiry.topic ? ` (${enquiry.topic})` : ''} from ${enquiry.name}`
+        : `New enquiry${enquiry.topic ? `: ${enquiry.topic}` : ''} from ${enquiry.name}`).slice(0, 180),
       text,
       html,
     });
@@ -132,22 +143,27 @@ export async function sendConfirmationEmail(enquiry: EnquiryMail): Promise<void>
 
   const firstName = oneLine(enquiry.name).split(' ')[0] || 'there';
   const message = enquiry.message.length > PREVIEW_LIMIT ? `${enquiry.message.slice(0, PREVIEW_LIMIT).trimEnd()}…` : enquiry.message;
+  const product = productName(enquiry);
   const rows: [string, string][] = [
-    ['Topic', enquiry.topic || 'General enquiry'],
-    ...(enquiry.company ? [['Company', enquiry.company] as [string, string]] : []),
+    ...(product ? [['Product', product] as [string, string]] : []),
+    [product ? 'You’d like to' : 'Topic', enquiry.topic || 'General enquiry'],
+    ...(enquiry.company ? [[product ? 'Business' : 'Company', enquiry.company] as [string, string]] : []),
+    ...(enquiry.phone ? [['Phone', enquiry.phone] as [string, string]] : []),
   ];
+  const thanks = product
+    ? `Thanks for your interest in our ${product}. We’ve received your details and one of the team will be in touch by email soon.`
+    : 'Thanks for getting in touch with Squaberry. We’ve received your message and one of the team will reply by email soon.';
 
   const text = [
     `Hi ${firstName},`,
     '',
-    'Thanks for getting in touch with Squaberry. We’ve received your message and one of the team will reply by email soon.',
+    thanks,
     '',
     'Here’s a copy of what you sent:',
     '',
     ...rows.map(([label, value]) => `${label}: ${value}`),
     '',
-    message,
-    '',
+    ...(message ? [message, ''] : []),
     'Need to add anything? Just reply to this email.',
     '',
     'The Squaberry team',
@@ -166,12 +182,12 @@ export async function sendConfirmationEmail(enquiry: EnquiryMail): Promise<void>
         <span style="color:#fffffd;font-size:18px;font-weight:bold;letter-spacing:-0.3px;vertical-align:middle">Squaberry</span>
       </td></tr>
       <tr><td style="padding:32px 28px 8px">
-        <h1 style="margin:0 0 14px;font-size:24px;line-height:1.25;letter-spacing:-0.4px">Thanks, ${escapeHtml(firstName)}. We’ve got your message.</h1>
-        <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:#444">One of the team will read it and reply by email soon. Here’s a copy of what you sent:</p>
+        <h1 style="margin:0 0 14px;font-size:24px;line-height:1.25;letter-spacing:-0.4px">Thanks, ${escapeHtml(firstName)}. ${product ? 'We’ve got your request.' : 'We’ve got your message.'}</h1>
+        <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:#444">${escapeHtml(product ? `Thanks for your interest in our ${product}. One of the team will be in touch by email soon.` : 'One of the team will read it and reply by email soon.')} Here’s a copy of what you sent:</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:12px;background:#f4f2ff">
           <tr><td style="padding:18px 20px">
             ${rows.map(([label, value]) => `<p style="margin:0 0 6px;font-size:13px;color:#6a5bb5"><strong>${label}:</strong> <span style="color:#1a1a1a">${escapeHtml(value)}</span></p>`).join('')}
-            <p style="margin:12px 0 0;font-size:15px;line-height:1.6;white-space:pre-wrap">${escapeHtml(message)}</p>
+            ${message ? `<p style="margin:12px 0 0;font-size:15px;line-height:1.6;white-space:pre-wrap">${escapeHtml(message)}</p>` : ''}
           </td></tr>
         </table>
         <p style="margin:22px 0 0;font-size:15px;line-height:1.6;color:#444">Need to add anything? Just reply to this email.</p>
@@ -191,7 +207,7 @@ export async function sendConfirmationEmail(enquiry: EnquiryMail): Promise<void>
       from,
       to: { name: oneLine(enquiry.name), address: enquiry.email },
       replyTo: team,
-      subject: 'We’ve received your message | Squaberry',
+      subject: product ? `We’ve received your request: ${product} | Squaberry` : 'We’ve received your message | Squaberry',
       text,
       html,
     });

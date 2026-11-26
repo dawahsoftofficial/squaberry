@@ -28,6 +28,10 @@ await connection.query(schema);
 // CREATE TABLE IF NOT EXISTS leaves existing tables alone, so columns added since a table was
 // first created are added here (MySQL 8 has no ADD COLUMN IF NOT EXISTS).
 const addedColumns = {
+  enquiries: [
+    ['product', 'VARCHAR(60) NULL AFTER source_page'],
+    ['phone', 'VARCHAR(40) NULL AFTER product'],
+  ],
   portfolio_items: [
     ['slug', 'VARCHAR(140) NULL AFTER image_url'],
     ['intro', 'VARCHAR(600) NULL AFTER slug'],

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, Figtree } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 
 // Self-hosted at build time by next/font: no requests to Google from visitors' browsers.
@@ -29,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-GB" className={`${bricolage.variable} ${figtree.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: revealScript }} />
+        <Script id="reveal-setup" strategy="beforeInteractive">{revealScript}</Script>
       </head>
       <body>
         <a className="skip" href="#main">Skip to content</a>

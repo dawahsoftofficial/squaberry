@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { safeAllProjects } from '@/lib/portfolio';
+import { products } from '@/lib/products';
 import { services } from '@/lib/services';
 
 const base = 'https://squaberry.co.uk';
@@ -15,6 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/services`, priority: 0.9 },
     { url: `${base}/work`, priority: 0.9 },
     ...projects.map(project => ({ url: `${base}/work/${project.slug}`, priority: 0.7 })),
+    { url: `${base}/products`, priority: 0.9 },
+    ...products.map(product => ({ url: `${base}/products/${product.slug}`, priority: 0.8 })),
     ...services.map(service => ({ url: `${base}/services/${service.slug}`, priority: 0.8 })),
     { url: `${base}/contact`, priority: 0.7 },
     { url: `${base}/privacy`, priority: 0.2 },

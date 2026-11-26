@@ -1,8 +1,8 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { after } from 'next/server';
 import { createEnquiry } from '@/lib/data';
+import { MIN_FILL_MS, rateLimited, visitorKey } from '@/lib/rate-limit';
 import { sendConfirmationEmail, sendEnquiryEmail } from '@/lib/mail';
 import { topics } from '@/lib/services';
 
@@ -11,26 +11,6 @@ export type EnquiryState = {
   message: string;
   errors: Partial<Record<'name' | 'email' | 'topic' | 'message', string>>;
 };
-
-const RATE_LIMIT = 5; // enquiries per visitor...
-const RATE_WINDOW_MS = 60 * 60 * 1000; // ...per hour
-const MIN_FILL_MS = 3000; // faster than this is treated as a bot
-
-// In-memory, per server process. IP addresses are never written to the database.
-const recent = new Map<string, number[]>();
-
-function rateLimited(key: string): boolean {
-  const now = Date.now();
-  for (const [ip, stamps] of recent) {
-    const fresh = stamps.filter(time => time > now - RATE_WINDOW_MS);
-    if (fresh.length) recent.set(ip, fresh);
-    else recent.delete(ip);
-  }
-  const stamps = recent.get(key) ?? [];
-  if (stamps.length >= RATE_LIMIT) return true;
-  recent.set(key, [...stamps, now]);
-  return false;
-}
 
 function line(value: FormDataEntryValue | null, max: number): string {
   return String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -66,9 +46,7 @@ export async function submitEnquiry(_previous: EnquiryState, formData: FormData)
     return { status: 'error', message: 'Please check the highlighted fields and try again.', errors };
   }
 
-  const headerList = await headers();
-  const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() || headerList.get('x-real-ip') || 'unknown';
-  if (rateLimited(ip)) {
+  if (rateLimited(await visitorKey())) {
     return {
       status: 'error',
       message: 'You’ve sent several messages in a short time. Please try again later or email hello@squaberry.co.uk.',
@@ -76,7 +54,7 @@ export async function submitEnquiry(_previous: EnquiryState, formData: FormData)
     };
   }
 
-  const enquiry = { name, email, company: company || null, topic: topic || null, message, source_page: source || null };
+  const enquiry = { name, email, company: company || null, topic: topic || null, message, source_page: source || null, product: null, phone: null };
   try {
     const id = await createEnquiry(enquiry);
     // Email the team, then send the visitor a copy, once they have their on-screen confirmation.

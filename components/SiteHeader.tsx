@@ -8,6 +8,7 @@ import { services, serviceStyle } from '@/lib/services';
 
 const links = [
   { href: '/work', label: 'Projects' },
+  { href: '/products', label: 'Products' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];

@@ -1,6 +1,5 @@
 /* Squaberry public site: soft, dark, rounded design system (reference: i3media.net).
-   Admin pages use app/admin/admin-base.css + admin.css instead and are unaffected by this file
-   apart from the skip link. */
+   Admin pages also use these tokens, fonts and base styles, plus app/admin/admin-base.css + admin.css. */
 
 :root{
   --bg:#1c1c1c;
@@ -577,6 +576,61 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
   .case-pair{grid-template-columns:minmax(0,1fr)}
   .case-shot{border-radius:var(--radius)}
   .case-heading{gap:10px}
+}
+
+/* ---------- Products: cards, listing and onboarding pages ---------- */
+.product-name{display:flex;align-items:center;gap:8px}
+.product-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:color-mix(in srgb,var(--accent,var(--lav)) 20%,transparent);color:var(--accent,var(--lav))}
+
+.product-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);align-items:start;gap:40px clamp(40px,6vw,96px);padding-top:clamp(140px,14vw,184px);padding-bottom:clamp(48px,6vw,80px)}
+.product-hero-main{display:grid;justify-items:start;gap:24px;padding-top:12px}
+.product-hero-main h1{max-width:14ch}
+.product-highlights{display:grid;gap:12px}
+.product-highlights li{display:flex;align-items:center;gap:12px;color:var(--fg);font-size:17px;font-weight:500}
+.product-check{display:grid;flex:none;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--accent,var(--lime));color:var(--ink-1)}
+.product-check svg{stroke-width:2.5}
+.product-meta{display:grid;justify-items:start;gap:16px;padding-top:8px;border-top:1px solid var(--border)}
+.product-meta .tag-row{padding-top:16px}
+.product-meta .tag{border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--fg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+.product-hero-form{position:relative;scroll-margin-top:110px}
+.product-hero-form::before{content:'';position:absolute;z-index:-1;inset:-10% -6%;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent,var(--lav)) 22%,transparent),transparent);pointer-events:none}
+
+.product-form .product-form-title{margin-bottom:6px;font-size:clamp(24px,2.2vw,30px);letter-spacing:-.025em;line-height:1.15}
+.product-interest{margin-top:16px;padding:0;border:0}
+.product-interest legend{padding:0;color:var(--fg-2);font-size:14px;font-weight:600}
+.product-interest .topic-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px}
+.product-interest .topic-option:last-child:nth-child(odd){grid-column:auto}
+.product-interest .topic-card{justify-content:center;min-height:50px;padding:10px 12px;font-size:14px;font-weight:600;text-align:center}
+.product-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}
+.product-fields .field-wide{grid-column:1/-1}
+.product-form .field textarea{min-height:96px}
+.product-form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-top:22px}
+.product-form-note{max-width:30ch;color:var(--fg-3);font-size:13px;line-height:1.5}
+.product-form-note a{text-decoration:underline;text-underline-offset:3px}
+.product-form .step-success-mark svg{stroke-width:2.5}
+
+.product-cover-media{position:relative;overflow:hidden;aspect-ratio:16/8;border-radius:var(--radius-lg);background:var(--surface)}
+.product-cover-media img{object-fit:cover}
+.product-gallery{display:grid;gap:16px;margin-top:clamp(36px,4.5vw,56px)}
+
+.product-faq{display:grid;gap:12px;max-width:900px;margin-top:clamp(36px,4.5vw,56px)}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);transition:border-color .3s,background .3s}
+.faq-item[open]{border-color:var(--border-2);background:var(--surface-2)}
+.faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;font-family:var(--font-display);font-size:clamp(18px,1.6vw,21px);font-weight:600;letter-spacing:-.015em;cursor:pointer;list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{color:var(--accent,var(--lav))}
+.faq-toggle{display:grid;flex:none;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.06);transition:transform .35s var(--ease-soft),background .3s,color .3s}
+.faq-item[open] .faq-toggle{background:var(--accent,var(--lav));color:var(--ink-1);transform:rotate(45deg)}
+.faq-item p{max-width:70ch;padding:0 22px 22px;color:var(--fg-2);line-height:1.65}
+
+@media (max-width:960px){
+  .product-hero{grid-template-columns:minmax(0,1fr)}
+  .product-hero-form{max-width:640px}
+}
+@media (max-width:640px){
+  .product-fields{grid-template-columns:minmax(0,1fr)}
+  .product-interest .topic-grid{grid-template-columns:minmax(0,1fr)}
+  .product-cover-media{aspect-ratio:4/3}
 }
 
 /* ---------- Motion ----------
