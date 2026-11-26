@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import ProcessSteps from '@/components/ProcessSteps';
 import PageHero from '@/components/PageHero';
 import SectionIntro from '@/components/SectionIntro';
-import { processSteps } from '@/lib/process';
 import { services, serviceStyle } from '@/lib/services';
 
 export const metadata: Metadata = {
@@ -40,12 +40,29 @@ export default function AboutPage() {
         )}
       />
 
-      <section className="container section statement" aria-labelledby="storyTitle">
-        <SectionIntro label="Our story" title="Square roots. Fresh thinking." id="storyTitle" />
-        <div style={{ marginTop: 'clamp(40px,5vw,72px)' }}>
-          <p className="text-reveal">Square gives us structure. Berry gives us character. Together, they’re a reminder that good technology takes clear thinking and a bit of imagination.</p>
-          <p className="reveal">The square stands for the logic underneath everything we build: sound engineering, sensible security and systems that hold up. The berry is the part people feel: design with personality, experiences that are easy to use, and ideas that make work a little more enjoyable.</p>
-          <p className="reveal">Whether it’s a new website, a campaign that brings in new customers or support that keeps your team running, we treat it as part of a bigger picture: your organisation, and where it’s heading.</p>
+      <section className="container section story" aria-labelledby="storyTitle">
+        <div className="story-main">
+          <SectionIntro label="Our story" title="Square roots. Fresh thinking." id="storyTitle" />
+          <p className="story-statement text-reveal">Square gives us structure. Berry gives us character. Together, they’re a reminder that good technology takes clear thinking and a bit of imagination.</p>
+          <p className="story-text reveal">Whether it’s a new website, a campaign that brings in new customers or support that keeps your team running, we treat it as part of a bigger picture: your organisation, and where it’s heading.</p>
+        </div>
+        <div className="story-pair">
+          <article className="story-card is-square reveal">
+            <span className="story-shape" aria-hidden="true" />
+            <h3>The square</h3>
+            <p>The logic underneath everything we build: sound engineering, sensible security and systems that hold up.</p>
+            <ul className="tag-row" aria-label="The square stands for">
+              <li className="tag">Engineering</li><li className="tag">Security</li><li className="tag">Reliable systems</li>
+            </ul>
+          </article>
+          <article className="story-card is-berry reveal">
+            <span className="story-shape" aria-hidden="true" />
+            <h3>The berry</h3>
+            <p>The part people feel: design with personality, experiences that are easy to use, and ideas that make work a little more enjoyable.</p>
+            <ul className="tag-row" aria-label="The berry stands for">
+              <li className="tag">Design</li><li className="tag">Experience</li><li className="tag">Ideas</li>
+            </ul>
+          </article>
         </div>
       </section>
 
@@ -84,16 +101,7 @@ export default function AboutPage() {
           <SectionIntro label="How we work" title="From “what if” to “it works.”" id="processTitle" tone="light">
             <p>A clear path, shared decisions and a team that stays connected to the detail.</p>
           </SectionIntro>
-          <ol className="feature-grid cols-4">
-            {processSteps.map((step, index) => (
-              <li className="feature-card reveal" key={step.name} style={{ ['--accent' as string]: step.accent }}>
-                <span className="feature-icon"><Icon name={step.icon} size={28} /></span>
-                <span className="pill">Step 0{index + 1}</span>
-                <h3>{step.name}</h3>
-                <p>{step.text}</p>
-              </li>
-            ))}
-          </ol>
+          <ProcessSteps />
         </div>
       </section>
 

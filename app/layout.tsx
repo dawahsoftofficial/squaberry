@@ -17,13 +17,20 @@ export const metadata: Metadata = {
   openGraph: { type: 'website', siteName: 'Squaberry', locale: 'en_GB' },
 };
 
+// Runs before first paint: lets scroll reveals hide content until it animates in. Skipped under reduced
+// motion; if the reveal script hasn't started within 3s, everything is shown as normal.
+const revealScript = `(function(){var d=document.documentElement;if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('js-reveal');setTimeout(function(){if(!d.classList.contains('reveal-ready'))d.classList.remove('js-reveal')},3000)})();`;
+
 export const viewport: Viewport = {
   themeColor: '#1c1c1c',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${bricolage.variable} ${figtree.variable}`}>
+    <html lang="en-GB" className={`${bricolage.variable} ${figtree.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: revealScript }} />
+      </head>
       <body>
         <a className="skip" href="#main">Skip to content</a>
         {children}

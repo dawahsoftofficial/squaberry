@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import ProcessSteps from '@/components/ProcessSteps';
 import PageHero from '@/components/PageHero';
 import SectionIntro from '@/components/SectionIntro';
-import { processSteps } from '@/lib/process';
 import { services, serviceStyle } from '@/lib/services';
 
 export const metadata: Metadata = {
@@ -59,16 +59,7 @@ export default function ServicesPage() {
         <SectionIntro label="How we work" title="A clear path, start to finish." id="processTitle">
           <p>Whatever the service, every project follows the same simple rhythm, with shared decisions and visible progress.</p>
         </SectionIntro>
-        <ol className="feature-grid cols-4">
-          {processSteps.map((step, index) => (
-            <li className="feature-card reveal" key={step.name} style={{ ['--accent' as string]: step.accent }}>
-              <span className="feature-icon"><Icon name={step.icon} size={28} /></span>
-              <span className="pill">Step 0{index + 1}</span>
-              <h3>{step.name}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
+        <ProcessSteps />
       </section>
     </main>
   );

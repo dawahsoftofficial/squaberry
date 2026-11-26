@@ -10,15 +10,17 @@ type Props = {
   aside?: ReactNode;
   /** Buttons and links, shown last on the right. */
   actions?: ReactNode;
+  /** 'l' for long titles such as project headlines. */
+  size?: 'xl' | 'l';
 };
 
 /** Page opener: eyebrow and large title on the left, intro, extras and actions on the right (stacked on phones). */
-export default function PageHero({ label, title, titleId = 'pageTitle', lead, aside, actions }: Props) {
+export default function PageHero({ label, title, titleId = 'pageTitle', lead, aside, actions, size = 'xl' }: Props) {
   return (
     <section className="container split-hero" aria-labelledby={titleId}>
       <div className="split-hero-main">
         <span className="eyebrow rise">{label}</span>
-        <h1 id={titleId} className="display-xl rise d1">{title}</h1>
+        <h1 id={titleId} className={`display-${size} rise d1`}>{title}</h1>
       </div>
       <div className="split-hero-side rise d2">
         {lead && <p className="lead">{lead}</p>}

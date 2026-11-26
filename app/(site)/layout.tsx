@@ -1,3 +1,4 @@
+import RevealObserver from '@/components/RevealObserver';
 import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
 import SmoothScroll from '@/components/SmoothScroll';
@@ -7,6 +8,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <SmoothScroll />
+      <RevealObserver />
       <SiteHeader />
       {children}
       <SiteFooter />

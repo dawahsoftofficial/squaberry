@@ -2,24 +2,40 @@ import Link from 'next/link';
 import Icon from './Icon';
 import { services } from '@/lib/services';
 
-// Two crossing ribbons: what we do (lime, front) and who we are (lavender, behind).
-const offerWords = ['Websites', 'Web apps', 'Branding', 'UI & UX', 'SEO', 'Paid social', 'IT support', 'Start a project'];
-const brandWords = ['Fresh ideas', 'Solid tech', 'Square thinking', 'Berry character', 'Built to last'];
+// Two rows of soft-square tiles sliding in opposite directions: what we do, with a few brand tiles.
+type Tile = { label: string; icon: string; accent?: string; tone?: 'lime' | 'lav' };
+const offerTiles: Tile[] = [
+  { label: 'Websites', icon: 'web', accent: '#b3a8ff' },
+  { label: 'Web apps', icon: 'apps', accent: '#8fd3e8' },
+  { label: 'Start a project', icon: 'arrow-up-right', tone: 'lime' },
+  { label: 'E-commerce', icon: 'shop', accent: '#ffb38a' },
+  { label: 'Branding', icon: 'design', accent: '#f5a8d4' },
+  { label: 'UI & UX', icon: 'ui', accent: '#ecff95' },
+  { label: 'IT support', icon: 'support', accent: '#9fe6b8' },
+];
+const brandTiles: Tile[] = [
+  { label: 'SEO', icon: 'seo', accent: '#ecff95' },
+  { label: 'Fresh ideas', icon: 'sparkle', tone: 'lav' },
+  { label: 'Paid social', icon: 'marketing', accent: '#f5a8d4' },
+  { label: 'Content & email', icon: 'content', accent: '#8fd3e8' },
+  { label: 'Solid tech', icon: 'bolt', tone: 'lime' },
+  { label: 'Cybersecurity', icon: 'security', accent: '#9fe6b8' },
+  { label: 'Cloud hosting', icon: 'cloud', accent: '#b3a8ff' },
+];
 
-function Ribbon({ words, tone, reverse = false }: { words: string[]; tone: 'lime' | 'lav'; reverse?: boolean }) {
+function TileRow({ tiles, reverse = false }: { tiles: Tile[]; reverse?: boolean }) {
   const group = (hidden: boolean) => (
     <div className="marquee-group" aria-hidden={hidden || undefined}>
-      {[...words, ...words].map((word, index) => (
-        <span className="ribbon-item" key={`${word}-${index}`}>
-          {word}
-          {word === 'Start a project' && <Icon name="arrow-up-right" className="ribbon-go" />}
-          <span className="ribbon-mark" />
+      {[...tiles, ...tiles].map((tile, index) => (
+        <span className={`strip-tile${tile.tone ? ` is-${tile.tone}` : ''}`} key={`${tile.label}-${index}`} style={tile.accent ? { ['--accent' as string]: tile.accent } : undefined}>
+          <span className="strip-icon"><Icon name={tile.icon} size={22} /></span>
+          {tile.label}
         </span>
       ))}
     </div>
   );
   return (
-    <div className={`ribbon is-${tone}${reverse ? ' is-reverse' : ''}`}>
+    <div className={`marquee strip-row${reverse ? ' is-reverse' : ''}`}>
       <div className="marquee-track">{group(false)}{group(true)}</div>
     </div>
   );
@@ -28,10 +44,10 @@ function Ribbon({ words, tone, reverse = false }: { words: string[]; tone: 'lime
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
-      <Link href="/contact#enquiry" className="ribbons" aria-label="Start a project with Squaberry">
-        <span className="ribbons-inner" aria-hidden="true">
-          <Ribbon words={brandWords} tone="lav" reverse />
-          <Ribbon words={offerWords} tone="lime" />
+      <Link href="/contact#enquiry" className="strip" aria-label="Start a project with Squaberry">
+        <span className="strip-inner" aria-hidden="true">
+          <TileRow tiles={offerTiles} />
+          <TileRow tiles={brandTiles} reverse />
         </span>
       </Link>
 

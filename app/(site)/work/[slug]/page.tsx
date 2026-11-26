@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { cache } from 'react';
+import CaseNav from '@/components/CaseNav';
 import Icon from '@/components/Icon';
+import PageHero from '@/components/PageHero';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { displayDomain, galleryImages, lines, paragraphs, type GalleryImage } from '@/lib/case-study';
@@ -44,13 +46,13 @@ function Shot({ image, sizes, priority = false }: { image: GalleryImage; sizes: 
   );
 }
 
-function Story({ title, text, id }: { title: string; text: string | null; id: string }) {
+function Story({ title, text, id, number, lead = false }: { title: string; text: string | null; id: string; number: number; lead?: boolean }) {
   const parts = paragraphs(text);
   if (!parts.length) return null;
   return (
-    <section className="case-text" aria-labelledby={id}>
-      <h2 id={id} className="case-heading reveal">{title}</h2>
-      {parts.map(part => <p className="reveal" key={part.slice(0, 40)}>{part}</p>)}
+    <section className="case-text" id={id} aria-labelledby={`${id}Title`}>
+      <h2 id={`${id}Title`} className="case-heading reveal"><span className="case-heading-num" aria-hidden="true">{String(number).padStart(2, '0')}</span>{title}</h2>
+      {parts.map((part, index) => <p className={`reveal${lead && index === 0 ? ' case-lead' : ''}`} key={part.slice(0, 40)}>{part}</p>)}
     </section>
   );
 }
@@ -63,8 +65,6 @@ export default async function ProjectPage({ params }: Props) {
 
   const service = getService(project.service_slug);
   const scope = lines(project.scope);
-  const overview = paragraphs(project.overview);
-  const challenge = paragraphs(project.challenge);
   const gallery = galleryImages(project.gallery);
   const [wide, tall, side, ...more] = gallery;
   const domain = displayDomain(project.site_url);
@@ -72,113 +72,96 @@ export default async function ProjectPage({ params }: Props) {
   const helpers = services.filter(item => item.slug !== project.service_slug);
   const helpColumns = service ? [service, ...helpers] : helpers;
 
+  // Story sections in reading order; only those with text appear (and get a number and a sidebar link).
+  const story = [
+    { id: 'overview', label: 'Overview', text: project.overview },
+    { id: 'challenge', label: 'The challenge', text: project.challenge },
+    { id: 'solution', label: 'What we built', text: project.solution },
+    { id: 'outcome', label: 'The outcome', text: project.results },
+  ].filter(section => paragraphs(section.text).length > 0);
+  const numberOf = (id: string) => story.findIndex(section => section.id === id) + 1;
+  const part = (id: string) => {
+    const section = story.find(item => item.id === id);
+    return section ? <Story title={section.label} text={section.text} id={section.id} number={numberOf(id)} lead={id === 'overview'} /> : null;
+  };
+  const visit = project.site_url && (
+    <a className="btn is-lime" href={project.site_url} target="_blank" rel="noopener noreferrer">
+      <span>Visit the live site</span>
+      <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
+      <span className="visually-hidden"> (opens in a new tab)</span>
+    </a>
+  );
+
   return (
     <main id="main" className="case">
-      <section className="container case-hero" aria-labelledby="pageTitle">
-        <nav className="case-crumbs rise" aria-label="Breadcrumb">
-          <Link href="/work">Projects</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">{project.title}</span>
-        </nav>
-        <div className="case-hero-grid">
-          <h1 id="pageTitle" className="display-l rise d1">{project.summary || project.title}</h1>
-          <div className="case-hero-side rise d2">
-            {project.intro && <p>{project.intro}</p>}
-            {project.site_url && (
-              <a className="text-link" href={project.site_url} target="_blank" rel="noopener noreferrer">
-                Visit {domain} <Icon name="arrow-up-right" size={18} /><span className="visually-hidden"> (opens in a new tab)</span>
-              </a>
-            )}
-          </div>
-        </div>
-      </section>
+      <PageHero
+        label={<><Link href="/work">Projects</Link> <span aria-hidden="true">/</span> {project.title}</>}
+        title={project.summary || project.title}
+        size="l"
+        lead={project.intro}
+        actions={visit}
+      />
 
       {project.image_url && (
         <div className="container case-cover rise d3">
-          <div className="case-cover-frame">
-            <div className="case-cover-media">
-              {project.image_url.startsWith('/') ? (
-                <Image src={project.image_url} alt={`${project.title} project artwork`} fill sizes="(max-width: 1400px) 100vw, 1320px" priority />
-              ) : (
-                <img src={project.image_url} alt={`${project.title} project artwork`} />
-              )}
-            </div>
-            <ul className="case-cover-tags tag-row" aria-label="Project tags">
-              {project.client && <li className="tag">{project.client}</li>}
-              {service && <li className="tag">{service.name}</li>}
-            </ul>
+          <div className="case-cover-media">
+            {project.image_url.startsWith('/') ? (
+              <Image src={project.image_url} alt={`${project.title} project artwork`} fill sizes="(max-width: 1400px) 100vw, 1320px" priority />
+            ) : (
+              <img src={project.image_url} alt={`${project.title} project artwork`} />
+            )}
           </div>
+          <ul className="case-cover-tags tag-row" aria-label="Project tags">
+            {project.client && <li className="tag">{project.client}</li>}
+            {service && <li className="tag">{service.name}</li>}
+          </ul>
         </div>
       )}
 
-      <section className="panel panel-cream case-panel" aria-label="Case study">
-        <div className="container case-body">
-          <aside className="case-facts reveal" aria-label="Project facts">
-            <dl>
-              {project.client && (
-                <div><dt>Industry</dt><dd>{project.client}</dd></div>
-              )}
-              {service && (
-                <div><dt>Service</dt><dd><Link href={`/services/${service.slug}`}>{service.name}</Link></dd></div>
-              )}
+      <div className="container case-layout">
+        <aside className="case-side" aria-label="About this project">
+          <div className="case-side-inner" data-lenis-prevent>
+            {story.length > 1 && <CaseNav sections={story.map(({ id, label }) => ({ id, label }))} articleId="case-article" />}
+            <dl className="case-facts">
+              {project.client && <div><dt>Industry</dt><dd>{project.client}</dd></div>}
+              {service && <div><dt>Service</dt><dd><Link href={`/services/${service.slug}`}>{service.name}</Link></dd></div>}
               {scope.length > 0 && (
-                <div><dt>What we did</dt><dd><ul>{scope.map(item => <li key={item}>{item}</li>)}</ul></dd></div>
+                <div className="is-wide">
+                  <dt>What we did</dt>
+                  <dd><ul className="tag-row">{scope.map(item => <li className="tag" key={item}>{item}</li>)}</ul></dd>
+                </div>
               )}
               {project.site_url && (
-                <div><dt>Website</dt><dd><a href={project.site_url} target="_blank" rel="noopener noreferrer">{domain}<span className="visually-hidden"> (opens in a new tab)</span></a></dd></div>
+                <div className="is-wide"><dt>Website</dt><dd><a href={project.site_url} target="_blank" rel="noopener noreferrer">{domain}<span className="visually-hidden"> (opens in a new tab)</span></a></dd></div>
               )}
             </dl>
-          </aside>
-
-          <div className="case-story">
-            {overview.length > 0 && (
-              <section aria-label="Overview">
-                <p className="case-lead reveal">{overview[0]}</p>
-                {overview.slice(1).map(part => <p className="reveal" key={part.slice(0, 40)}>{part}</p>)}
-              </section>
-            )}
-            {challenge.length > 0 && <Story title="The challenge" text={project.challenge} id="challengeTitle" />}
+            {visit}
           </div>
-        </div>
+        </aside>
 
-        {wide && (
-          <div className="container case-gallery is-wide">
-            <Shot image={wide} sizes="(max-width: 1400px) 100vw, 1320px" />
-          </div>
-        )}
-
-        <div className="container case-narrow">
-          <Story title="What we built" text={project.solution} id="solutionTitle" />
-        </div>
-
-        {(tall || side) && (
-          <div className={`container case-gallery is-pair${tall && side ? '' : ' is-single'}`}>
-            {tall && <Shot image={tall} sizes="(max-width: 640px) 100vw, 40vw" />}
-            {side && <Shot image={side} sizes="(max-width: 640px) 100vw, 60vw" />}
-          </div>
-        )}
-
-        {project.quote && (
-          <div className="container case-narrow">
+        <article className="case-article" id="case-article" aria-label={`${project.title} case study`}>
+          {part('overview')}
+          {part('challenge')}
+          {wide && <Shot image={wide} sizes="(max-width: 960px) 100vw, 900px" />}
+          {part('solution')}
+          {(tall || side) && (
+            <div className={`case-pair${tall && side ? '' : ' is-single'}`}>
+              {tall && <Shot image={tall} sizes="(max-width: 640px) 100vw, 360px" />}
+              {side && <Shot image={side} sizes="(max-width: 640px) 100vw, 540px" />}
+            </div>
+          )}
+          {project.quote && (
             <figure className="case-quote reveal">
               <blockquote><p>{project.quote}</p></blockquote>
               {project.quote_name && (
                 <figcaption><strong>{project.quote_name}</strong>{project.quote_role && <span>{project.quote_role}</span>}</figcaption>
               )}
             </figure>
-          </div>
-        )}
-
-        <div className="container case-narrow">
-          <Story title="The outcome" text={project.results} id="resultsTitle" />
-        </div>
-
-        {more.map(image => (
-          <div className="container case-gallery is-wide" key={image.src}>
-            <Shot image={image} sizes="(max-width: 1400px) 100vw, 1320px" />
-          </div>
-        ))}
-      </section>
+          )}
+          {part('outcome')}
+          {more.map(image => <Shot key={image.src} image={image} sizes="(max-width: 960px) 100vw, 900px" />)}
+        </article>
+      </div>
 
       <section className="container section" aria-labelledby="helpTitle">
         <SectionIntro label="How we can help" title="Planning something similar?" id="helpTitle">
@@ -219,15 +202,6 @@ export default async function ProjectPage({ params }: Props) {
         </section>
       )}
 
-      {project.site_url && (
-        <div className="case-float">
-          <a className="btn" href={project.site_url} target="_blank" rel="noopener noreferrer">
-            <span>Visit the live site</span>
-            <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
-            <span className="visually-hidden"> (opens in a new tab)</span>
-          </a>
-        </div>
-      )}
     </main>
   );
 }

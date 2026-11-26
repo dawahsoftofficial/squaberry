@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import RevealObserver from '@/components/RevealObserver';
 import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = { title: 'Page not found', robots: { index: fa
 export default function NotFound() {
   return (
     <>
+      <RevealObserver />
       <SiteHeader />
       <main id="main" className="container page-hero">
         <p className="not-found-code rise" aria-hidden="true">404</p>

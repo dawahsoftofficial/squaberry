@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { connection } from 'next/server';
 import EnquiryForm from '@/components/EnquiryForm';
 import Icon from '@/components/Icon';
+import ProcessSteps from '@/components/ProcessSteps';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { safeAllProjects } from '@/lib/portfolio';
-import { processSteps } from '@/lib/process';
 import { services, serviceStyle } from '@/lib/services';
 
 export const metadata: Metadata = {
@@ -109,16 +109,7 @@ export default async function HomePage() {
         <SectionIntro label="How we work" title="From “what if” to “it works.”" id="processTitle">
           <p>A clear path, shared decisions and a team that stays connected to the detail, from the first call to long after launch.</p>
         </SectionIntro>
-        <ol className="feature-grid cols-4">
-          {processSteps.map((step, index) => (
-            <li className="feature-card reveal" key={step.name} style={{ ['--accent' as string]: step.accent }}>
-              <span className="feature-icon"><Icon name={step.icon} size={28} /></span>
-              <span className="pill">Step 0{index + 1}</span>
-              <h3>{step.name}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
+        <ProcessSteps />
       </section>
 
       <section className="container section-tight statement" aria-label="About Squaberry">
