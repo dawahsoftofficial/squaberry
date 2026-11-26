@@ -1,7 +1,7 @@
 # Squaberry project guide
 
 ## Site structure
-- The site is a Next.js app (App Router, TypeScript). Keep dependencies minimal: no CSS or UI frameworks; the hand-written stylesheets carry the design. The only front-end libraries are Lenis (smooth scrolling) and Lucide (`lucide-react`) for icons. Use Lucide icons rather than hand-drawn SVGs.
+- The site is a Next.js app (App Router, TypeScript). Keep dependencies minimal: no CSS or UI frameworks; the hand-written stylesheets carry the design. The only front-end libraries are Lenis (smooth scrolling) and Lucide (`lucide-react`) for icons; on the server, `mysql2` talks to the database and `nodemailer` sends enquiry emails. Use Lucide icons rather than hand-drawn SVGs.
 - Enquiries are stored in MySQL and managed in the password-protected admin panel at `/admin`. Never commit credentials; they live in `.env.local` / `.env` (see `.env.example`).
 - Keep the homepage, services, projects, about, contact, terms and privacy pages linked through the shared header and footer.
 - Put brand artwork in `public/assets/` and use the supplied Squaberry logo artwork without altering its proportions (on dark backgrounds it is shown in white via a CSS filter).

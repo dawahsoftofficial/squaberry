@@ -1,7 +1,9 @@
 'use server';
 
 import { headers } from 'next/headers';
+import { after } from 'next/server';
 import { createEnquiry } from '@/lib/data';
+import { sendEnquiryEmail } from '@/lib/mail';
 import { topics } from '@/lib/services';
 
 export type EnquiryState = {
@@ -74,15 +76,11 @@ export async function submitEnquiry(_previous: EnquiryState, formData: FormData)
     };
   }
 
+  const enquiry = { name, email, company: company || null, topic: topic || null, message, source_page: source || null };
   try {
-    await createEnquiry({
-      name,
-      email,
-      company: company || null,
-      topic: topic || null,
-      message,
-      source_page: source || null,
-    });
+    const id = await createEnquiry(enquiry);
+    // Email the team once the visitor has their confirmation; a mail problem never loses the enquiry.
+    after(() => sendEnquiryEmail({ id, ...enquiry }));
   } catch (error) {
     console.error('Enquiry could not be saved:', error instanceof Error ? error.message : error);
     return {
