@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Am I a Muslim?</title>
+<meta name="description" content="Quick questions, just tap. Find out if any of your beliefs cancel your Islam.">
+<meta property="og:title" content="Am I a Muslim?">
+<meta property="og:description" content="Quick questions. Just tap. Find out in 2 minutes.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://squaberry.co.uk/oneness.html">
+<link rel="canonical" href="https://squaberry.co.uk/oneness.html">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --ink: #000000;
+    --muted: #6B6B6B;
+    --line: #E2E2E2;
+    --soft: #F4F4F4;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000000; --ink: #FFFFFF; --muted: #9A9A9A; --line: #2C2C2C; --soft: #141414; }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3 { margin: 0; letter-spacing: -0.02em; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  /* ---------- Live counters ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 8px 0 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line);
+  }
+  .stats.show { animation: dropIn .6s var(--ease) backwards; }
+  .stat:nth-child(2) { text-align: center; }
+  .stat:nth-child(3) { text-align: right; }
+  .stat b { display: inline-block; font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .stat span { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .stat:nth-child(2) span { justify-content: center; }
+  .stat:nth-child(3) span { justify-content: flex-end; }
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); animation: pulse 1.8s ease-in-out infinite; }
+  .stat.bump b { animation: bump .6s var(--ease); }
+
+  /* ---------- Screens ---------- */
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; animation: fadeUp .5s var(--ease) backwards; }
+
+  /* ---------- Quiz ---------- */
+  .qhead { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .back {
+    border: 0; background: var(--soft); width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center; transition: opacity .25s, transform .15s;
+  }
+  .back:active { transform: scale(.9); }
+  .back.off { opacity: 0; pointer-events: none; }
+  .progress { flex: 1; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .progress > i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--ink); transition: width .6s var(--ease); }
+  .count { font-size: 14px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; }
+
+  /* Golden "one" visual — fills the space above the question.
+     The golden spiral opens, its curl becomes a cursive "o", and one unbroken line keeps writing "one"
+     on paper that glides right → left. See mountGoldOneCursive(). */
+  .visual { flex: 1 1 auto; position: relative; min-height: 150px; margin: 0 -16px; overflow: hidden; }
+  .visual svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  /* squares keep the soft radial fade; the handwriting arrives and leaves through soft side edges */
+  .visual .g-back {
+    -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+            mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  }
+  .visual .g-front {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+            mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+  }
+  .g-sq { fill: none; stroke: var(--line); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+  .g-stroke { fill: none; stroke: var(--ink); stroke-width: .5; stroke-linecap: round; stroke-linejoin: round; }
+  .g-blob { fill: var(--ink); }
+  .g-halo { fill: none; stroke: var(--ink); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+
+  .stage { flex: none; display: grid; }
+  .panel { grid-area: 1 / 1; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
+  .panel.enter-next { animation: inNext .5s var(--ease) backwards; }
+  .panel.enter-prev { animation: inPrev .5s var(--ease) backwards; }
+  .panel.leave-next { animation: outNext .25s ease-in forwards; pointer-events: none; }
+  .panel.leave-prev { animation: outPrev .25s ease-in forwards; pointer-events: none; }
+
+  .topic { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 6px 0 10px; }
+  .question { font-size: clamp(25px, 7vw, 30px); font-weight: 800; line-height: 1.2; letter-spacing: -0.025em; margin: 8px 0 18px; }
+  .options { display: grid; gap: 10px; padding-bottom: 6px; }
+  .opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    text-align: left; background: var(--bg); border: 2px solid var(--line); border-radius: 16px;
+    padding: 17px 18px; font-size: 17px; font-weight: 600;
+    transition: background .22s var(--ease), color .22s var(--ease), border-color .22s var(--ease), transform .15s var(--ease);
+  }
+  .panel.enter-next .opt, .panel.enter-prev .opt { animation: rise .55s var(--ease) backwards; animation-delay: calc(.12s + var(--i) * .06s); }
+  .opt:active { transform: scale(.97); }
+  @media (hover: hover) { .opt:hover { border-color: var(--ink); } }
+  .opt.picked { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .radio {
+    flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line);
+    display: grid; place-items: center; transition: background .22s, border-color .22s;
+  }
+  .radio svg { width: 14px; height: 14px; stroke: var(--ink); stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .35s var(--ease) .05s; }
+  .opt.picked .radio { background: var(--bg); border-color: var(--bg); }
+  .opt.picked .radio svg { stroke-dashoffset: 0; }
+
+  /* ---------- Result ---------- */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  .verdict { padding: 18px 0 4px; }
+  .v-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .v-word { font-size: clamp(56px, 18vw, 76px); font-weight: 900; letter-spacing: -0.045em; line-height: 1; margin: 6px 0 12px; }
+  .verdict.in .v-word { animation: pop .8s var(--ease) backwards .1s; }
+  .verdict h1 { font-size: 22px; line-height: 1.25; }
+  .verdict p { color: var(--muted); margin: 10px 0 0; }
+  .tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+  .tally div { border: 2px solid var(--line); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .tally b { display: block; font-size: 26px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tally .t-bad.hot { border-color: var(--ink); }
+
+  .reasons { margin-top: 24px; padding: 18px; border-radius: 16px; background: var(--ink); color: var(--bg); }
+  .reasons h2 { font-size: 18px; margin-bottom: 10px; }
+  .reasons ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .reasons li { font-weight: 600; }
+
+  .section-title { font-size: 20px; margin: 34px 0 12px; }
+  .card { border: 2px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .card.bad { border-color: var(--ink); }
+  .card.warn { border-style: dashed; border-color: var(--muted); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; margin-bottom: 10px; border: 1.5px solid var(--muted); color: var(--muted); }
+  .card.bad .tag { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .card h3 { font-size: 16.5px; line-height: 1.4; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .card .you { font-size: 14.5px; color: var(--muted); margin: 0 0 10px; }
+  .card .you b { color: var(--ink); }
+  .card .why { font-size: 15.5px; margin: 0 0 10px; }
+  .ayah { margin: 0; padding: 12px 14px; border-left: 3px solid var(--ink); background: var(--soft); border-radius: 0 10px 10px 0; font-size: 15px; }
+  .ayah cite { display: block; font-style: normal; font-weight: 700; font-size: 13px; margin-top: 6px; color: var(--muted); }
+
+  .steps { counter-reset: s; display: grid; gap: 10px; }
+  .step { border: 2px solid var(--line); border-radius: 16px; padding: 14px 16px 14px 54px; position: relative; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; left: 14px; top: 14px; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--ink); color: var(--bg); display: grid; place-items: center; font-weight: 800; font-size: 14px;
+  }
+  .step b { display: block; margin-bottom: 2px; }
+  .step span { color: var(--muted); font-size: 15px; }
+  .shahada { margin-top: 10px; padding: 14px; background: var(--soft); border-radius: 12px; }
+  .shahada .tr { font-style: italic; font-size: 15px; }
+  .shahada .en { font-size: 15px; margin-top: 6px; color: var(--muted); }
+
+  .toggle { width: 100%; border: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; padding: 14px; margin-top: 4px; }
+  .expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease); }
+  .expand.open { grid-template-rows: 1fr; }
+  .expand > div { overflow: hidden; min-height: 0; }
+
+  /* Lead form */
+  .lead { margin-top: 30px; padding: 20px 18px; border-radius: 20px; border: 2px solid var(--ink); }
+  .lead h2 { font-size: 20px; margin-bottom: 14px; }
+  .tick { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 14px; background: var(--soft); font-weight: 600; cursor: pointer; user-select: none; }
+  .tick input { position: absolute; opacity: 0; pointer-events: none; }
+  .box { flex: none; width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--ink); display: grid; place-items: center; transition: background .2s var(--ease), transform .15s; }
+  .box svg { width: 16px; height: 16px; stroke: var(--bg); stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .35s var(--ease) .05s; }
+  .tick input:checked + .box { background: var(--ink); }
+  .tick input:checked + .box svg { stroke-dashoffset: 0; }
+  .tick:active .box { transform: scale(.9); }
+  .tick input:focus-visible + .box { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .fields { display: grid; gap: 10px; padding-top: 12px; }
+  .field {
+    width: 100%; font: inherit; font-size: 17px; color: var(--ink); background: var(--bg);
+    border: 2px solid var(--line); border-radius: 14px; padding: 15px 16px; transition: border-color .2s;
+  }
+  .field:focus { outline: none; border-color: var(--ink); }
+  .err { margin: 0; min-height: 0; font-size: 14px; font-weight: 600; }
+  .thanks { text-align: center; padding: 10px 0 4px; animation: fadeUp .6s var(--ease) backwards; }
+  .thanks svg { width: 56px; height: 56px; }
+  .thanks circle, .thanks path { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .thanks circle { stroke-dasharray: 160; stroke-dashoffset: 160; animation: draw .7s var(--ease) forwards; }
+  .thanks path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .45s var(--ease) forwards .5s; }
+  .thanks b { display: block; font-size: 19px; margin-top: 10px; }
+  .thanks span { color: var(--muted); font-size: 15px; }
+
+  .btn {
+    width: 100%; border: 2px solid var(--ink); border-radius: 14px; padding: 16px 20px;
+    font-weight: 700; font-size: 17px; background: var(--ink); color: var(--bg);
+    transition: transform .15s var(--ease), opacity .2s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .5; }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .fine { text-align: center; color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+
+  .note { margin-top: 24px; padding: 14px 16px; border-radius: 14px; background: var(--soft); color: var(--muted); font-size: 14px; }
+  .note b { color: var(--ink); }
+  .actions { display: grid; gap: 10px; margin-top: 24px; }
+  .actions .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 16px);
+    background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; font-weight: 600;
+    opacity: 0; transition: opacity .3s var(--ease), transform .3s var(--ease); pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 28px; }
+  #quiz.active ~ footer { display: none; }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes dropIn { from { opacity: 0; transform: translateY(-10px); } }
+  @keyframes inNext { from { opacity: 0; transform: translateX(36px); } }
+  @keyframes inPrev { from { opacity: 0; transform: translateX(-36px); } }
+  @keyframes outNext { to { opacity: 0; transform: translateX(-36px); } }
+  @keyframes outPrev { to { opacity: 0; transform: translateX(36px); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes pop { from { opacity: 0; transform: scale(.7); } }
+  @keyframes bump { 40% { transform: scale(1.25); } }
+  @keyframes pulse { 50% { opacity: .25; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; } }
+  @keyframes drawLoop { 0% { stroke-dashoffset: 1; } 46%, 54% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Live counters -->
+  <header class="stats" id="stats" hidden aria-live="polite">
+    <div class="stat"><b data-k="tried">0</b><span><i class="live"></i>Tried</span></div>
+    <div class="stat"><b data-k="passed">0</b><span>Passed</span></div>
+    <div class="stat"><b data-k="failed">0</b><span>Failed</span></div>
+  </header>
+
+  <!-- QUIZ (starts straight away) -->
+  <section class="screen active" id="quiz">
+    <div class="qhead">
+      <button class="back off" id="back" aria-label="Previous question">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+      <div class="count" id="count">1/16</div>
+    </div>
+    <div class="visual" id="visual" aria-hidden="true"></div>
+    <div class="stage" id="stage"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="result"></section>
+
+  <footer>Answers are anonymous. We only count totals.<br>Based on the Nullifiers of Islam as explained by the scholars. Quran translations: Sahih International.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================================================================
+   QUESTIONS
+   id    : stable key used in the stats file (keep in sync with api.php)
+   short : one-line reason shown under "Why you failed"
+   v     : "ok" correct · "warn" unsure · "bad" contradicts Islam
+   ================================================================== */
+const QUESTIONS = [
+  {
+    id: "dua-to-dead", topic: "Worship",
+    short: "Making du'a to the dead, saints or pirs",
+    q: "Can you make du'a to a saint or pir in their grave?",
+    options: [
+      { t: "No, only to Allah", v: "ok" },
+      { t: "Yes, they can help", v: "bad" },
+    ],
+    why: "Du'a is worship. Calling upon anyone besides Allah for what only Allah can do is shirk — the first and greatest nullifier of Islam.",
+    ayah: "And do not invoke besides Allah that which neither benefits you nor harms you, for if you did, then indeed you would be of the wrongdoers.",
+    ref: "Yunus 10:106"
+  },
+  {
+    id: "intermediaries", topic: "Intermediaries",
+    short: "Using intermediaries to reach Allah",
+    q: "Do we need saints or pirs to reach Allah?",
+    options: [
+      { t: "No, I can ask Allah directly", v: "ok" },
+      { t: "Yes, we need them", v: "bad" },
+    ],
+    why: "Making intermediaries between yourself and Allah — calling on them, asking them for intercession and relying on them — is exactly what the idol-worshippers of Makkah did. Allah is near and answers directly.",
+    ayah: "And when My servants ask you concerning Me — indeed I am near. I respond to the invocation of the supplicant when he calls upon Me.",
+    ref: "Al-Baqarah 2:186 · see also Az-Zumar 39:3"
+  },
+  {
+    id: "shirk-forgiven", topic: "Fate of idol worshippers",
+    short: "Believing those who die upon shirk will be forgiven",
+    q: "Will someone who dies upon shirk be forgiven?",
+    options: [
+      { t: "No", v: "ok" },
+      { t: "Yes, Allah is Merciful", v: "bad" },
+    ],
+    why: "Not considering those who worship others with Allah to be disbelievers, doubting it, or approving of their way is a nullifier — because it rejects what Allah Himself has clearly stated.",
+    ayah: "Indeed, Allah does not forgive association with Him, but He forgives what is less than that for whom He wills.",
+    ref: "An-Nisa 4:48"
+  },
+  {
+    id: "all-religions", topic: "Other religions",
+    short: "Believing all religions lead to Paradise",
+    q: "Do all religions lead to Paradise?",
+    options: [
+      { t: "No, only Islam", v: "ok" },
+      { t: "Yes, if you're a good person", v: "bad" },
+    ],
+    why: "Believing that other religions are equally accepted by Allah denies a clear statement of the Quran, and falls under not declaring disbelief to be disbelief.",
+    ayah: "And whoever desires other than Islam as religion — never will it be accepted from him, and he, in the Hereafter, will be among the losers.",
+    ref: "Aal 'Imran 3:85"
+  },
+  {
+    id: "man-made-law", topic: "Allah's law",
+    short: "Believing man-made law is equal to or better than Allah's",
+    q: "Are man-made laws as good as Allah's law?",
+    options: [
+      { t: "No, Allah's law is best", v: "ok" },
+      { t: "Yes, or even better", v: "bad" },
+    ],
+    why: "Believing that any other law or judgement is better than, or equal to, what Allah revealed is a nullifier. No one is a better judge than the One who created us.",
+    ayah: "Then is it the judgement of [the time of] ignorance they desire? But who is better than Allah in judgement for a people who are certain [in faith].",
+    ref: "Al-Ma'idah 5:50"
+  },
+  {
+    id: "punishments-barbaric", topic: "Allah's punishments",
+    short: "Calling Allah's prescribed punishments barbaric",
+    q: "Are Allah's punishments for theft and zina barbaric?",
+    options: [
+      { t: "No, they are just", v: "ok" },
+      { t: "Yes, they're outdated", v: "bad" },
+    ],
+    why: "Hating or despising anything Allah legislated is a nullifier, even if a person still practises other parts of Islam. (Carrying out these punishments is the role of a legitimate Islamic authority, not individuals — this question is about what you believe.)",
+    ayah: "That is because they disliked what Allah revealed, so He rendered worthless their deeds.",
+    ref: "Muhammad 47:9"
+  },
+  {
+    id: "replace-punishments", topic: "Changing Allah's punishments",
+    short: "Allowing man-made punishments in place of Allah's",
+    q: "Can man-made punishments replace Allah's — like jail instead of the punishment for theft?",
+    options: [
+      { t: "No, Allah's punishments can't be replaced", v: "ok" },
+      { t: "Yes, that's fine", v: "bad" },
+    ],
+    why: "Allah Himself set certain punishments, such as for theft. Believing it is allowed to replace them with man-made punishments — as many modern legal systems do — is a nullifier, because it puts man's judgement above Allah's. (These punishments are carried out only by a legitimate Islamic authority, under strict conditions — and any doubt prevents them.)",
+    ayah: "[As for] the thief, the male and the female, amputate their hands in recompense for what they committed as a deterrent [punishment] from Allah. And Allah is Exalted in Might and Wise.",
+    ref: "Al-Ma'idah 5:38 · see also 5:44"
+  },
+  {
+    id: "judging-man-made-law", topic: "Judging by man-made law",
+    short: "Believing it's halal to judge by laws against Allah's",
+    q: "Is it halal to judge people by laws that go against Allah's law?",
+    options: [
+      { t: "No", v: "ok" },
+      { t: "Yes, if it's the law of the land", v: "bad" },
+    ],
+    why: "Judging between people by laws that contradict what Allah revealed is a grave sin, and believing it is halal is disbelief. If you work as a judge or in the courts and your work involves ruling against Allah's law, ask a scholar about your job.",
+    ayah: "And whoever does not judge by what Allah has revealed — then it is those who are the disbelievers.",
+    ref: "Al-Ma'idah 5:44"
+  },
+  {
+    id: "better-guidance", topic: "The Prophet's guidance ﷺ",
+    short: "Believing other guidance is better than the Prophet's ﷺ",
+    q: "Can anyone's guidance be better than the Prophet's ﷺ?",
+    options: [
+      { t: "No", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Believing that any guidance is more complete than the Prophet's ﷺ, or that anyone's judgement is better than his, is a nullifier of Islam.",
+    ayah: "But no, by your Lord, they will not [truly] believe until they make you judge concerning that over which they dispute among themselves and then find within themselves no discomfort from what you have judged and submit in [full, willing] submission.",
+    ref: "An-Nisa 4:65"
+  },
+  {
+    id: "hating-islam", topic: "Accepting Islam fully",
+    short: "Hating part of what Allah revealed",
+    q: "Do you hate any part of Islam?",
+    options: [
+      { t: "No, I accept all of it", v: "ok" },
+      { t: "Some parts are hard, but I accept them", v: "ok" },
+      { t: "Yes, some parts", v: "bad" },
+    ],
+    noUnsure: true,
+    why: "Struggling to understand a ruling is normal — keep learning. But hating something Allah or His Messenger ﷺ brought is a nullifier, even if the person still acts on it.",
+    ayah: "That is because they disliked what Allah revealed, so He rendered worthless their deeds.",
+    ref: "Muhammad 47:9"
+  },
+  {
+    id: "my-body-my-choice", topic: "My body, my choice?",
+    short: "Putting your own choice above Allah's commands",
+    q: "'My body, my choice' — even over Allah's commands?",
+    options: [
+      { t: "No, Allah's command comes first", v: "ok" },
+      { t: "Yes, it's my choice", v: "bad" },
+    ],
+    why: "Seeking justice and real rights for women is part of Islam. But slogans like 'mera jism, meri marzi' — as used at events like Aurat March — claim the right to overrule Allah. Believing your own desire has authority over Allah's commands rejects His lordship and His law.",
+    ayah: "Have you seen he who has taken as his god his [own] desire, and Allah has sent him astray due to knowledge…",
+    ref: "Al-Jathiyah 45:23 · see also Al-Ahzab 33:36"
+  },
+  {
+    id: "mocking", topic: "Mocking the religion",
+    short: "Treating mockery of the religion as harmless",
+    q: "Is joking about Allah or the Quran harmless?",
+    options: [
+      { t: "No, never", v: "ok" },
+      { t: "Yes, it's just banter", v: "bad" },
+    ],
+    why: "Mocking anything of the religion — or its rewards and punishments — is a nullifier, whether serious or joking. Allah did not accept the excuse of those who said 'we were only joking'.",
+    ayah: "Say, 'Is it Allah and His verses and His Messenger that you were mocking?' Make no excuse; you have disbelieved after your belief.",
+    ref: "At-Tawbah 9:65–66"
+  },
+  {
+    id: "god-in-games", topic: "Calling creation 'god'",
+    short: "Calling yourself or others 'god', even in games",
+    q: "Is it okay to call yourself a 'god' in games, even as a joke?",
+    options: [
+      { t: "No, only Allah is God", v: "ok" },
+      { t: "Yes, it's just a game", v: "bad" },
+    ],
+    why: "Only Allah is God. 'I'm a god', 'war god', praising games built around false gods like God of War — claiming godhood for yourself or any creation is speaking words of shirk, and Allah did not accept 'we were only joking' as an excuse.",
+    ayah: "Allah has not taken any son, nor has there ever been with Him any deity.",
+    ref: "Al-Mu'minun 23:91 · see also At-Tawbah 9:65–66"
+  },
+  {
+    id: "shirk-songs-films", topic: "Songs & films",
+    short: "Enjoying songs and films that praise shirk",
+    q: "Is it okay to enjoy songs or films that praise worshipping others besides Allah?",
+    options: [
+      { t: "No, shirk is never entertainment", v: "ok" },
+      { t: "Yes, it's just for fun", v: "bad" },
+    ],
+    why: "Lyrics like 'sajde karun tere' (I prostrate to you) and scenes celebrating idol worship are shirk. Singing along approvingly, or being pleased with shirk, is a nullifier. Don't listen to or watch any of it — at weddings, parties or anywhere else.",
+    ayah: "And it has already come down to you in the Book that when you hear the verses of Allah [recited], they are denied [by them] and ridiculed; so do not sit with them until they enter into another conversation. Indeed, you would then be like them.",
+    ref: "An-Nisa 4:140"
+  },
+  {
+    id: "magic", topic: "Magic",
+    short: "Approving of black magic",
+    q: "Is black magic okay for a good reason?",
+    options: [
+      { t: "No, never", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Practising magic (sihr), or being pleased with it, is a nullifier. It is done through the devils and requires disbelief.",
+    ayah: "…But the two angels do not teach anyone unless they say, 'We are a trial, so do not disbelieve [by practicing magic].'",
+    ref: "Al-Baqarah 2:102"
+  },
+  {
+    id: "siding-against-muslims", topic: "Loyalty",
+    short: "Approving of helping enemies fight Muslims",
+    q: "Is it okay to side with enemies against Muslims?",
+    options: [
+      { t: "No", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Supporting and aiding the enemies of Islam against the Muslims, out of preference for them and their religion, is a nullifier.",
+    ayah: "…And whoever is an ally to them among you — then indeed, he is [one] of them.",
+    ref: "Al-Ma'idah 5:51"
+  },
+  {
+    id: "above-shariah", topic: "Above the Shariah?",
+    short: "Believing some people are above the Shariah",
+    q: "Can a saint reach a level where he no longer needs to pray?",
+    options: [
+      { t: "No, never", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Believing that anyone is allowed to step outside the Shariah of Muhammad ﷺ is a nullifier. Worship is required of every sane adult until death.",
+    ayah: "And worship your Lord until there comes to you the certainty (death).",
+    ref: "Al-Hijr 15:99"
+  },
+  {
+    id: "turning-away", topic: "Turning away",
+    short: "Turning away from learning and practising Islam",
+    q: "Is being born Muslim enough, without learning or practising?",
+    options: [
+      { t: "No", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Turning away from the religion completely — not learning it and not acting upon it — is a nullifier. Islam is submission, not a family label.",
+    ayah: "And who is more unjust than one who is reminded of the verses of his Lord; then he turns away from them? Indeed We, from the criminals, will take retribution.",
+    ref: "As-Sajdah 32:22"
+  },
+  {
+    id: "final-prophet", topic: "The final Prophet",
+    short: "Denying that Muhammad ﷺ is the final Prophet",
+    q: "Can a new prophet come after Muhammad ﷺ?",
+    options: [
+      { t: "No, he is the last", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "The finality of prophethood is known to every Muslim by necessity. Denying it is disbelief by the agreement of the scholars.",
+    ayah: "Muhammad is not the father of [any] one of your men, but [he is] the Messenger of Allah and last of the prophets.",
+    ref: "Al-Ahzab 33:40"
+  },
+  {
+    id: "haram-is-halal", topic: "Changing halal & haram",
+    short: "Declaring halal what Allah made haram",
+    q: "Are alcohol, zina or interest okay nowadays?",
+    options: [
+      { t: "No, still haram", v: "ok" },
+      { t: "Yes, times have changed", v: "bad" },
+    ],
+    why: "Committing a sin does not by itself take a person out of Islam. But declaring something halal that Allah clearly made haram (or the reverse) is disbelief.",
+    ayah: "And do not say about what your tongues assert of untruth, 'This is lawful and this is unlawful,' to invent falsehood about Allah.",
+    ref: "An-Nahl 16:116"
+  },
+  {
+    id: "same-sex-halal", topic: "LGBTQ",
+    short: "Declaring same-sex relationships halal",
+    q: "Are same-sex relationships halal if there's love?",
+    options: [
+      { t: "No, Allah made them haram", v: "ok" },
+      { t: "Yes, love is love", v: "bad" },
+    ],
+    why: "Having unwanted feelings is a test, not a sin. Acting on them is a major sin. But declaring same-sex relationships halal — or celebrating them as good — rejects a clear ruling of Allah, and that is disbelief.",
+    ayah: "And [We had sent] Lot when he said to his people, 'Do you commit such immorality as no one has preceded you with from among the worlds? Indeed, you approach men with desire, instead of women. Rather, you are a transgressing people.'",
+    ref: "Al-A'raf 7:80–81"
+  },
+  {
+    id: "quran-changed", topic: "The Quran",
+    short: "Believing the Quran has been changed",
+    q: "Has the Quran been changed?",
+    options: [
+      { t: "No, Allah preserved it", v: "ok" },
+      { t: "Yes", v: "bad" },
+    ],
+    why: "Allah promised to protect the Quran. Believing it has been altered or is incomplete denies that promise.",
+    ayah: "Indeed, it is We who sent down the message [i.e., the Qur'an], and indeed, We will be its guardian.",
+    ref: "Al-Hijr 15:9"
+  }
+];
+
+const UNSURE = { t: "I'm not sure", v: "warn" };
+const API = "/api/oneness";   // Next.js route: app/api/oneness/route.ts
+const COUNTED_KEY = "aim_counted_v1";
+
+/* ================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = (ms) => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+const fmt = (n) => Number(n).toLocaleString();
+const CHECK = `<svg viewBox="0 0 16 16" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>`;
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+
+let idx = 0, answers = [], order = [], locked = false, stats = null, lastResult = null;
+
+/* ---------- Live counters ---------- */
+async function loadStats() {
+  try {
+    const r = await fetch(API + "?action=stats", { cache: "no-store" });
+    if (!r.ok) return;
+    setStats(await r.json());
+  } catch (e) { /* no backend (e.g. opened as a local file) — counters stay hidden */ }
+}
+
+function setStats(s) {
+  if (!s || typeof s.tried !== "number") return;
+  const bar = $("#stats");
+  if (bar.hidden) { bar.hidden = false; bar.classList.add("show"); }
+  ["tried", "passed", "failed"].forEach(k => {
+    const el = bar.querySelector(`[data-k="${k}"]`);
+    const from = stats ? stats[k] : 0;
+    countUp(el, from, s[k]);
+    if (stats && s[k] !== stats[k]) {
+      const st = el.parentElement;
+      st.classList.remove("bump"); void st.offsetWidth; st.classList.add("bump");
+    }
+  });
+  stats = s;
+}
+
+function countUp(el, from, to, dur = 1100) {
+  if (reduced || from === to) { el.textContent = fmt(to); return; }
+  const t0 = performance.now();
+  const tick = (now) => {
+    const p = Math.min(1, (now - t0) / dur);
+    el.textContent = fmt(Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))));
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+/* ---------- Golden "one" visual ----------
+   Opens like the golden spiral: Fibonacci squares fade in and the spiral curls out from its eye.
+   Its 8-arc keeps turning into a cursive "o", and one unbroken line writes "one". The page then glides
+   right → left at a constant speed: after the "e" the pen marker bobs and slowly calms (the line keeps
+   the trace exactly as drawn), and once it is flat the pen rises into the next "one". Loops seamlessly. */
+const SVGNS = "http://www.w3.org/2000/svg";
+
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const easeInOut = (u) => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const easeOut = (u) => 1 - Math.pow(1 - u, 3);
+const soft = (u) => 1 - Math.pow(1 - u, 4);          // close to --ease, for the square fade-in
+const smooth = (u) => u * u * (3 - 2 * u);
+const lerp = (a, b, u) => a + (b - a) * u;
+
+const OPT = {
+  penStart: 0.4,      // s: pen touches down at the spiral's eye
+  wordTime: 8.0,      // s: writing one "one" (entry, o, n, e)
+  tailTime: 10.5,     // s: target for the line between words (50% longer gap than 7.0)
+  turn: [-18, 4.8],   // the opening's slow turn settles upright by 4.8 s
+  follow: [2.4, 6.4], // the paper eases from still (the spiral) into its constant glide
+  sqOut: [5.0, 7.0],  // squares fade as the paper starts to move
+  zoom: 0.6,          // writing view: zoom out so a whole "one" is readable at once
+  penBias: 16,        // where the pen sits, on average, right of centre (units) — written text shows to its left
+  copies: 4,          // words after the first; the loop runs on copy LOOP_COPY
+  wave: { amp: 3.6, len: 24, damp: 0.92 },        // pen bob: height, wave width on the page (≈ an n's hump), share of the tail it takes to die out
+};
+const LOOP_COPY = 3;  // far enough from the first word (with the golden curl) that it is never in view at the seam
+
+function blobPath(r, seed, n = 9) {
+  let s = seed;
+  const rand = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const pts = Array.from({ length: n }, (_, i) => {
+    const a = (i / n) * Math.PI * 2, rr = r * (0.82 + rand() * 0.36);
+    return [Math.cos(a) * rr, Math.sin(a) * rr];
+  });
+  const P = (i) => pts[(i + n) % n], f = (v) => v.toFixed(3);
+  let d = `M${f(P(0)[0])} ${f(P(0)[1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+}
+
+/* ---- the cursive "one", in letter space: o centred at (0,0), r = 8,
+        x-height at y = -8, baseline at y = 8. All joins are tangent. ---- */
+const R8 = ["A", 8];
+const ENTRY = [                                   // the flat line rises into the o's top-left…
+  ["C", -15, 8, -9.2, -2.12, -5.657, -5.657],
+  [...R8, 0, -8],                                 // …and joins the circle, turning clockwise like the spiral
+];
+const O_LOOP = [[...R8, 8, 0], [...R8, 0, 8], [...R8, -8, 0], [...R8, 0, -8]];   // full turn, top → top
+const NE = [
+  ["C", 4, -8, 9, -9, 11.5, -6],                  // bridge off the o's top becomes the n's first shoulder
+  ["C", 13, -4.2, 13, 0, 13, 8],                  // first leg down
+  ["C", 13, 1, 15, -8.5, 19, -8.5],               // back up the leg, over the second shoulder
+  ["C", 22, -8.5, 23.5, -5, 23.5, 0],
+  ["C", 23.5, 5.5, 24.5, 8, 27.5, 8],             // second leg rounds into the baseline
+  ["C", 31.5, 8, 35.5, 1.5, 35.5, -3],            // e: up-stroke
+  ["C", 35.5, -6.5, 33.5, -8.3, 31, -8.3],        //    over the top of its loop
+  ["C", 28.5, -8.3, 27.5, -3, 28.5, 2],           //    down the back, crossing the up-stroke
+  ["C", 29.5, 7, 33, 9.13, 36, 8],                //    out of the loop, already curling up into the wave (slope ≈ 0.38)
+];
+const E_EXIT = 36;                                 // x where the e meets the baseline and the tail begins
+
+/* ---- path as absolute segments; drawn as SVG, sampled with plain maths (fast) ---- */
+function place(segs, dx, dy) {
+  return segs.map(s => s[0] === "C"
+    ? ["C", s[1] + dx, s[2] + dy, s[3] + dx, s[4] + dy, s[5] + dx, s[6] + dy]
+    : ["A", s[1], s[2] + dx, s[3] + dy]);
+}
+function toD(start, segs) {
+  const f = (v) => +v.toFixed(4);
+  return `M${f(start[0])} ${f(start[1])} ` + segs.map(s => s[0] === "C"
+    ? `C${f(s[1])} ${f(s[2])} ${f(s[3])} ${f(s[4])} ${f(s[5])} ${f(s[6])}`
+    : `A${s[1]} ${s[1]} 0 0 1 ${f(s[2])} ${f(s[3])}`).join(" ");
+}
+// flatten to a fine polyline, then resample every `ds` units of arc length
+function sampleSegs(start, segs, ds) {
+  const px = [start[0]], py = [start[1]], ends = [];
+  let cx = start[0], cy = start[1];
+  for (const s of segs) {
+    if (s[0] === "C") {
+      const [, x1, y1, x2, y2, x3, y3] = s, n = 48;
+      for (let i = 1; i <= n; i++) {
+        const t = i / n, u = 1 - t;
+        px.push(u * u * u * cx + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3);
+        py.push(u * u * u * cy + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3);
+      }
+      cx = x3; cy = y3;
+    } else {                                       // small clockwise arc (sweep 1, large-arc 0)
+      const [, r, x3, y3] = s, mx = (cx + x3) / 2, my = (cy + y3) / 2;
+      const dx = x3 - cx, dy = y3 - cy, ch = Math.hypot(dx, dy), off = Math.sqrt(Math.max(0, r * r - ch * ch / 4));
+      let best = null;
+      for (const sg of [1, -1]) {
+        const ccx = mx - sg * dy / ch * off, ccy = my + sg * dx / ch * off;
+        const a0 = Math.atan2(cy - ccy, cx - ccx);
+        let da = Math.atan2(y3 - ccy, x3 - ccx) - a0;
+        while (da <= 0) da += 2 * Math.PI;
+        if (!best || da < best.da) best = { ccx, ccy, a0, da };
+      }
+      const n = Math.max(8, Math.ceil(r * best.da / 0.15));
+      for (let i = 1; i <= n; i++) { const a = best.a0 + best.da * i / n; px.push(best.ccx + r * Math.cos(a)); py.push(best.ccy + r * Math.sin(a)); }
+      cx = x3; cy = y3;
+    }
+    ends.push(px.length - 1);
+  }
+  const cum = new Float64Array(px.length);
+  for (let i = 1; i < px.length; i++) cum[i] = cum[i - 1] + Math.hypot(px[i] - px[i - 1], py[i] - py[i - 1]);
+  const L = cum[px.length - 1], N = Math.floor(L / ds) + 1;
+  const X = new Float64Array(N), Y = new Float64Array(N);
+  for (let i = 0, j = 0; i < N; i++) {
+    const s = i * ds;
+    while (j < px.length - 2 && cum[j + 1] < s) j++;
+    const u = (s - cum[j]) / Math.max(1e-9, cum[j + 1] - cum[j]);
+    X[i] = px[j] + (px[j + 1] - px[j]) * u; Y[i] = py[j] + (py[j + 1] - py[j]) * u;
+  }
+  return { X, Y, N, L, segEnd: ends.map(k => cum[k]) };   // segEnd: arc length at the end of each segment
+}
+
+function mountGoldOneCursive(host) {
+  /* --- geometry: identical to the original golden-spiral visual --- */
+  const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34];
+  const dirs = ["right", "down", "left", "up"];
+  const squares = [{ x: 0, y: 0, s: 1 }];
+  let x0 = 0, y0 = 0, x1 = 1, y1 = 1;
+  const O_SQ = 5;                                  // the 8-square: its arc becomes the first o
+  const curl = [["A", 1, 1, 0]];                   // from (0,1), as in the original golden-spiral visual
+  let curlLen = Math.PI / 2;
+  for (let n = 1; n < fib.length; n++) {
+    const s = fib[n], dir = dirs[(n - 1) % 4];
+    let x, y, ex, ey;
+    if (dir === "right") { x = x1; y = y0; ex = x + s; ey = y + s; }
+    if (dir === "down")  { x = x0; y = y1; ex = x;     ey = y + s; }
+    if (dir === "left")  { x = x0 - s; y = y0; ex = x; ey = y; }
+    if (dir === "up")    { x = x0; y = y0 - s; ex = x + s; ey = y; }
+    squares.push({ x, y, s });
+    if (n < O_SQ) { curl.push(["A", s, ex, ey]); curlLen += Math.PI / 2 * s; }
+    x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + s); y1 = Math.max(y1, y + s);
+  }
+  // the curl ends at the top of the 8-square's arc, heading right; that arc's centre is the first o's centre
+  const oq = squares[O_SQ], OX = oq.x, OY = oq.y + oq.s;          // (2, 3)
+  const START = [0, 1], BASE = OY + 8;
+
+  /* --- the stroke as alternating pieces: word, tail, word, tail, …
+         Words are fixed paths. Tails are straight at rest; their wave is added live while they settle. --- */
+  const ds = 0.2;
+  function build(tailLen) {
+    const tail = [["C", E_EXIT + tailLen / 3, 8, E_EXIT + 2 * tailLen / 3, 8, E_EXIT + tailLen, 8]];
+    const W = E_EXIT + tailLen + 20;                            // next entry starts 20 left of its o
+    const els = []; let segs = [];
+    const push = (kind, s, extra) => { els.push({ kind, from: segs.length, n: s.length, segs: s, ...extra }); segs = segs.concat(s); };
+    push("word", [...curl, ...place([...O_LOOP, ...NE], OX, OY)], { start: START });
+    push("tail", place(tail, OX, OY), { xa: OX + E_EXIT, xb: OX + E_EXIT + tailLen });
+    for (let k = 1; k <= OPT.copies; k++) {
+      const dx = OX + k * W;
+      push("word", place([...ENTRY, ...O_LOOP, ...NE], dx, OY), { start: [dx - 20, BASE] });
+      push("tail", place(tail, dx, OY), { xa: dx + E_EXIT, xb: dx + E_EXIT + tailLen });
+    }
+    const S = sampleSegs(START, segs, ds);
+    els.forEach(e => { e.s0 = e.from ? S.segEnd[e.from - 1] : 0; e.s1 = S.segEnd[e.from + e.n - 1]; });
+    return { W, els, S };
+  }
+  function timing(g) {
+    const { X, Y, N } = g.S;
+    const ang = new Float64Array(N), raw = new Float64Array(N), K = new Float64Array(N);
+    for (let i = 0; i < N - 1; i++) ang[i] = Math.atan2(Y[i + 1] - Y[i], X[i + 1] - X[i]);
+    ang[N - 1] = ang[N - 2];
+    for (let i = 1; i < N; i++) { let a = ang[i] - ang[i - 1]; a = Math.atan2(Math.sin(a), Math.cos(a)); raw[i] = Math.abs(a) / ds; }
+    const HW = 8;                                               // smooth curvature over ±1.6 units
+    for (let i = 0; i < N; i++) { let s = 0, c = 0; for (let j = -HW; j <= HW; j++) { const k = i + j; if (k >= 0 && k < N) { s += raw[k]; c++; } } K[i] = s / c; }
+    const pace = (i) => Math.max(0.28, 1 / (1 + 2.6 * K[i])) * Math.min(1, Math.sqrt(0.02 + (i * ds) / 8));
+    const w = g.els[2 * LOOP_COPY];
+    let u = 0; for (let i = Math.round(w.s0 / ds); i < Math.round(w.s1 / ds); i++) u += ds / pace(i);
+    return { pace, v: u / OPT.wordTime };                       // top speed: each word takes OPT.wordTime
+  }
+  // The paper's speed is the word's average forward speed (entry start → e exit, over wordTime).
+  // On the tail the pen moves at that same speed, so it holds still on screen and the line streams out
+  // behind it, like a chart recorder. That fixes the tail's length.
+  const V0 = (E_EXIT + 20) / OPT.wordTime;
+  const g = build(V0 * OPT.tailTime), tm = timing(g);
+  const { X, Y, N } = g.S, els = g.els;
+
+  // camera: same viewBox maths as the original golden-spiral visual
+  const ox = 0.9, oy = 0.55;
+  const R = Math.max(...[[x0, y0], [x1, y0], [x0, y1], [x1, y1]].map(([x, y]) => Math.hypot(x - ox, y - oy)));
+  const half = R * 0.78;
+  const viewBox = `${ox - half} ${oy - half} ${half * 2} ${half * 2}`;
+
+  const spl = 'calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1"';
+  const blobs = [11, 23, 37, 51].map(seed => blobPath(2.4, seed));
+  host.innerHTML = `
+    <svg class="g-back" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">
+      <g data-cam>${squares.map(q => `<rect class="g-sq" x="${q.x}" y="${q.y}" width="${q.s}" height="${q.s}"/>`).join("")}</g>
+    </svg>
+    <svg class="g-front" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">
+      <g data-cam>
+        <g data-ink></g>
+        <g data-nib>
+          <circle class="g-halo" r="3">
+            <animate attributeName="r" values="2.6;6;2.6" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".45;0;.45" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <path class="g-blob" d="${blobs[0]}">
+            <animate attributeName="d" values="${[...blobs, blobs[0]].join(";")}" keyTimes="0;.25;.5;.75;1" dur="3.4s" repeatCount="indefinite" ${spl}/>
+            <animateTransform attributeName="transform" type="rotate" values="0;360" dur="9s" repeatCount="indefinite"/>
+          </path>
+        </g>
+      </g>
+    </svg>`;
+
+  const cams = host.querySelectorAll("[data-cam]");
+  const rects = [...host.querySelectorAll(".g-sq")];
+  const inkG = host.querySelector("[data-ink]");
+  const nib = host.querySelector("[data-nib]");
+  els.forEach(e => {
+    e.el = document.createElementNS(SVGNS, "path");
+    e.el.setAttribute("class", "g-stroke");
+    if (e.kind === "word") { e.len = e.s1 - e.s0; e.el.setAttribute("d", toD(e.start, e.segs)); e.el.setAttribute("pathLength", e.len.toFixed(4)); }
+    inkG.appendChild(e.el);
+    e.state = "";
+  });
+
+  /* --- arrival time of the pen at every sample (pen speed follows curvature) --- */
+  const Tm = new Float64Array(N), BL = 5;                   // blend over 5 units into / out of each tail
+  const speed = new Float64Array(N);
+  for (let i = 0; i < N; i++) speed[i] = tm.v * tm.pace(i);
+  for (const e of els) if (e.kind === "tail") {
+    const a = Math.round(e.s0 / ds), b = Math.round(e.s1 / ds), vIn = speed[a], vOut = speed[Math.min(N - 1, b)];
+    for (let i = a; i < b; i++) {
+      const dIn = (i - a) * ds, dOut = (b - i) * ds;
+      speed[i] = V0 + (vIn - V0) * (1 - smooth(clamp(dIn / BL))) + (vOut - V0) * (1 - smooth(clamp(dOut / BL)));
+    }
+  }
+  Tm[0] = OPT.penStart;
+  for (let i = 1; i < N; i++) Tm[i] = Tm[i - 1] + ds / speed[i];
+  const tAt = (s) => Tm[Math.min(N - 1, Math.round(s / ds))];
+  els.forEach(e => { e.t0 = tAt(e.s0); e.t1 = tAt(e.s1); });
+  const loopW = els[2 * LOOP_COPY];
+  const i2 = Math.round(loopW.s0 / ds), i3 = Math.round(els[2 * LOOP_COPY + 2].s0 / ds);
+  const T2 = Tm[i2], P = Tm[i3] - Tm[i2];                     // P = word time + tail time
+  const V = g.W / P;                                          // the paper's constant speed (units / s)
+
+  // paper position: a straight line in time, placed so the pen sits OPT.penBias right of centre on average
+  let mean = 0;
+  for (let i = i2; i < i3; i++) mean += (X[i] - (X[i2] + V * (Tm[i] - T2))) * (Tm[i + 1] - Tm[i]);
+  mean /= P;
+  const paper = (t) => X[i2] + V * (t - T2) + mean - OPT.penBias;
+
+  // the pen's damped bob on a tail: the height of the trace at paper-x `x` is where the pen was
+  // when it passed x, so what has been drawn never changes
+  const W8 = OPT.wave;
+  function wave(e, x) {
+    const f = (e.s0 + (x - e.xa)) / ds, i = Math.min(N - 2, Math.floor(f));
+    const tau = lerp(Tm[i], Tm[i + 1], f - i) - e.t0;         // seconds since the pen left the e
+    const u = x - e.xa;                                         // distance along the page since the e
+    // starts at 40% height so its first rise has the same slope as the e's exit (0.4 · amp · 2π/len ≈ 0.38)
+    const A = W8.amp * (1 - easeInOut(clamp(tau / (W8.damp * (e.t1 - e.t0))))) * (0.4 + 0.6 * smooth(clamp(u / (W8.len / 4))));
+    // first crest 30% taller; the boost is zero where the wave crosses the baseline, so the curve stays smooth
+    const boost = u < W8.len / 2 ? 1 + 0.3 * Math.sin(Math.PI * u / (W8.len / 2)) : 1;
+    return A < 1e-4 ? 0 : -A * boost * Math.sin(2 * Math.PI * u / W8.len);   // up first (screen y points down)
+  }
+
+  function idxAt(t) {
+    if (t <= Tm[0]) return 0;
+    if (t >= Tm[N - 1]) return N - 1;
+    let lo = 0, hi = N - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (Tm[m] <= t) lo = m; else hi = m; }
+    return lo + (t - Tm[lo]) / (Tm[hi] - Tm[lo]);
+  }
+  const at = (A, f) => { const i = Math.floor(f), u = f - i; return i >= N - 1 ? A[N - 1] : lerp(A[i], A[i + 1], u); };
+  // seamless time: the opening plays once, then copy LOOP_COPY repeats forever
+  const wrap = (t) => t < T2 ? t : T2 + ((t - T2) % P);
+
+  function render(tAbs, still = false, sHead = null) {
+    const t = wrap(tAbs);
+    const firstPass = tAbs < T2;
+
+    // squares: fade in one by one exactly like .g-sq, then away as the paper starts to move
+    const sqOut = 1 - easeInOut(clamp((tAbs - OPT.sqOut[0]) / (OPT.sqOut[1] - OPT.sqOut[0])));
+    rects.forEach((el, i) => { el.style.opacity = still ? 0 : (soft(clamp((tAbs - i * 0.12) / 1.2)) * sqOut).toFixed(3); });
+
+    // ink: words reveal up to the pen; tails are redrawn live while their wave settles
+    const f = sHead === null ? idxAt(t) : sHead / ds, head = f * ds;
+    let px = at(X, f), py = at(Y, f);
+    for (const e of els) {
+      if (head <= e.s0 + 1e-6) { if (e.state !== "off") { e.el.style.visibility = "hidden"; e.state = "off"; } continue; }
+      if (e.state === "off" || e.state === "") e.el.style.visibility = "";
+      if (e.kind === "word") {
+        if (head >= e.s1) { if (e.state !== "full") { e.el.style.strokeDasharray = "none"; e.state = "full"; } }
+        else { e.el.style.strokeDasharray = `${head - e.s0} ${e.len + 1}`; e.state = "part"; }
+      } else {
+        if (head >= e.s1 && e.state === "full") continue;
+        const xh = head >= e.s1 ? e.xb : px;
+        let d = `M${e.xa.toFixed(3)} ${BASE}`;
+        for (let x = e.xa + 0.4; x < xh; x += 0.4) d += ` L${x.toFixed(3)} ${(BASE + wave(e, x)).toFixed(3)}`;
+        d += ` L${xh.toFixed(3)} ${(BASE + wave(e, xh)).toFixed(3)}`;
+        e.el.setAttribute("d", d); e.state = head >= e.s1 ? "full" : "live";
+        if (head < e.s1) py = BASE + wave(e, xh);               // the pen marker bobs; the line records it
+      }
+    }
+
+    // camera: still for the spiral, then eases into the paper's constant glide (and zooms out)
+    const follow = firstPass ? easeInOut(clamp((tAbs - OPT.follow[0]) / (OPT.follow[1] - OPT.follow[0]))) : 1;
+    let camX = lerp(ox, paper(t), follow), camY = lerp(oy, OY, follow), zoom = lerp(1, OPT.zoom, follow);
+    const turn = firstPass && !still ? OPT.turn[0] * (1 - easeOut(clamp(tAbs / OPT.turn[1]))) : 0;
+    if (still) { camX = OX + 22; camY = OY; zoom = OPT.zoom; }   // static frame: the first word, centred
+    const tf = `translate(${ox} ${oy}) scale(${zoom.toFixed(5)}) translate(${(-camX).toFixed(4)} ${(-camY).toFixed(4)}) rotate(${turn.toFixed(4)} ${ox} ${oy})`;
+    cams.forEach(gr => gr.setAttribute("transform", tf));
+    const sw = (0.5 / zoom).toFixed(4);                         // same line weight on screen at any zoom
+    for (const e of els) e.el.style.strokeWidth = sw;
+
+    // the wiggling blob is the pen nib; it grows as it curls out (like the quiz blob), then stays
+    const k = (0.3 + 0.2 * clamp(head / curlLen)) / zoom;
+    nib.setAttribute("transform", `translate(${px.toFixed(4)} ${py.toFixed(4)}) scale(${k.toFixed(4)})`);
+    nib.style.opacity = still ? 0 : clamp((tAbs - OPT.penStart) / 0.5).toFixed(3);
+    return t;
+  }
+
+  // the still frame for reduced motion: the first word, with a straight line after it
+  const stillHead = els[0].s1 + 14;
+  return { render, renderStill: () => render(0, true, stillHead), svgs: host.querySelectorAll("svg"),
+           loopStart: T2, period: P, speed: V, tailTime: els[2 * LOOP_COPY + 1].t1 - els[2 * LOOP_COPY + 1].t0 };
+}
+
+// Runs whenever the quiz screen is showing; restarts with each new attempt; pauses on other screens.
+const GOLD_SPEED = 2;                              // approved playback speed for the whole sequence
+let goldOne = null, goldRaf = 0;
+function startGold() {
+  if (!goldOne) goldOne = mountGoldOneCursive($("#visual"));
+  cancelAnimationFrame(goldRaf);
+  if (reduced) { goldOne.renderStill(); goldOne.svgs.forEach(s => s.pauseAnimations && s.pauseAnimations()); return; }
+  let t0 = null;
+  const tick = (now) => {
+    if (!$("#quiz").classList.contains("active")) { goldRaf = 0; return; }
+    if (t0 === null) t0 = now;
+    goldOne.render((now - t0) / 1000 * GOLD_SPEED);
+    goldRaf = requestAnimationFrame(tick);
+  };
+  goldRaf = requestAnimationFrame(tick);
+}
+
+/* ---------- Quiz ---------- */
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const optionsFor = (i) => QUESTIONS[i].noUnsure ? order[i] : [...order[i], UNSURE];
+
+function show(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === name));
+  window.scrollTo(0, 0);
+}
+
+function start() {
+  idx = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  order = QUESTIONS.map(q => shuffle(q.options));
+  $("#stage").innerHTML = "";
+  show("quiz");
+  startGold();
+  renderQuestion(1);
+}
+
+function renderQuestion(dir) {
+  const q = QUESTIONS[idx];
+  const opts = optionsFor(idx);
+  $("#bar").style.width = (idx / QUESTIONS.length * 100) + "%";
+  $("#count").textContent = (idx + 1) + "/" + QUESTIONS.length;
+  $("#back").classList.toggle("off", idx === 0);
+
+  const stage = $("#stage");
+  stage.querySelectorAll(".panel").forEach(old => {
+    if (reduced) return old.remove();
+    old.className = "panel " + (dir > 0 ? "leave-next" : "leave-prev");
+    setTimeout(() => old.remove(), 260);
+  });
+
+  const panel = document.createElement("div");
+  panel.className = "panel " + (dir > 0 ? "enter-next" : "enter-prev");
+  panel.innerHTML = `
+    <p class="question">${q.q}</p>
+    <div class="options" role="group" aria-label="Answers">
+      ${opts.map((o, k) => `
+        <button class="opt ${answers[idx] && answers[idx].t === o.t ? "picked" : ""}" style="--i:${k}" data-k="${k}">
+          <span>${o.t}</span><span class="radio">${CHECK}</span>
+        </button>`).join("")}
+    </div>`;
+  panel.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => pick(+b.dataset.k, panel)));
+  stage.appendChild(panel);
+  locked = false;
+}
+
+async function pick(k, panel) {
+  if (locked) return;
+  locked = true;
+  answers[idx] = optionsFor(idx)[k];
+  panel.querySelectorAll(".opt").forEach((b, i) => b.classList.toggle("picked", i === k));
+  if (navigator.vibrate) navigator.vibrate(10);
+  await wait(340);
+  if (idx < QUESTIONS.length - 1) { idx++; renderQuestion(1); }
+  else { $("#bar").style.width = "100%"; await wait(250); finish(); }
+}
+
+function back() {
+  if (idx > 0 && !locked) { idx--; renderQuestion(-1); }
+}
+
+/* ---------- Finish ---------- */
+function finish() {
+  const bad = [], warn = [], ok = [];
+  answers.forEach((a, i) => (a.v === "bad" ? bad : a.v === "warn" ? warn : ok).push(i));
+  lastResult = { bad, warn, ok };
+  renderResult(bad, warn, ok);
+  recordResult(bad, warn);
+}
+
+async function recordResult(bad, warn) {
+  if (store.get(COUNTED_KEY)) return; // each device is counted once
+  try {
+    const r = await fetch(API + "?action=finish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ failed: bad.map(i => QUESTIONS[i].id), unsure: warn.map(i => QUESTIONS[i].id) })
+    });
+    if (!r.ok) return;
+    store.set(COUNTED_KEY, "1");
+    setStats(await r.json());
+  } catch (e) {}
+}
+
+function card(i, level) {
+  const q = QUESTIONS[i], a = answers[i];
+  const label = { bad: "Contradicts Islam", warn: "Unsure — learn this", ok: "Correct" }[level];
+  return `
+    <article class="card ${level} reveal">
+      <span class="tag">${label}</span>
+      <h3>${q.q}</h3>
+      <p class="you">You answered: <b>${a.t}</b></p>
+      <p class="why">${q.why}</p>
+      ${level === "warn" ? `<p class="why"><b>Note:</b> In matters this clear, doubt is itself dangerous. Please learn this one with certainty.</p>` : ""}
+      <blockquote class="ayah">"${q.ayah}"<cite>— ${q.ref}</cite></blockquote>
+    </article>`;
+}
+
+function renderResult(bad, warn, ok) {
+  const failed = bad.length > 0;
+  const needHelp = bad.length || warn.length;
+  let word, title, sub;
+  if (failed) {
+    word = "Failed";
+    title = bad.length === 1 ? "1 of your beliefs contradicts Islam" : `${bad.length} of your beliefs contradict Islam`;
+    sub = "According to the scholars of Islam, the beliefs below are nullifiers — they take a person out of Islam. Please don't ignore this. The door of repentance is open until your last breath.";
+  } else if (warn.length) {
+    word = "Passed";
+    title = "…but you have gaps to fill";
+    sub = "None of your answers contradicted Islam, but you were unsure about some core beliefs. Every Muslim must know these with certainty.";
+  } else {
+    word = "Passed";
+    title = "Your beliefs are sound";
+    sub = "Your answers match the fundamentals of Islam on every point. Keep learning, and ask Allah to keep your heart firm.";
+  }
+
+  const el = $("#result");
+  el.innerHTML = `
+    <div class="verdict reveal">
+      <div class="v-label">Your result</div>
+      <div class="v-word">${word}</div>
+      <h1>${title}</h1>
+      <p>${sub}</p>
+      <div class="tally">
+        <div class="t-bad ${failed ? "hot" : ""}"><b data-to="${bad.length}">0</b>Contradicts</div>
+        <div><b data-to="${warn.length}">0</b>Unsure</div>
+        <div><b data-to="${ok.length}">0</b>Correct</div>
+      </div>
+    </div>
+
+    ${failed ? `
+      <div class="reasons reveal">
+        <h2>Why you failed</h2>
+        <ol>${bad.map(i => `<li>${QUESTIONS[i].short}</li>`).join("")}</ol>
+      </div>
+      <h2 class="section-title reveal">Beliefs to fix now</h2>
+      ${bad.map(i => card(i, "bad")).join("")}` : ""}
+
+    ${warn.length ? `<h2 class="section-title reveal">Beliefs to learn</h2>${warn.map(i => card(i, "warn")).join("")}` : ""}
+
+    ${needHelp ? `
+      <h2 class="section-title reveal">What should I do now?</h2>
+      <div class="steps">
+        <div class="step reveal"><b>Learn the correct belief</b><span>Read each point above and its evidence again, slowly. Ask Allah to guide your heart to the truth.</span></div>
+        <div class="step reveal"><b>Repent sincerely and renew your shahada</b><span>Leave the wrong belief, regret it, and declare your faith with conviction:</span>
+          <div class="shahada">
+            <div class="tr">Ashhadu an lā ilāha illallāh, wa ashhadu anna Muḥammadan rasūlullāh</div>
+            <div class="en">I bear witness that there is no god worthy of worship except Allah, and I bear witness that Muhammad is the Messenger of Allah.</div>
+          </div>
+        </div>
+        <div class="step reveal"><b>Ask someone who knows</b><span>There is no shame in asking — the shame is in staying upon error.</span></div>
+      </div>
+      <blockquote class="ayah reveal" style="margin-top:14px">"Say, 'O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.'"<cite>— Az-Zumar 39:53</cite></blockquote>
+    ` : `
+      <div class="shahada reveal" style="margin-top:22px">
+        <div class="tr">Yā muqallibal-qulūb, thabbit qalbī ʿalā dīnik</div>
+        <div class="en">"O Turner of hearts, keep my heart firm upon Your religion." — Tirmidhi</div>
+      </div>
+    `}
+
+    ${ok.length ? `
+      <button class="toggle reveal" id="toggleAll" aria-expanded="false">Show the ${ok.length} you got right</button>
+      <div class="expand" id="allAnswers"><div inert>${ok.map(i => card(i, "ok").replace(" reveal", "")).join("")}</div></div>` : ""}
+
+    <section class="lead reveal" id="lead">
+      <h2>${needHelp ? "Want help with the corrections?" : "Want more reminders like this?"}</h2>
+      <div id="leadForm">
+        <label class="tick">
+          <input type="checkbox" id="want">
+          <span class="box">${CHECK}</span>
+          <span>${needHelp ? "Yes, I'd like someone to go through these with me" : "Yes, keep me updated"}</span>
+        </label>
+        <div class="expand" id="leadFields"><div inert>
+          <div class="fields">
+            <input class="field" id="lname" type="text" placeholder="Your name" autocomplete="name" maxlength="80">
+            <input class="field" id="lcontact" type="text" placeholder="WhatsApp number or email" autocomplete="tel" maxlength="120">
+            <p class="err" id="lerr" role="alert"></p>
+            <button class="btn" id="lsubmit">Submit</button>
+            <p class="fine">Only used to get back to you. Never shared.</p>
+          </div>
+        </div></div>
+      </div>
+      <div class="thanks" id="thanks" hidden>
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="25"/><path d="M17 29l7 7 15-16"/></svg>
+        <b>Thank you</b>
+        <span>We'll be in touch soon, in sha Allah.</span>
+      </div>
+    </section>
+
+    <div class="note reveal">
+      <b>Please note:</b> This check helps you examine <b>your own</b> beliefs. It is not a fatwa and does not judge any individual.
+      Scholars only rule on a specific person after considering things like ignorance, coercion and misunderstanding.
+      But don't use that as an excuse to stay as you are — now that you know, act on it.
+    </div>
+
+    <div class="actions reveal">
+      <button class="btn" id="share">Share with family & friends</button>
+      <div class="row">
+        <button class="btn ghost" id="wa">WhatsApp</button>
+        <button class="btn ghost" id="retake">Retake</button>
+      </div>
+    </div>
+  `;
+
+  show("result");
+  revealOnScroll(el);
+  setTimeout(() => el.querySelectorAll(".tally b").forEach(b => countUp(b, 0, +b.dataset.to, 900)), reduced ? 0 : 350);
+
+  // show/hide correct answers
+  const t = $("#toggleAll");
+  if (t) t.addEventListener("click", () => {
+    const box = $("#allAnswers"), open = !box.classList.contains("open");
+    box.classList.toggle("open", open);
+    box.firstElementChild.inert = !open;
+    t.setAttribute("aria-expanded", open);
+    t.textContent = open ? "Hide correct answers" : `Show the ${ok.length} you got right`;
+  });
+
+  // lead form
+  $("#want").addEventListener("change", (e) => {
+    const box = $("#leadFields");
+    box.classList.toggle("open", e.target.checked);
+    box.firstElementChild.inert = !e.target.checked;
+    if (e.target.checked) setTimeout(() => $("#lname").focus({ preventScroll: true }), reduced ? 0 : 350);
+  });
+  $("#lsubmit").addEventListener("click", submitLead);
+
+  $("#share").addEventListener("click", share);
+  $("#wa").addEventListener("click", () => window.open("https://wa.me/?text=" + encodeURIComponent(shareText() + " " + shareUrl()), "_blank", "noopener"));
+  $("#retake").addEventListener("click", start);
+}
+
+function revealOnScroll(root) {
+  const items = [...root.querySelectorAll(".reveal")];
+  if (reduced || !("IntersectionObserver" in window)) { items.forEach(i => i.classList.add("in")); return; }
+  let batch = 0;
+  const io = new IntersectionObserver((entries) => {
+    entries.filter(e => e.isIntersecting).forEach(e => {
+      e.target.style.transitionDelay = (batch++ % 6) * 70 + "ms";
+      e.target.classList.add("in");
+      io.unobserve(e.target);
+    });
+    batch = 0;
+  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+  items.forEach(i => io.observe(i));
+}
+
+/* ---------- Lead submit ---------- */
+async function submitLead() {
+  const name = $("#lname").value.trim();
+  const contact = $("#lcontact").value.trim();
+  const err = $("#lerr");
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+  const isPhone = /^\+?[\d\s\-()]{7,20}$/.test(contact) && contact.replace(/\D/g, "").length >= 7;
+  if (name.length < 2) { err.textContent = "Please enter your name."; return $("#lname").focus(); }
+  if (!isEmail && !isPhone) { err.textContent = "Please enter a valid WhatsApp number or email."; return $("#lcontact").focus(); }
+  err.textContent = "";
+
+  const btn = $("#lsubmit");
+  btn.disabled = true; btn.textContent = "Sending…";
+  try {
+    const r = await fetch(API + "?action=lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name, contact,
+        failed: lastResult.bad.map(i => QUESTIONS[i].id),
+        unsure: lastResult.warn.map(i => QUESTIONS[i].id)
+      })
+    });
+    if (!r.ok) throw new Error();
+    $("#leadForm").hidden = true;
+    $("#thanks").hidden = false;
+  } catch (e) {
+    err.textContent = "Couldn't send. Please check your connection and try again.";
+    btn.disabled = false; btn.textContent = "Submit";
+  }
+}
+
+/* ---------- Share ---------- */
+const shareText = () => "Am I a Muslim? Find out in 2 minutes — just tap:";
+const shareUrl = () => location.origin + location.pathname;
+
+async function share() {
+  const data = { title: "Am I a Muslim?", text: shareText(), url: shareUrl() };
+  if (navigator.share) { try { await navigator.share(data); } catch (e) {} return; }
+  try { await navigator.clipboard.writeText(data.text + " " + data.url); toast("Link copied"); }
+  catch (e) { toast("Copy the link from your browser to share"); }
+}
+
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg; el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+/* keyboard: 1–3 to answer, ← to go back */
+document.addEventListener("keydown", (e) => {
+  if (!$("#quiz").classList.contains("active") || e.target.matches("input")) return;
+  const n = parseInt(e.key, 10);
+  const panel = $("#stage .panel:last-child");
+  if (n >= 1 && n <= optionsFor(idx).length && panel) pick(n - 1, panel);
+  if (e.key === "ArrowLeft" || e.key === "Backspace") back();
+});
+
+$("#back").addEventListener("click", back);
+loadStats();
+start();
+</script>
+</body>
+</html>

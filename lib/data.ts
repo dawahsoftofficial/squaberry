@@ -178,3 +178,51 @@ export async function savePortfolioItem(id: number | null, input: PortfolioInput
 export async function deletePortfolioItem(id: number): Promise<void> {
   await db().execute('DELETE FROM portfolio_items WHERE id = ?', [id]);
 }
+
+// --- "Am I a Muslim?" quiz (public/oneness.html) ---------------------------------------------
+
+export type OnenessStats = { tried: number; passed: number; failed: number };
+export type OnenessLead = { name: string; contact: string; result: 'failed' | 'unsure' | 'passed'; failed: string[]; unsure: string[] };
+
+export async function getOnenessStats(): Promise<OnenessStats> {
+  const [rows] = await db().query<Row<OnenessStats>[]>('SELECT tried, passed, failed FROM oneness_stats WHERE id = 1');
+  const row = rows[0];
+  return { tried: Number(row?.tried ?? 0), passed: Number(row?.passed ?? 0), failed: Number(row?.failed ?? 0) };
+}
+
+/** Counts one finished quiz (and which questions were failed or unsure) in a single transaction. */
+export async function recordOnenessResult(failedIds: string[], unsureIds: string[]): Promise<OnenessStats> {
+  const conn = await db().getConnection();
+  try {
+    await conn.beginTransaction();
+    const passed = failedIds.length ? 0 : 1, failed = failedIds.length ? 1 : 0;
+    await conn.execute(
+      'INSERT INTO oneness_stats (id, tried, passed, failed) VALUES (1, 1, ?, ?) ON DUPLICATE KEY UPDATE tried = tried + 1, passed = passed + ?, failed = failed + ?',
+      [passed, failed, passed, failed],
+    );
+    for (const [ids, column] of [[failedIds, 'failed'], [unsureIds, 'unsure']] as const) {
+      if (!ids.length) continue;
+      const rows = ids.map(() => `(?, ${column === 'failed' ? '1, 0' : '0, 1'})`).join(', ');
+      await conn.query(
+        `INSERT INTO oneness_reasons (question_id, failed, unsure) VALUES ${rows} ON DUPLICATE KEY UPDATE ${column} = ${column} + 1`,
+        ids,
+      );
+    }
+    const [rows] = await conn.query<Row<OnenessStats>[]>('SELECT tried, passed, failed FROM oneness_stats WHERE id = 1');
+    await conn.commit();
+    const row = rows[0];
+    return { tried: Number(row?.tried ?? 0), passed: Number(row?.passed ?? 0), failed: Number(row?.failed ?? 0) };
+  } catch (error) {
+    await conn.rollback().catch(() => {});
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function createOnenessLead(lead: OnenessLead): Promise<void> {
+  await db().execute(
+    'INSERT INTO oneness_leads (name, contact, result, failed_ids, unsure_ids) VALUES (?, ?, ?, ?, ?)',
+    [lead.name, lead.contact, lead.result, lead.failed.join(','), lead.unsure.join(',')],
+  );
+}
