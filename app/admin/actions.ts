@@ -34,8 +34,9 @@ export async function login(_previous: LoginState, formData: FormData): Promise<
     return { error: 'Too many attempts. Please wait 15 minutes and try again.' };
   }
 
-  if (!passwordMatches(String(formData.get('password') ?? ''))) {
+  if (!passwordMatches(String(formData.get('password') ?? '').slice(0, 256))) {
     failedLogins.set(ip, [...attempts, now]);
+    await new Promise(resolve => setTimeout(resolve, 800)); // slows password guessing
     return { error: 'That password isn’t right.' };
   }
 
@@ -44,7 +45,7 @@ export async function login(_previous: LoginState, formData: FormData): Promise<
   (await cookies()).set(SESSION_COOKIE, session.value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     path: '/admin',
     maxAge: session.maxAge,
   });

@@ -4,7 +4,8 @@ import { after } from 'next/server';
 import { createEnquiry } from '@/lib/data';
 import { sendConfirmationEmail, sendEnquiryEmail } from '@/lib/mail';
 import { getProduct, signupInterests } from '@/lib/products';
-import { MIN_FILL_MS, rateLimited, visitorKey } from '@/lib/rate-limit';
+import { rateLimited, visitorKey } from '@/lib/rate-limit';
+import { acceptanceLimit, screenSubmission, spendFormToken } from '@/lib/spam';
 
 export type ProductSignupState = {
   status: 'idle' | 'success' | 'error';
@@ -20,8 +21,9 @@ const success: ProductSignupState = { status: 'success', message: 'Thanks, you�
 
 /** Product page signup: saved as a product enquiry (enquiries.product), then emailed to the team and the visitor. */
 export async function submitProductSignup(_previous: ProductSignupState, formData: FormData): Promise<ProductSignupState> {
-  const started = Number(formData.get('started') || 0);
-  if (line(formData.get('website'), 200) || (started > 0 && Date.now() - started < MIN_FILL_MS)) return success;
+  // Bots that fill the hidden honeypot field get a quiet "success" and nothing is stored.
+  if (line(formData.get('website'), 200)) return success;
+  const token = line(formData.get('token'), 200);
 
   const product = getProduct(line(formData.get('product'), 60));
   if (!product) return { status: 'error', message: 'Please choose a product and try again.', errors: {} };
@@ -45,6 +47,24 @@ export async function submitProductSignup(_previous: ProductSignupState, formDat
   if (rateLimited(await visitorKey())) {
     return { status: 'error', message: 'You’ve sent several requests in a short time. Please try again later or email hello@squaberry.co.uk.', errors: {} };
   }
+
+  // Spam checks (lib/spam.ts): spam and repeats get the same quiet "success", so bots learn nothing.
+  const verdict = screenSubmission(token, { name, email, company, message: message || `${interest} ${product.slug}` });
+  if (verdict !== 'ok') {
+    console.info(`Product signup not saved: ${verdict}.`);
+    return success;
+  }
+  const limit = acceptanceLimit(email, message || product.slug);
+  if (limit) {
+    return {
+      status: 'error',
+      message: limit === 'email'
+        ? 'We’ve already received several messages from this address today. We’ll reply soon, or email hello@squaberry.co.uk.'
+        : 'We’re receiving a lot of messages right now. Please try again in a little while or email hello@squaberry.co.uk.',
+      errors: {},
+    };
+  }
+  spendFormToken(token);
 
   const enquiry = {
     name,

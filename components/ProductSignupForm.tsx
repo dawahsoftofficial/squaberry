@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { startTransition, useActionState, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import Icon from './Icon';
+import { getFormToken } from '@/app/actions/form-token';
 import { submitProductSignup, type ProductSignupState } from '@/app/actions/product';
 import { signupInterests } from '@/lib/products';
 
@@ -13,14 +14,16 @@ type Values = { name: string; email: string; company: string; phone: string; int
 export default function ProductSignupForm({ product, productName }: { product: string; productName: string }) {
   const [state, formAction, pending] = useActionState(submitProductSignup, initialState);
   const [values, setValues] = useState<Values>({ name: '', email: '', company: '', phone: '', interest: signupInterests[0], message: '' });
-  const startedRef = useRef<HTMLInputElement>(null);
+  const [token, setToken] = useState('');
   const statusRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const uid = useId();
   const fid = (name: string) => `${uid}-${name}`;
 
   useEffect(() => {
-    if (startedRef.current) startedRef.current.value = String(Date.now());
+    // Server-signed token for the spam check (lib/spam.ts).
+    // Kept in state: React would reset a hidden input's value set directly on every re-render.
+    getFormToken().then(setToken).catch(() => {});
   }, []);
   useEffect(() => {
     if (state.status === 'success') successRef.current?.focus();
@@ -49,7 +52,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
   }
 
   return (
-    <form className="step-form product-form" onSubmit={onSubmit} noValidate={false} aria-labelledby={fid('title')}>
+    <form className="step-form product-form" action={formAction} onSubmit={onSubmit} aria-labelledby={fid('title')}>
       <p className="step-form-kicker eyebrow">Get started</p>
       <h2 id={fid('title')} className="product-form-title">Get {productName} for your business</h2>
 
@@ -100,7 +103,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
         <label htmlFor={fid('website')}>Leave this field empty</label>
         <input id={fid('website')} name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
-      <input ref={startedRef} type="hidden" name="started" defaultValue="" />
+      <input type="hidden" name="token" value={token} readOnly />
 
       <p ref={statusRef} className={`form-status${state.status === 'error' ? ' is-error' : ''}`} role="status" aria-live="polite" tabIndex={-1}>
         {state.status === 'error' ? state.message : ''}

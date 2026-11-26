@@ -25,4 +25,3 @@ export function rateLimited(key: string): boolean {
   return false;
 }
 
-export const MIN_FILL_MS = 3000; // faster than this is treated as a bot

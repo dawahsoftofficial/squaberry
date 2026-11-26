@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { startTransition, useActionState, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import Icon from './Icon';
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry';
+import { getFormToken } from '@/app/actions/form-token';
 import { otherTopic, services } from '@/lib/services';
 
 type Field = 'topic' | 'message' | 'name' | 'email';
@@ -66,12 +67,17 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
   const stepRefs = useRef<(HTMLFieldSetElement | null)[]>([]);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
-  const startedRef = useRef<HTMLInputElement>(null);
+  const [token, setToken] = useState('');
   const moved = useRef(false);
 
+  // A server-signed token proves the form was opened here before it was sent (spam check, lib/spam.ts).
+  // Kept in state: React would reset a hidden input's value set directly on every re-render.
+  const refreshToken = () => {
+    getFormToken().then(setToken).catch(() => {});
+  };
   useEffect(() => {
     setEnhanced(true);
-    if (startedRef.current) startedRef.current.value = String(Date.now());
+    refreshToken();
   }, []);
 
   // Move focus to the new step's group (its legend is announced) after the user changes step.
@@ -159,7 +165,7 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
     setStep(firstStep);
     setFurthest(firstStep);
     moved.current = true;
-    if (startedRef.current) startedRef.current.value = String(Date.now());
+    refreshToken();
   };
 
   // Before hydration (no JS) the server's answer is the only source of errors and success.
@@ -321,7 +327,7 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
           <label htmlFor={fid('website')}>Leave this field empty</label>
           <input id={fid('website')} name="website" type="text" tabIndex={-1} autoComplete="off" />
         </div>
-        <input ref={startedRef} type="hidden" name="started" defaultValue="" />
+        <input type="hidden" name="token" value={token} readOnly />
         <input type="hidden" name="source" value={source} />
 
         <div className="step-actions">

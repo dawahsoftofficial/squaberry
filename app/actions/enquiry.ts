@@ -2,7 +2,8 @@
 
 import { after } from 'next/server';
 import { createEnquiry } from '@/lib/data';
-import { MIN_FILL_MS, rateLimited, visitorKey } from '@/lib/rate-limit';
+import { rateLimited, visitorKey } from '@/lib/rate-limit';
+import { acceptanceLimit, screenSubmission, spendFormToken } from '@/lib/spam';
 import { sendConfirmationEmail, sendEnquiryEmail } from '@/lib/mail';
 import { topics } from '@/lib/services';
 
@@ -23,11 +24,9 @@ const success: EnquiryState = {
 };
 
 export async function submitEnquiry(_previous: EnquiryState, formData: FormData): Promise<EnquiryState> {
-  // Bots: a filled honeypot or an impossibly fast submission get a quiet "success" and nothing is stored.
-  const started = Number(formData.get('started') || 0);
-  if (line(formData.get('website'), 200) || (started > 0 && Date.now() - started < MIN_FILL_MS)) {
-    return success;
-  }
+  // Bots that fill the hidden honeypot field get a quiet "success" and nothing is stored.
+  if (line(formData.get('website'), 200)) return success;
+  const token = line(formData.get('token'), 200);
 
   const name = line(formData.get('name'), 120);
   const email = line(formData.get('email'), 254);
@@ -53,6 +52,24 @@ export async function submitEnquiry(_previous: EnquiryState, formData: FormData)
       errors: {},
     };
   }
+
+  // Spam checks (lib/spam.ts): spam and repeats get the same quiet "success", so bots learn nothing.
+  const verdict = screenSubmission(token, { name, email, company, message });
+  if (verdict !== 'ok') {
+    console.info(`Enquiry not saved: ${verdict}.`);
+    return success;
+  }
+  const limit = acceptanceLimit(email, message);
+  if (limit) {
+    return {
+      status: 'error',
+      message: limit === 'email'
+        ? 'We’ve already received several messages from this address today. We’ll reply soon, or email hello@squaberry.co.uk.'
+        : 'We’re receiving a lot of messages right now. Please try again in a little while or email hello@squaberry.co.uk.',
+      errors: {},
+    };
+  }
+  spendFormToken(token);
 
   const enquiry = { name, email, company: company || null, topic: topic || null, message, source_page: source || null, product: null, phone: null };
   try {
