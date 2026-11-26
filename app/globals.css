@@ -465,6 +465,8 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .step-form .form-privacy a{text-decoration:underline;text-underline-offset:3px}
 .step-form .form-status{margin-top:18px;padding:14px 16px;border-radius:var(--radius-sm);font-size:15px;font-weight:600}
 .step-form .form-status:empty{display:none}
+/* Spam trap: kept in the form for bots but moved off-screen (not display:none, which some bots skip). */
+.field-trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .step-form .form-status.is-error{border:1px solid rgba(255,180,171,.35);background:rgba(255,180,171,.08);color:var(--danger)}
 .step-success{display:grid;justify-items:start;gap:14px}
 .step-success:focus{outline:none}

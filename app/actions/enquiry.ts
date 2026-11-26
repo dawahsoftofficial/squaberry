@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { after } from 'next/server';
 import { createEnquiry } from '@/lib/data';
-import { sendEnquiryEmail } from '@/lib/mail';
+import { sendConfirmationEmail, sendEnquiryEmail } from '@/lib/mail';
 import { topics } from '@/lib/services';
 
 export type EnquiryState = {
@@ -79,8 +79,12 @@ export async function submitEnquiry(_previous: EnquiryState, formData: FormData)
   const enquiry = { name, email, company: company || null, topic: topic || null, message, source_page: source || null };
   try {
     const id = await createEnquiry(enquiry);
-    // Email the team once the visitor has their confirmation; a mail problem never loses the enquiry.
-    after(() => sendEnquiryEmail({ id, ...enquiry }));
+    // Email the team, then send the visitor a copy, once they have their on-screen confirmation.
+    // A mail problem never loses the enquiry (it is already saved).
+    after(async () => {
+      await sendEnquiryEmail({ id, ...enquiry });
+      await sendConfirmationEmail({ id, ...enquiry });
+    });
   } catch (error) {
     console.error('Enquiry could not be saved:', error instanceof Error ? error.message : error);
     return {
