@@ -1,16 +1,20 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema } from '@/lib/schema';
 import ProductCard from '@/components/ProductCard';
 import SectionIntro from '@/components/SectionIntro';
 import { products } from '@/lib/products';
 
-export const metadata: Metadata = {
-  title: 'Products',
-  description: 'Ready-made software from Squaberry: gym management, fast food ordering, a WhatsApp AI assistant and website chatbots, set up in your brand and supported by our team.',
-  alternates: { canonical: '/products' },
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Software for gyms, takeaways & AI assistants',
+  description: 'Ready-made software from Squaberry: gym management, fast food ordering, a WhatsApp AI assistant and website chatbots, set up in your brand.',
+  path: '/products',
+  og: 'products',
+});
 
 const reasons = [
   { icon: 'build', title: 'Set up for you', text: 'We configure everything, bring over your data and test it with you before launch.', accent: '#b3a8ff' },
@@ -21,6 +25,7 @@ const reasons = [
 export default function ProductsPage() {
   return (
     <main id="main">
+      <JsonLd data={breadcrumbSchema([{ name: 'Products', path: '/products' }])} />
       <PageHero
         label="Products"
         title={<>Software that’s<br />ready to go.</>}

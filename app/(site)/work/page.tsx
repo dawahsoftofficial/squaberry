@@ -1,18 +1,22 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { connection } from 'next/server';
 import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema } from '@/lib/schema';
 import ProjectsBrowser from '@/components/ProjectsBrowser';
 import { safeAllProjects } from '@/lib/portfolio';
 import { services } from '@/lib/services';
 import { toCardProject } from '@/lib/case-study';
 
-export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'Websites, apps and digital products Squaberry has designed and built: charities, food delivery, e-commerce, education and more.',
-  alternates: { canonical: '/work' },
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Projects & case studies',
+  description: 'Websites, apps and digital products Squaberry has designed and built for charities, food delivery, e-commerce, education and more.',
+  path: '/work',
+  og: 'work',
+});
 
 export default async function WorkPage() {
   await connection();
@@ -24,6 +28,7 @@ export default async function WorkPage() {
 
   return (
     <main id="main">
+      <JsonLd data={breadcrumbSchema([{ name: 'Projects', path: '/work' }])} />
       <PageHero
         label="Selected work"
         title={<>Work we’re<br />proud of.</>}

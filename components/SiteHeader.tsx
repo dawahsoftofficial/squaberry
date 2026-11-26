@@ -1,9 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Icon from './Icon';
+import { mediaUrl } from '@/lib/media-url';
 import { services, serviceStyle } from '@/lib/services';
 
 const links = [
@@ -150,7 +152,7 @@ export default function SiteHeader() {
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${mega ? ' is-mega' : ''}`} onPointerLeave={event => event.pointerType === 'mouse' && mega && closeMegaSoon()}>
       <div className="dock">
         <Link href="/" className="brand" aria-label="Squaberry home" onPointerEnter={() => mega && closeMegaSoon()}>
-          <img src="/assets/squaberry-logo.svg" alt="Squaberry" width={152} height={50} />
+          <img src={mediaUrl('/assets/squaberry-logo.svg')} alt="Squaberry" width={152} height={50} />
         </Link>
         <span className="dock-divider" aria-hidden="true" />
 
@@ -251,7 +253,7 @@ export default function SiteHeader() {
 
           <Link href="/work/muntada-aid" className="mega-work">
             <span className="mega-work-media">
-              <img src="/assets/portfolio/muntada-aid.png" alt="" width={1168} height={880} loading="lazy" />
+              <Image src="/assets/portfolio/muntada-aid.png" alt="" width={1168} height={880} sizes="340px" />
               <span className="mega-work-label">Case study</span>
             </span>
             <span className="mega-work-title">Muntada Aid</span>

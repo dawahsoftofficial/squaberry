@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -6,6 +7,9 @@ import { connection } from 'next/server';
 import EnquiryForm from '@/components/EnquiryForm';
 import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+import { absoluteUrl, ogImage } from '@/lib/seo';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { safeServiceProjects } from '@/lib/portfolio';
@@ -20,12 +24,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const service = getService((await params).slug);
   if (!service) return {};
-  return {
-    title: service.name,
-    description: `${service.summary} ${service.tags.join(', ')} from Squaberry.`,
-    alternates: { canonical: `/services/${service.slug}` },
-    openGraph: { title: `${service.name} — Squaberry`, description: service.summary, images: [`/assets/services/${service.slug}.png`] },
-  };
+  return pageMetadata({
+    title: `${service.name} services`,
+    description: service.summary,
+    path: `/services/${service.slug}`,
+    og: `service-${service.slug}`,
+  });
 }
 
 // Card widths for 1, 2 or more projects so the grid always fills neatly.
@@ -44,6 +48,12 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <main id="main">
+      <JsonLd
+        data={[
+          breadcrumbSchema([{ name: 'Services', path: '/services' }, { name: service.name, path: `/services/${service.slug}` }]),
+          serviceSchema(service, absoluteUrl(ogImage(`service-${service.slug}`))),
+        ]}
+      />
       <PageHero
         titleId="serviceTitle"
         label={<><Link href="/services">Services</Link> <span aria-hidden="true">/</span> {service.number}</>}

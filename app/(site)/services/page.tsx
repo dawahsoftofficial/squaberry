@@ -1,20 +1,25 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import ProcessSteps from '@/components/ProcessSteps';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema } from '@/lib/schema';
 import SectionIntro from '@/components/SectionIntro';
 import { services, serviceStyle } from '@/lib/services';
 
-export const metadata: Metadata = {
-  title: 'Services',
-  description: 'Web and app development, design, digital marketing and IT support: everything Squaberry offers, under one roof.',
-  alternates: { canonical: '/services' },
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Services: development, design, marketing & IT',
+  description: 'Web and app development, design, digital marketing and IT support: everything Squaberry offers, under one roof, from first idea to launch and beyond.',
+  path: '/services',
+  og: 'services',
+});
 
 export default function ServicesPage() {
   return (
     <main id="main">
+      <JsonLd data={breadcrumbSchema([{ name: 'Services', path: '/services' }])} />
       <PageHero
         label="What we do"
         title={<>One partner.<br />Every piece.</>}

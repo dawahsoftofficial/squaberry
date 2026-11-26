@@ -3,10 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Icon from '@/components/Icon';
+import JsonLd from '@/components/JsonLd';
 import ProductCard from '@/components/ProductCard';
 import ProductSignupForm from '@/components/ProductSignupForm';
 import SectionIntro from '@/components/SectionIntro';
 import { getProduct, onboardingSteps, products, type ProductImage } from '@/lib/products';
+import { breadcrumbSchema, faqSchema, productSchema } from '@/lib/schema';
+import { absoluteUrl, clip, ogImage, pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,12 +23,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProduct((await params).slug);
   if (!product) return { title: 'Product not found' };
-  return {
-    title: product.name,
-    description: product.intro,
-    alternates: { canonical: `/products/${product.slug}` },
-    openGraph: { title: `${product.name}: ${product.tagline}`, description: product.intro, images: [{ url: product.cover.src }] },
-  };
+  return pageMetadata({
+    title: `${product.name} for your business`,
+    description: clip(product.intro, 158),
+    path: `/products/${product.slug}`,
+    og: `product-${product.slug}`,
+  });
 }
 
 function Shot({ image, sizes }: { image: ProductImage; sizes: string }) {
@@ -45,6 +48,13 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <main id="main" className="product-page" style={style}>
+      <JsonLd
+        data={[
+          breadcrumbSchema([{ name: 'Products', path: '/products' }, { name: product.name, path: `/products/${product.slug}` }]),
+          productSchema(product, absoluteUrl(ogImage(`product-${product.slug}`))),
+          faqSchema(product.faqs),
+        ]}
+      />
       <section className="container product-hero" aria-labelledby="pageTitle">
         <div className="product-hero-main">
           <span className="eyebrow rise"><Link href="/products">Products</Link> <span aria-hidden="true">/</span> {product.name}</span>

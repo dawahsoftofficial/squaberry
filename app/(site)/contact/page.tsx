@@ -1,18 +1,23 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import EnquiryForm from '@/components/EnquiryForm';
 import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema } from '@/lib/schema';
 
-export const metadata: Metadata = {
-  title: { absolute: 'Contact — Squaberry' },
-  description: 'Talk to Squaberry about your next design, development, marketing or technology project.',
-  alternates: { canonical: '/contact' },
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Contact us',
+  description: 'Start a project with Squaberry. Tell us about your website, app, marketing or IT needs and we will reply within one working day.',
+  path: '/contact',
+  og: 'contact',
+});
 
 export default function ContactPage() {
   return (
     <main id="main">
+      <JsonLd data={breadcrumbSchema([{ name: 'Contact', path: '/contact' }])} />
       <PageHero
         label="Contact"
         title="Let’s make something work."

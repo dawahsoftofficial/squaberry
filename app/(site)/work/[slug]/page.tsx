@@ -1,4 +1,8 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import type { Metadata } from 'next';
+import { absoluteUrl, pageMetadata } from '@/lib/seo';
+import { mediaUrl } from '@/lib/media-url';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -7,6 +11,8 @@ import { cache } from 'react';
 import CaseNav from '@/components/CaseNav';
 import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema, caseStudySchema } from '@/lib/schema';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { displayDomain, galleryImages, lines, paragraphs, type GalleryImage } from '@/lib/case-study';
@@ -22,16 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = await loadProject(slug).catch(() => null);
   if (!project) return { title: 'Project not found' };
   const description = project.intro || project.summary || `A ${project.client ?? ''} project by Squaberry.`;
-  return {
+  // A pre-rendered share card if there is one, else the first gallery screenshot or the cover.
+  const card = `work-${project.slug}`;
+  const og = existsSync(path.join(process.cwd(), 'public', 'og', `${card}.jpg`))
+    ? card
+    : galleryImages(project.gallery)[0]?.src ?? project.image_url ?? 'work';
+  return pageMetadata({
     title: `${project.title} case study`,
     description,
-    alternates: { canonical: `/work/${project.slug}` },
-    openGraph: {
-      title: `${project.title}: ${project.summary ?? 'case study'}`,
-      description,
-      images: project.image_url ? [{ url: project.image_url }] : undefined,
-    },
-  };
+    path: `/work/${project.slug}`,
+    og,
+    type: 'article',
+  });
 }
 
 function Shot({ image, sizes, priority = false }: { image: GalleryImage; sizes: string; priority?: boolean }) {
@@ -94,6 +102,12 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <main id="main" className="case">
+      <JsonLd
+        data={[
+          breadcrumbSchema([{ name: 'Projects', path: '/work' }, { name: project.title, path: `/work/${project.slug}` }]),
+          caseStudySchema({ ...project, slug }, project.intro || project.summary || project.title, project.image_url ? absoluteUrl(mediaUrl(project.image_url)) : null),
+        ]}
+      />
       <PageHero
         label={<><Link href="/work">Projects</Link> <span aria-hidden="true">/</span> {project.title}</>}
         title={project.summary || project.title}

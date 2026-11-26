@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Icon from './Icon';
+import { mediaUrl } from '@/lib/media-url';
 import { services } from '@/lib/services';
 
 // Two rows of soft-square tiles sliding in opposite directions: what we do, with a few brand tiles.
@@ -54,7 +55,7 @@ export default function SiteFooter() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <img src="/assets/squaberry-logo.svg" alt="Squaberry" width={152} height={50} />
+            <img src={mediaUrl('/assets/squaberry-logo.svg')} alt="Squaberry" width={152} height={50} loading="lazy" />
             <p>Fresh ideas and solid tech: design, development, marketing and IT, under one roof.</p>
           </div>
           <nav className="footer-col" aria-label="Footer: pages">

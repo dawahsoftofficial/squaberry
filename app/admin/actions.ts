@@ -2,7 +2,8 @@
 
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
+import { portfolioTag } from '@/lib/portfolio';
 import { createSessionValue, passwordMatches, requireAdmin, SESSION_COOKIE } from '@/lib/auth';
 import {
   deleteEnquiry,
@@ -144,6 +145,7 @@ export async function savePortfolio(_previous: PortfolioFormState, formData: For
     quote_name: text(formData, 'quote_name', 120) || null,
     quote_role: text(formData, 'quote_role', 120) || null,
   });
+  updateTag(portfolioTag); // public pages read the portfolio through a cache (lib/portfolio.ts)
   revalidatePath('/admin', 'layout');
   revalidatePath(`/services/${serviceSlug}`);
   revalidatePath('/work', 'layout');
@@ -153,6 +155,7 @@ export async function savePortfolio(_previous: PortfolioFormState, formData: For
 export async function removePortfolio(formData: FormData): Promise<void> {
   await requireAdmin();
   await deletePortfolioItem(idFrom(formData));
+  updateTag(portfolioTag);
   revalidatePath('/admin', 'layout');
   redirect('/admin/portfolio?deleted=1');
 }

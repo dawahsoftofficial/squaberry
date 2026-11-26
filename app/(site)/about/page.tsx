@@ -1,18 +1,22 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import ProcessSteps from '@/components/ProcessSteps';
 import PageHero from '@/components/PageHero';
+import JsonLd from '@/components/JsonLd';
+import { breadcrumbSchema } from '@/lib/schema';
 import SectionIntro from '@/components/SectionIntro';
 import TeamGrid from '@/components/TeamGrid';
 import { services, serviceStyle } from '@/lib/services';
 import { teamGroups } from '@/lib/team';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'About us',
-  description: 'Squaberry brings structure and character to technology: thoughtful design, careful engineering and a human touch, from the first conversation.',
-  alternates: { canonical: '/about' },
-};
+  description: 'Meet Squaberry: a digital studio that brings structure and character to technology, with thoughtful design, careful engineering and a human touch.',
+  path: '/about',
+  og: 'about',
+});
 
 const beliefs = [
   { title: 'Make the complicated feel simple.', text: 'Technology should make work easier, not add another layer to manage. We explain things plainly and design for the people who use them every day.' },
@@ -30,6 +34,7 @@ const promises = [
 export default function AboutPage() {
   return (
     <main id="main">
+      <JsonLd data={breadcrumbSchema([{ name: 'About us', path: '/about' }])} />
       <PageHero
         label="About Squaberry"
         title={<>A little square.<br />A lot of possibility.</>}

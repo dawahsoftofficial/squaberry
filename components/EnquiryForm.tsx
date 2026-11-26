@@ -187,6 +187,7 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
       ref={formRef}
       id={id}
       className={`step-form is-${variant}${enhanced ? ' is-enhanced' : ''}`}
+      data-first-step={firstStep}
       action={formAction}
       onSubmit={onSubmit}
       onKeyDown={onKeyDown}

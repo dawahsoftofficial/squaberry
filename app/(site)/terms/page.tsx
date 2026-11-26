@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import LegalPage from '@/components/LegalPage';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Terms & conditions',
-  description: 'Terms for using the Squaberry website at squaberry.co.uk.',
-  alternates: { canonical: '/terms' },
-};
+  description: 'The terms for using squaberry.co.uk: using the site, its content, our services, external links, liability, changes and how to contact us.',
+  path: '/terms',
+});
 
 const sections = [
   { id: 'using', label: 'Using this site' },

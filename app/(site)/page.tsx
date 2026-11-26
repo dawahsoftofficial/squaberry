@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { connection } from 'next/server';
 import EnquiryForm from '@/components/EnquiryForm';
@@ -10,11 +11,13 @@ import TypeLine from '@/components/TypeLine';
 import { safeAllProjects } from '@/lib/portfolio';
 import { services, serviceStyle } from '@/lib/services';
 
-export const metadata: Metadata = {
-  title: { absolute: 'Squaberry — Fresh ideas. Solid tech.' },
-  alternates: { canonical: '/' },
-  openGraph: { title: 'Squaberry — Fresh ideas. Solid tech.', description: 'Thoughtful design and connected technology for what comes next.', url: '/' },
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Squaberry — Web design, app development & digital marketing',
+  absoluteTitle: true,
+  description: 'Squaberry designs and builds fast websites, apps and custom software, and helps businesses grow with digital marketing and dependable IT support.',
+  path: '/',
+  og: 'home',
+});
 
 // The hero's typed second line. The first phrase is what renders without JS and what screen readers hear.
 const heroPhrases = ['Solid tech.', 'Smart apps.', 'Bold brands.', 'Real growth.'];
