@@ -25,6 +25,7 @@ import {
   Shapes,
   ShieldCheck,
   Target,
+  UserRound,
   Workflow,
   X,
   type LucideIcon,
@@ -42,6 +43,7 @@ const icons = {
   check: Check,
   mail: Mail,
   chat: MessageCircle,
+  person: UserRound,
   // Services
   web: MonitorSmartphone,
   design: Palette,

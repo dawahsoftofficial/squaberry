@@ -4,7 +4,9 @@ import Icon from '@/components/Icon';
 import ProcessSteps from '@/components/ProcessSteps';
 import PageHero from '@/components/PageHero';
 import SectionIntro from '@/components/SectionIntro';
+import TeamGrid from '@/components/TeamGrid';
 import { services, serviceStyle } from '@/lib/services';
+import { teamGroups } from '@/lib/team';
 
 export const metadata: Metadata = {
   title: 'About us',
@@ -64,6 +66,13 @@ export default function AboutPage() {
             </ul>
           </article>
         </div>
+      </section>
+
+      <section className="container section team" aria-labelledby="teamTitle">
+        <SectionIntro label="Our team" title="The people behind the work." id="teamTitle">
+          <p>A small, close-knit team: the people you talk to are the people who plan, design and build your project.</p>
+        </SectionIntro>
+        {teamGroups.map(group => <TeamGrid key={group.id} group={group} />)}
       </section>
 
       <section className="panel panel-cream section" aria-labelledby="beliefsTitle">
