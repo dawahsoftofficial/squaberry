@@ -23,7 +23,7 @@ const beliefs = [
 const promises = [
   { label: 'Plain language', icon: 'chat', accent: '#b3a8ff', text: 'No jargon for the sake of it. You’ll always know what we’re doing and why.' },
   { label: 'One partner', icon: 'web', accent: '#8fd3e8', text: 'Design, development, marketing and IT support under one roof, joined up.' },
-  { label: 'Shared decisions', icon: 'strategy', accent: '#ecff95', text: 'A clear path, agreed together, with progress you can see along the way.' },
+  { label: 'Shared decisions', icon: 'strategy', accent: '#ff9ed2', text: 'A clear path, agreed together, with progress you can see along the way.' },
   { label: 'In it for the long run', icon: 'evolve', accent: '#ffb38a', text: 'Launch is a beginning. We stay on hand to support and improve what we build.' },
 ];
 

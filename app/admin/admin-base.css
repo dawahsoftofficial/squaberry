@@ -20,9 +20,9 @@
 :is(.admin,.admin-login) .mono{color:var(--a-muted);font-family:var(--font-body);font-size:12px;font-weight:600;letter-spacing:.12em;line-height:1.5;text-transform:uppercase}
 :is(.admin,.admin-login) .arrow{display:inline-block;transition:transform .3s var(--ease-soft)}
 
-/* Primary button: the public site's lime soft-square button. */
-:is(.admin,.admin-login) .button{display:inline-flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:0 18px;border:0;border-radius:var(--radius-sm);background:var(--lime);color:var(--ink-1);font-size:15px;font-weight:600;line-height:1;transition:background .25s,transform .3s var(--ease-soft)}
-:is(.admin,.admin-login) .button:hover{background:#f3ffb8;transform:translateY(-2px)}
+/* Primary button: the public site's gradient soft-square button. */
+:is(.admin,.admin-login) .button{display:inline-flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:0 18px;border:0;border-radius:var(--radius-sm);background:var(--grad) border-box;color:#fff;font-size:15px;font-weight:600;line-height:1;transition:background .25s,transform .3s var(--ease-soft)}
+:is(.admin,.admin-login) .button:hover{background:var(--grad-hover) border-box;transform:translateY(-2px)}
 :is(.admin,.admin-login) .button:hover .arrow{transform:translate(2px,-2px)}
 :is(.admin,.admin-login) .button .arrow{font-size:18px}
 :is(.admin,.admin-login) .button:disabled{opacity:.6;cursor:progress;transform:none}

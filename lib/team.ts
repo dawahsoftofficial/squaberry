@@ -31,7 +31,7 @@ export const teamGroups: TeamGroup[] = [
     members: [
       { name: 'Team member', role: 'Lead developer', bio: 'Plans the architecture and keeps the code sound, secure and easy to grow.', accent: '#8fd3e8' },
       { name: 'Team member', role: 'Full-stack developer', bio: 'Builds features end to end, from the database to the screen.', accent: '#f5a8d4' },
-      { name: 'Team member', role: 'Front-end developer', bio: 'Turns designs into fast, accessible pages that work on every device.', accent: '#ecff95' },
+      { name: 'Team member', role: 'Front-end developer', bio: 'Turns designs into fast, accessible pages that work on every device.', accent: '#86b4ff' },
     ],
   },
 ];

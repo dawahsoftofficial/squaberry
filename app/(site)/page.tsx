@@ -6,6 +6,7 @@ import Icon from '@/components/Icon';
 import ProcessSteps from '@/components/ProcessSteps';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
+import TypeLine from '@/components/TypeLine';
 import { safeAllProjects } from '@/lib/portfolio';
 import { services, serviceStyle } from '@/lib/services';
 
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
   openGraph: { title: 'Squaberry — Fresh ideas. Solid tech.', description: 'Thoughtful design and connected technology for what comes next.', url: '/' },
 };
 
+// The hero's typed second line. The first phrase is what renders without JS and what screen readers hear.
+const heroPhrases = ['Solid tech.', 'Smart apps.', 'Bold brands.', 'Real growth.'];
 
 export default async function HomePage() {
   await connection(); // Projects come from the database, so render per request.
@@ -26,7 +29,7 @@ export default async function HomePage() {
       <section className="container home-hero" aria-labelledby="heroTitle">
         <div>
           <span className="pill rise">Independent thinking. Connected technology.</span>
-          <h1 id="heroTitle" className="display-xl rise d1">Fresh ideas.<br />Solid tech.</h1>
+          <h1 id="heroTitle" className="display-xl rise d1">Fresh ideas.<br /><TypeLine phrases={heroPhrases} /></h1>
           <p className="lead rise d2">From the first sketch to the systems behind it, we make technology feel clear, useful and full of possibility.</p>
           <ul className="hero-services rise d3" aria-label="What we do">
             {services.map(service => (

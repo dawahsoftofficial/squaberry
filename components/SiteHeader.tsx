@@ -182,7 +182,7 @@ export default function SiteHeader() {
         </nav>
 
         <a href="mailto:hello@squaberry.co.uk" className="dock-mail" onPointerEnter={() => mega && closeMegaSoon()}>hello@squaberry.co.uk</a>
-        <Link href="/contact#enquiry" className="btn is-lime header-cta" onPointerEnter={() => mega && closeMegaSoon()}>
+        <Link href="/contact#enquiry" className="btn is-accent header-cta" onPointerEnter={() => mega && closeMegaSoon()}>
           <span>Start a project</span>
           <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
         </Link>
@@ -290,7 +290,7 @@ export default function SiteHeader() {
           </ul>
         </nav>
         <div className="mobile-menu-foot">
-          <Link href="/contact#enquiry" className="btn is-lime">
+          <Link href="/contact#enquiry" className="btn is-accent">
             <span>Start a project</span>
             <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
           </Link>

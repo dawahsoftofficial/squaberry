@@ -85,7 +85,7 @@ export default async function ProjectPage({ params }: Props) {
     return section ? <Story title={section.label} text={section.text} id={section.id} number={numberOf(id)} lead={id === 'overview'} /> : null;
   };
   const visit = project.site_url && (
-    <a className="btn is-lime" href={project.site_url} target="_blank" rel="noopener noreferrer">
+    <a className="btn is-accent" href={project.site_url} target="_blank" rel="noopener noreferrer">
       <span>Visit the live site</span>
       <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
       <span className="visually-hidden"> (opens in a new tab)</span>

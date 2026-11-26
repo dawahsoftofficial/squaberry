@@ -3,22 +3,22 @@ import Icon from './Icon';
 import { services } from '@/lib/services';
 
 // Two rows of soft-square tiles sliding in opposite directions: what we do, with a few brand tiles.
-type Tile = { label: string; icon: string; accent?: string; tone?: 'lime' | 'lav' };
+type Tile = { label: string; icon: string; accent?: string; tone?: 'accent' | 'lav' };
 const offerTiles: Tile[] = [
   { label: 'Websites', icon: 'web', accent: '#b3a8ff' },
   { label: 'Web apps', icon: 'apps', accent: '#8fd3e8' },
-  { label: 'Start a project', icon: 'arrow-up-right', tone: 'lime' },
+  { label: 'Start a project', icon: 'arrow-up-right', tone: 'accent' },
   { label: 'E-commerce', icon: 'shop', accent: '#ffb38a' },
   { label: 'Branding', icon: 'design', accent: '#f5a8d4' },
-  { label: 'UI & UX', icon: 'ui', accent: '#ecff95' },
+  { label: 'UI & UX', icon: 'ui', accent: '#ff9ed2' },
   { label: 'IT support', icon: 'support', accent: '#9fe6b8' },
 ];
 const brandTiles: Tile[] = [
-  { label: 'SEO', icon: 'seo', accent: '#ecff95' },
+  { label: 'SEO', icon: 'seo', accent: '#86b4ff' },
   { label: 'Fresh ideas', icon: 'sparkle', tone: 'lav' },
   { label: 'Paid social', icon: 'marketing', accent: '#f5a8d4' },
   { label: 'Content & email', icon: 'content', accent: '#8fd3e8' },
-  { label: 'Solid tech', icon: 'bolt', tone: 'lime' },
+  { label: 'Solid tech', icon: 'bolt', tone: 'accent' },
   { label: 'Cybersecurity', icon: 'security', accent: '#9fe6b8' },
   { label: 'Cloud hosting', icon: 'cloud', accent: '#b3a8ff' },
 ];

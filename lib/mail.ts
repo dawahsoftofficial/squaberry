@@ -178,7 +178,7 @@ export async function sendConfirmationEmail(enquiry: EnquiryMail): Promise<void>
   <tr><td align="center" style="padding:32px 16px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;border-radius:18px;overflow:hidden;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a">
       <tr><td style="padding:22px 28px;background:#1c1c1c">
-        <span style="display:inline-block;width:10px;height:10px;margin-right:10px;border-radius:3px;background:#ecff95;vertical-align:middle"></span>
+        <span style="display:inline-block;width:10px;height:10px;margin-right:10px;border-radius:3px;background-color:#7c55f7;background-image:linear-gradient(135deg,#3d72f5,#7c55f7,#d4479c,#f58a3d);vertical-align:middle"></span>
         <span style="color:#fffffd;font-size:18px;font-weight:bold;letter-spacing:-0.3px;vertical-align:middle">Squaberry</span>
       </td></tr>
       <tr><td style="padding:32px 28px 8px">

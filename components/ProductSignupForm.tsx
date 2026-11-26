@@ -107,7 +107,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
       </p>
 
       <div className="product-form-foot">
-        <button className="btn is-lime" type="submit" disabled={pending}>
+        <button className="btn is-accent" type="submit" disabled={pending}>
           <span>{pending ? 'Sending…' : 'Get started'}</span>
           <span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span>
         </button>

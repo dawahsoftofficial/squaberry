@@ -1,5 +1,5 @@
 /* Admin shell and surfaces, in the public site's style: dark surfaces, soft-square controls,
-   lavender and lime accents, Bricolage headings. Base controls are in admin-base.css. */
+   lavender and gradient accents, Bricolage headings. Base controls are in admin-base.css. */
 
 .admin{
   --admin-border:var(--a-border);
@@ -33,8 +33,8 @@
 .admin-nav a,.admin-view-site{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 12px;border-radius:12px;color:var(--a-muted);font-size:15px;font-weight:500;transition:background .25s,color .25s}
 .admin-nav a:hover,.admin-view-site:hover{background:rgba(255,255,255,.05);color:var(--fg)}
 .admin-nav a[aria-current=page]{position:relative;background:var(--surface-2);color:var(--fg)}
-.admin-nav a[aria-current=page]::after{content:'';position:absolute;right:12px;width:8px;height:8px;border-radius:2px;background:var(--lime)}
-.admin-nav a[aria-current=page] .admin-icon{color:var(--lime)}
+.admin-nav a[aria-current=page]::after{content:'';position:absolute;right:12px;width:8px;height:8px;border-radius:2px;background:var(--grad) border-box}
+.admin-nav a[aria-current=page] .admin-icon{color:var(--spark)}
 .admin-view-site{justify-content:space-between;margin-top:auto;border:1px solid var(--admin-border)}
 .admin-view-site .admin-icon{width:17px;height:17px}
 
@@ -49,16 +49,16 @@
 .admin-notifications,.admin-account{min-width:44px;min-height:44px;border:1px solid var(--admin-border);background:var(--a-card);color:var(--fg);transition:background .25s,border-color .25s}
 .admin-notifications{position:relative;display:grid;place-items:center;padding:0;border-radius:12px}
 .admin-account{padding:4px 12px 4px 4px;border-radius:14px;font-size:14px;font-weight:600}
-.admin-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--lime);color:var(--ink-1)}
+.admin-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--grad) border-box;color:#fff}
 .admin-avatar .admin-icon{width:18px;height:18px}
 .admin-notifications:hover,.admin-account:hover,
 .admin-notifications[aria-expanded=true],.admin-account[aria-expanded=true]{border-color:var(--a-border-2);background:var(--a-card-2)}
-.admin-notification-count{position:absolute;top:-6px;right:-6px;min-width:20px;padding:2px 5px;border-radius:8px;background:var(--lime);color:var(--ink-1);font-size:11px;font-weight:700;line-height:1.3;text-align:center}
+.admin-notification-count{position:absolute;top:-6px;right:-6px;min-width:20px;padding:2px 5px;border-radius:8px;background:var(--grad) border-box;color:#fff;font-size:11px;font-weight:700;line-height:1.3;text-align:center}
 .admin-popover{position:absolute;top:calc(100% + 10px);right:0;width:min(290px,calc(100vw - 28px));padding:16px;border:1px solid var(--a-border-2);border-radius:18px;background:var(--a-card-2);box-shadow:0 24px 60px -20px rgba(0,0,0,.7)}
 .admin-popover h2{font-size:17px;letter-spacing:-.015em}
 .admin-popover p{margin-top:4px;color:var(--a-muted);font-size:14px}
 .admin-popover-action{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;margin-top:12px;padding:8px 12px;border:0;border-radius:12px;background:rgba(255,255,255,.06);font-size:14px;font-weight:600;transition:background .2s,color .2s}
-.admin-popover-action:hover{background:var(--lime);color:var(--ink-1)}
+.admin-popover-action:hover{background:var(--grad) border-box;color:#fff}
 .admin-popover-action .admin-icon{width:17px;height:17px}
 .admin-account-popover{width:170px;padding:6px}
 .admin-account-popover .admin-popover-action{justify-content:flex-start;margin:0;background:transparent}
@@ -73,7 +73,7 @@
 .admin-back{margin-bottom:18px;font-size:14px;font-weight:600}
 .admin-back a{color:var(--fg-2)}
 .admin-back a:hover{color:var(--fg);text-decoration:underline;text-underline-offset:4px}
-.admin-flash{margin-bottom:20px;padding:14px 18px;border:1px solid rgba(236,255,149,.3);border-radius:var(--radius-sm);background:rgba(236,255,149,.08);color:var(--fg);font-size:15px;font-weight:600}
+.admin-flash{margin-bottom:20px;padding:14px 18px;border:1px solid rgba(196,155,255,.3);border-radius:var(--radius-sm);background:rgba(196,155,255,.08);color:var(--fg);font-size:15px;font-weight:600}
 .admin-flash.is-error{border-color:rgba(255,180,171,.35);background:rgba(255,180,171,.08);color:var(--a-danger)}
 
 /* ---------- Cards ---------- */
@@ -86,7 +86,7 @@
 .inbox-summary div{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 16px;border:1px solid var(--admin-border);border-radius:16px;background:var(--a-card)}
 .inbox-summary dt{color:var(--a-muted);font-size:13px;font-weight:600}
 .inbox-summary dd{margin:0;font-family:var(--font-display);font-size:26px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
-.inbox-summary div:first-child dd{color:var(--lime)}
+.inbox-summary div:first-child dd{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent}
 .inbox-card{
   --inbox-columns:minmax(0,1.05fr) minmax(0,1.3fr) minmax(66px,.32fr) minmax(106px,.48fr) 18px;
   --inbox-padding:22px;
@@ -98,8 +98,8 @@
 .admin-tabs a{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border-radius:12px;color:var(--a-muted);font-size:14px;font-weight:600;transition:background .2s,color .2s}
 .admin-tabs a span{min-width:22px;padding:1px 6px;border-radius:7px;background:rgba(255,255,255,.07);font-size:12px;text-align:center;font-variant-numeric:tabular-nums}
 .admin-tabs a:hover{background:rgba(255,255,255,.05);color:var(--fg)}
-.admin-tabs a[aria-current=page]{background:var(--lime);color:var(--ink-1)}
-.admin-tabs a[aria-current=page] span{background:rgba(26,26,26,.12);color:var(--ink-1)}
+.admin-tabs a[aria-current=page]{background:var(--grad) border-box;color:#fff}
+.admin-tabs a[aria-current=page] span{background:rgba(255,255,255,.22);color:#fff}
 .kind-tabs{display:flex;flex-wrap:wrap;gap:3px;padding:4px;border:1px solid var(--admin-border);border-radius:14px;background:var(--bg-2)}
 .kind-tabs a{display:flex;align-items:center;min-height:34px;padding:0 12px;border-radius:10px;color:var(--a-muted);font-size:13px;font-weight:600;transition:background .2s,color .2s}
 .kind-tabs a:hover{color:var(--fg)}
@@ -107,7 +107,7 @@
 .product-badge{display:inline-block;margin-right:6px;padding:2px 9px;border-radius:999px;background:rgba(179,168,255,.16);color:var(--lav);font-size:12px;font-weight:600;vertical-align:1px}
 
 .status-badge{display:inline-flex;justify-self:start;padding:4px 10px;border:1px solid transparent;border-radius:999px;background:rgba(255,255,255,.07);color:var(--fg-2);font-size:12px;font-weight:600;line-height:1.3;text-transform:capitalize;white-space:nowrap}
-.status-badge.is-new{background:var(--lime);color:var(--ink-1)}
+.status-badge.is-new{background:var(--grad) border-box;color:#fff}
 .status-badge.is-archived{border-color:var(--admin-border);background:transparent;color:var(--a-muted)}
 
 .enquiry-list{list-style:none;margin:0;padding:0}
@@ -118,8 +118,8 @@
 .enquiry-row a:hover{background:rgba(255,255,255,.035)}
 .enquiry-row a:focus-visible{outline-offset:-3px}
 .enquiry-row a > .admin-icon{width:18px;height:18px;color:var(--a-muted);transition:transform .3s var(--ease-soft),color .2s}
-.enquiry-row a:hover > .admin-icon{color:var(--lime);transform:translateX(3px)}
-.enquiry-row.is-new .enquiry-who strong::after{content:'';display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:2px;background:var(--lime);vertical-align:2px}
+.enquiry-row a:hover > .admin-icon{color:var(--spark);transform:translateX(3px)}
+.enquiry-row.is-new .enquiry-who strong::after{content:'';display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:2px;background:var(--grad) border-box;vertical-align:2px}
 .enquiry-sender{display:flex;align-items:center;gap:12px;min-width:0}
 .enquiry-avatar{display:grid;flex:none;place-items:center;width:40px;height:40px;border-radius:12px;background:rgba(179,168,255,.16);color:var(--lav);font-size:13px;font-weight:700}
 .enquiry-who,.enquiry-excerpt{display:grid;gap:2px;min-width:0;line-height:1.5}
@@ -146,7 +146,7 @@
 .enquiry-meta dt{color:var(--a-muted);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .enquiry-meta dd{margin:4px 0 0;font-size:15px;overflow-wrap:anywhere}
 .enquiry-meta dd a{text-decoration:underline;text-decoration-color:var(--a-border-2);text-underline-offset:4px}
-.enquiry-meta dd a:hover{color:var(--lime)}
+.enquiry-meta dd a:hover{color:var(--spark)}
 .enquiry-actions{display:grid;gap:10px;margin-top:24px;padding-top:24px;border-top:1px solid var(--admin-border)}
 .enquiry-actions .button{width:100%}
 .admin-button{width:100%;min-height:46px;padding:0 16px;border:1px solid var(--a-border-2);border-radius:var(--radius-sm);background:transparent;color:var(--fg);font-size:14px;font-weight:600;text-align:left;transition:background .2s,border-color .2s}
@@ -159,11 +159,11 @@
 .danger-zone form{max-width:260px}
 
 /* ---------- Sign in ---------- */
-.admin-login{display:grid;place-items:center;min-height:100vh;padding:24px;background:radial-gradient(45% 45% at 20% 15%,rgba(179,168,255,.18),transparent 70%),radial-gradient(40% 40% at 85% 90%,rgba(236,255,149,.1),transparent 70%),var(--bg)}
+.admin-login{display:grid;place-items:center;min-height:100vh;padding:24px;background:radial-gradient(45% 45% at 20% 15%,rgba(179,168,255,.18),transparent 70%),radial-gradient(40% 40% at 85% 90%,rgba(245,138,61,.12),transparent 70%),var(--bg)}
 .admin-login-card{width:min(100%,430px);padding:40px 36px;border:1px solid var(--a-border);border-radius:28px;background:linear-gradient(170deg,var(--surface-2),var(--surface));box-shadow:0 40px 100px -40px rgba(0,0,0,.8)}
 .admin-login-logo{display:block;width:140px;height:auto;margin-bottom:30px;filter:brightness(0) invert(1)}
 .admin-login-card .mono{display:flex;align-items:center;gap:10px}
-.admin-login-card .mono::before{content:'';width:8px;height:8px;border-radius:2px;background:var(--lime)}
+.admin-login-card .mono::before{content:'';width:8px;height:8px;border-radius:2px;background:var(--grad) border-box}
 .admin-login-card h1{margin:12px 0 8px;font-size:44px}
 .admin-form{display:grid;gap:18px;margin-top:28px}
 .admin-form .button{width:100%}
@@ -175,13 +175,13 @@
 .case-fields legend{padding:0 10px;font-family:var(--font-display);font-size:18px;font-weight:600}
 .case-fields > .field-hint{grid-column:1/-1;margin:0}
 .checkbox-field{display:flex;align-items:center;align-self:end;gap:12px;min-height:50px}
-.checkbox-field input{width:22px;height:22px;min-height:0;padding:0;accent-color:var(--lime)}
+.checkbox-field input{width:22px;height:22px;min-height:0;padding:0;accent-color:#7c55f7}
 .admin-group{margin-top:16px;overflow:hidden}
 .admin-group-head{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:64px;padding:10px 20px;border-bottom:1px solid var(--admin-border)}
 .admin-group-head h2{font-size:22px}
 .admin-group-head h2 .mono{margin-right:8px}
 .admin-group-head a{display:flex;align-items:center;gap:6px;flex:none;min-height:40px;padding:0 12px;border-radius:12px;background:rgba(255,255,255,.06);font-size:14px;font-weight:600;transition:background .2s,color .2s}
-.admin-group-head a:hover{background:var(--lime);color:var(--ink-1)}
+.admin-group-head a:hover{background:var(--grad) border-box;color:#fff}
 .portfolio-admin-list{list-style:none;margin:0;padding:0}
 .portfolio-admin-list li + li{border-top:1px solid var(--admin-border)}
 .portfolio-admin-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 20px;transition:background .2s}
@@ -217,7 +217,8 @@
     border-bottom:1px solid var(--admin-border);
   }
   .admin-brand,.admin-context-root{display:none}
-  .admin-mobile-brand{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--lime)}
+  .admin-mobile-brand{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--grad) border-box}
+  .admin-mobile-brand img{filter:brightness(0) invert(1)}
   .admin-mobile-brand img{width:19px;height:auto}
   .admin-nav{display:flex;gap:4px}
   .admin-nav a,.admin-view-site{min-height:44px}

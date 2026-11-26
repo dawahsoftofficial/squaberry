@@ -172,7 +172,7 @@ export const serviceStyle: Record<string, { icon: string; accent: string }> = {
   'web-app-development': { icon: 'web', accent: '#b3a8ff' },
   'design-digital-experiences': { icon: 'design', accent: '#ffb38a' },
   'cloud-infrastructure': { icon: 'cloud', accent: '#8fd3e8' },
-  'ai-workflow-automation': { icon: 'automation', accent: '#ecff95' },
+  'ai-workflow-automation': { icon: 'automation', accent: '#ff9ed2' },
   'digital-marketing': { icon: 'marketing', accent: '#f5a8d4' },
   'it-support-security': { icon: 'security', accent: '#9fe6b8' },
   'strategy-consulting': { icon: 'strategy', accent: '#f5a8d4' },

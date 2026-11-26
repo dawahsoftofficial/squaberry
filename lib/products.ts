@@ -143,7 +143,7 @@ export const products: Product[] = [
     tagline: 'Turn website visitors into conversations.',
     intro: 'An AI chatbot added to your website, trained on your content, that answers visitors’ questions, recommends the right service or product, and collects leads for your team.',
     icon: 'bot',
-    accent: '#ecff95',
+    accent: '#86b4ff',
     cover: { src: '/assets/products/chatbot-integration.jpg', alt: 'Website with an AI chat widget open on a laptop' },
     highlights: ['Added to your existing website', 'Answers from your own content', 'Captures leads while you sleep'],
     features: [

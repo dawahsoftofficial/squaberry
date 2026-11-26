@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { startTransition, useActionState, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import Icon from './Icon';
 import { submitEnquiry, type EnquiryState } from '@/app/actions/enquiry';
 import { otherTopic, services } from '@/lib/services';
 
@@ -172,7 +173,7 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
     const firstName = values.name.trim().split(/\s+/)[0];
     return (
       <div className={`step-form is-${variant} step-success`} id={id} ref={successRef} tabIndex={-1} role="status" aria-live="polite">
-        <span className="step-success-mark" aria-hidden="true">✓</span>
+        <span className="step-success-mark" aria-hidden="true"><Icon name="check" size={28} /></span>
         <p className="mono">MESSAGE RECEIVED</p>
         <h3>Thanks{firstName ? `, ${firstName}` : ''}.</h3>
         <p>Your message is with our team. We’ll reply to <strong>{values.email || 'you'}</strong> by email.</p>
@@ -203,12 +204,12 @@ export default function EnquiryForm({ defaultTopic = '', source, variant = 'full
               <li key={item.label} className={`${index === step ? 'is-current' : ''}${done ? ' is-done' : ''}`} aria-current={index === step ? 'step' : undefined}>
                 {reachable ? (
                   <button type="button" onClick={() => goTo(index)}>
-                    <span className="step-dot" aria-hidden="true">{done ? '✓' : index + 1}</span>
+                    <span className="step-dot" aria-hidden="true">{done ? <Icon name="check" size={14} /> : index + 1}</span>
                     <span>{item.label}<span className="visually-hidden">: go back to step {index + 1}</span></span>
                   </button>
                 ) : (
                   <span className="step-progress-item">
-                    <span className="step-dot" aria-hidden="true">{done ? '✓' : index + 1}</span>
+                    <span className="step-dot" aria-hidden="true">{done ? <Icon name="check" size={14} /> : index + 1}</span>
                     <span>{item.label}</span>
                   </span>
                 )}
