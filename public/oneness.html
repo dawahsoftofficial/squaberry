@@ -237,6 +237,29 @@
   @keyframes draw { to { stroke-dashoffset: 0; } }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeIn { from { opacity: 0; } }
+
+  /* Opening: "Let us see if you are indeed a believer." one word per screen */
+  .intro {
+    position: fixed; inset: 0; z-index: 50; background: var(--bg); color: var(--ink);
+    display: grid; place-items: center; padding: 24px; cursor: pointer;
+    transition: opacity .7s var(--ease), visibility .7s;
+  }
+  .intro.done { opacity: 0; visibility: hidden; pointer-events: none; }
+  .intro-word {
+    font-size: clamp(54px, 17vw, 104px); font-weight: 900; letter-spacing: -0.045em; line-height: 1;
+    text-align: center; opacity: 0;
+  }
+  .intro-word.in  { animation: wordIn .5s cubic-bezier(.2, .8, .2, 1) forwards; }
+  .intro-word.out { animation: wordOut .32s ease-in forwards; }
+  .intro-word.final { font-size: clamp(60px, 19vw, 120px); }
+  .intro-word.sentence { font-size: clamp(34px, 10vw, 56px); letter-spacing: -0.03em; line-height: 1.1; opacity: 1; }
+  .intro-skip {
+    position: absolute; bottom: calc(22px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+    background: none; border: 0; padding: 12px 18px; font-size: 13px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  @keyframes wordIn  { from { opacity: 0; transform: translateY(14px) scale(.94); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes wordOut { from { opacity: 1; transform: none; filter: none; } to { opacity: 0; transform: translateY(-10px) scale(1.03); filter: blur(8px); } }
   @keyframes drawLoop { 0% { stroke-dashoffset: 1; } 46%, 54% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -246,6 +269,10 @@
 </style>
 </head>
 <body>
+<div class="intro" id="intro" role="presentation">
+  <p class="intro-word" id="introWord" aria-live="polite"></p>
+  <button class="intro-skip" id="introSkip" type="button">Skip</button>
+</div>
 <div class="app">
 
   <!-- Live counters -->
@@ -1259,8 +1286,48 @@ document.addEventListener("keydown", (e) => {
 });
 
 $("#back").addEventListener("click", back);
+/* ---------- Opening words ----------
+   One word per screen, each fading in and out; a pause before "indeed" and before "believer.",
+   which holds before the quiz starts. Tap anywhere (or Skip) to go straight in. */
+function playIntro() {
+  const box = $("#intro"), el = $("#introWord");
+  const words = ["Let", "us", "see", "if", "you", "are", "indeed", "a", "believer."];
+  const pauseBefore = { indeed: 450, "believer.": 800 };
+  let skipped = false, finish;
+  const done = new Promise(r => (finish = r));
+  const end = () => { if (skipped) return; skipped = true; box.classList.add("done"); finish(); };
+  box.addEventListener("click", end);
+  document.addEventListener("keydown", function onKey(e) {
+    if (e.key === "Enter" || e.key === " " || e.key === "Escape") { document.removeEventListener("keydown", onKey); end(); }
+  });
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  if (reduced) {                                   // no motion: show the sentence, then continue
+    el.className = "intro-word sentence";
+    el.textContent = "Let us see if you are indeed a believer.";
+    sleep(2200).then(end);
+    return done;
+  }
+  (async () => {
+    await sleep(500);
+    for (const w of words) {
+      if (skipped) return;
+      if (pauseBefore[w]) await sleep(pauseBefore[w]);
+      const last = w === words[words.length - 1];
+      el.textContent = w;
+      el.className = "intro-word in" + (last ? " final" : "");
+      await sleep(last ? 1900 : 560 + w.length * 25);
+      if (last) break;
+      el.className = "intro-word out";
+      await sleep(320);
+    }
+    end();
+  })();
+  return done;
+}
+
 loadStats();
-start();
+playIntro().then(start);
 </script>
 </body>
 </html>
