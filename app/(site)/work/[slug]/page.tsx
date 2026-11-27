@@ -104,7 +104,7 @@ export default async function ProjectPage({ params }: Props) {
     <main id="main" className="case">
       <JsonLd
         data={[
-          breadcrumbSchema([{ name: 'Projects', path: '/work' }, { name: project.title, path: `/work/${project.slug}` }]),
+          breadcrumbSchema([{ name: 'Our Work', path: '/work' }, { name: project.title, path: `/work/${project.slug}` }]),
           caseStudySchema({ ...project, slug }, project.intro || project.summary || project.title, project.image_url ? absoluteUrl(mediaUrl(project.image_url)) : null),
         ]}
       />

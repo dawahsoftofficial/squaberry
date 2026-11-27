@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Icon from './Icon';
 import { mediaUrl } from '@/lib/media-url';
+import { products } from '@/lib/products';
 import { services, serviceStyle } from '@/lib/services';
 
 const links = [
-  { href: '/work', label: 'Projects' },
-  { href: '/products', label: 'Products' },
+  { href: '/work', label: 'Our Work' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -42,14 +42,21 @@ const offers: { label: string; slug: string }[] = [
   { label: 'Automation', slug: 'ai-workflow-automation' },
 ];
 
+// The product shown as a card in the Products panel (the newest one).
+const spotlight = products.find(product => product.slug === 'amanah-ai') ?? products[0];
+
+type Menu = 'services' | 'products';
+const menus: Menu[] = ['services', 'products'];
+
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [mega, setMega] = useState(false);
+  const [menu, setMenu] = useState<Menu | null>(null);
+  const mega = menu !== null;
   const [scrolled, setScrolled] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const servicesRef = useRef<HTMLButtonElement>(null);
-  const megaRef = useRef<HTMLDivElement>(null);
+  const triggerRefs = useRef<Record<Menu, HTMLButtonElement | null>>({ services: null, products: null });
+  const panelRefs = useRef<Record<Menu, HTMLDivElement | null>>({ services: null, products: null });
   const closeTimer = useRef<number | undefined>(undefined);
 
   const visibleSlugs = new Set(services.map(service => service.slug));
@@ -66,32 +73,33 @@ export default function SiteHeader() {
   // Close both menus on navigation.
   useEffect(() => {
     setOpen(false);
-    setMega(false);
+    setMenu(null);
   }, [pathname]);
 
-  // ---- Services mega menu (desktop) ----
-  const openMega = useCallback(() => {
+  // ---- Services and Products mega menus (desktop) ----
+  const openMega = useCallback((which: Menu) => {
     window.clearTimeout(closeTimer.current);
-    setMega(true);
+    setMenu(which);
   }, []);
   const closeMegaSoon = useCallback(() => {
     window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setMega(false), 180);
+    closeTimer.current = window.setTimeout(() => setMenu(null), 180);
   }, []);
-  const closeMega = useCallback((returnFocus = false) => {
+  const closeMega = useCallback((returnFocus?: Menu) => {
     window.clearTimeout(closeTimer.current);
-    setMega(false);
-    if (returnFocus) servicesRef.current?.focus();
+    setMenu(null);
+    if (returnFocus) triggerRefs.current[returnFocus]?.focus();
   }, []);
 
   useEffect(() => {
-    if (!mega) return;
+    if (!menu) return;
     const onKey = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') closeMega(true);
+      if (event.key === 'Escape') closeMega(menu);
     };
     const onPointer = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (!megaRef.current?.contains(target) && !servicesRef.current?.contains(target)) closeMega();
+      const inside = menus.some(which => panelRefs.current[which]?.contains(target) || triggerRefs.current[which]?.contains(target));
+      if (!inside) closeMega();
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('pointerdown', onPointer);
@@ -99,34 +107,53 @@ export default function SiteHeader() {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer);
     };
-  }, [mega, closeMega]);
+  }, [menu, closeMega]);
 
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   // The mega menu only exists on wide screens: close it if the window narrows to the phone layout.
   useEffect(() => {
     const narrow = window.matchMedia('(max-width: 960px)');
-    const onChange = () => narrow.matches && setMega(false);
+    const onChange = () => narrow.matches && setMenu(null);
     narrow.addEventListener('change', onChange);
     return () => narrow.removeEventListener('change', onChange);
   }, []);
 
-  const onServicesKey = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      openMega();
-      window.setTimeout(() => megaRef.current?.querySelector<HTMLElement>('a')?.focus(), 30);
-    }
-  };
-  const onServicesClick = () => {
-    if (mega) return closeMega();
-    openMega();
-  };
-  // Leaving the panel by keyboard closes it.
-  const onMegaBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    const next = event.relatedTarget as Node | null;
-    if (next && !megaRef.current?.contains(next) && next !== servicesRef.current) closeMega();
-  };
+  // Each dropdown: a button in the dock and a panel under it (one open at a time).
+  const trigger = (which: Menu, label: string, href: string) => (
+    <button
+      ref={node => { triggerRefs.current[which] = node; }}
+      type="button"
+      className={`dock-link${isCurrent(href) ? ' is-current' : ''}`}
+      aria-expanded={menu === which}
+      aria-controls={`${which}-menu`}
+      onClick={() => (menu === which ? closeMega() : openMega(which))}
+      onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
+        if (event.key !== 'ArrowDown') return;
+        event.preventDefault();
+        openMega(which);
+        window.setTimeout(() => panelRefs.current[which]?.querySelector<HTMLElement>('a')?.focus(), 30);
+      }}
+      onPointerEnter={event => event.pointerType === 'mouse' && openMega(which)}
+    >
+      {label}
+      <Icon name="chevron-down" size={16} className="dock-chevron" />
+    </button>
+  );
+  const panelProps = (which: Menu, label: string) => ({
+    ref: (node: HTMLDivElement | null) => { panelRefs.current[which] = node; },
+    id: `${which}-menu`,
+    className: `mega${menu === which ? ' is-open' : ''}`,
+    role: 'region',
+    'aria-label': label,
+    inert: menu !== which,
+    onPointerEnter: (event: React.PointerEvent<HTMLDivElement>) => { if (event.pointerType === 'mouse') openMega(which); },
+    // Leaving the panel by keyboard closes it.
+    onBlur: (event: React.FocusEvent<HTMLDivElement>) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && !panelRefs.current[which]?.contains(next) && next !== triggerRefs.current[which]) closeMega();
+    },
+  });
 
   // ---- Full-screen menu (phones and tablets) ----
   useEffect(() => {
@@ -157,19 +184,8 @@ export default function SiteHeader() {
         <span className="dock-divider" aria-hidden="true" />
 
         <nav className="dock-nav" aria-label="Main navigation">
-          <button
-            ref={servicesRef}
-            type="button"
-            className={`dock-link${isCurrent('/services') ? ' is-current' : ''}`}
-            aria-expanded={mega}
-            aria-controls="services-menu"
-            onClick={onServicesClick}
-            onKeyDown={onServicesKey}
-            onPointerEnter={event => event.pointerType === 'mouse' && openMega()}
-          >
-            Services
-            <Icon name="chevron-down" size={16} className="dock-chevron" />
-          </button>
+          {trigger('services', 'Services', '/services')}
+          {trigger('products', 'Products', '/products')}
           {links.map(link => (
             <Link
               key={link.href}
@@ -196,7 +212,7 @@ export default function SiteHeader() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => {
-            setMega(false);
+            setMenu(null);
             setOpen(value => !value);
           }}
         >
@@ -208,16 +224,7 @@ export default function SiteHeader() {
       {/* The dim layer is inside the header, so leaving the panel onto it doesn't fire the header's pointerleave. */}
       <div className="nav-scrim" aria-hidden="true" onPointerEnter={event => event.pointerType === 'mouse' && mega && closeMegaSoon()} />
 
-      <div
-        ref={megaRef}
-        id="services-menu"
-        className="mega"
-        role="region"
-        aria-label="Services"
-        inert={!mega}
-        onPointerEnter={event => event.pointerType === 'mouse' && openMega()}
-        onBlur={onMegaBlur}
-      >
+      <div {...panelProps('services', 'Services')}>
         <div className="mega-grid">
           <div className="mega-col">
             <p className="mega-label">Services</p>
@@ -267,6 +274,52 @@ export default function SiteHeader() {
         </div>
       </div>
 
+      <div {...panelProps('products', 'Products')}>
+        <div className="mega-grid is-products">
+          <div className="mega-col">
+            <p className="mega-label">Products</p>
+            <ul className="mega-features is-two">
+              {products.map(product => (
+                <li key={product.slug}>
+                  <Link href={`/products/${product.slug}`} className="mega-feature" style={{ ['--accent' as string]: product.accent }}>
+                    <span className="mega-feature-icon"><Icon name={product.icon} size={22} /></span>
+                    <span className="mega-feature-text">
+                      <span className="mega-feature-title">{product.name}</span>
+                      <span className="mega-feature-sub">{product.category}</span>
+                    </span>
+                    <Icon name="arrow-right" size={18} className="mega-feature-go" />
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/products" className="mega-feature">
+                  <span className="mega-feature-icon"><Icon name="grid" size={22} /></span>
+                  <span className="mega-feature-text">
+                    <span className="mega-feature-title">All products</span>
+                    <span className="mega-feature-sub">Compare them side by side</span>
+                  </span>
+                  <Icon name="arrow-right" size={18} className="mega-feature-go" />
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <Link href={`/products/${spotlight.slug}`} className="mega-work">
+            <span className="mega-work-media">
+              <Image src={spotlight.cover.src} alt="" width={1200} height={900} sizes="340px" />
+              <span className="mega-work-label">New</span>
+            </span>
+            <span className="mega-work-title">{spotlight.name}</span>
+            <span className="mega-work-text">{spotlight.headline}.</span>
+          </Link>
+        </div>
+
+        <div className="mega-foot">
+          <p>Ready-made software, set up in your brand. Book a demo to see one working.</p>
+          <Link href="/products" className="text-link">Browse products <Icon name="arrow-right" size={16} /></Link>
+        </div>
+      </div>
+
       <div className="mobile-menu" id="mobile-menu" hidden={!open}>
         <nav aria-label="Mobile navigation">
           <ul>
@@ -279,6 +332,19 @@ export default function SiteHeader() {
                     <Link href={`/services/${service.slug}`} aria-current={pathname === `/services/${service.slug}` ? 'page' : undefined} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
                       <Icon name={serviceStyle[service.slug].icon} size={20} />
                       {service.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+            <li>
+              <Link href="/products" aria-current={pathname === '/products' ? 'page' : undefined}>Products</Link>
+              <ul className="mobile-sub">
+                {products.map(product => (
+                  <li key={product.slug}>
+                    <Link href={`/products/${product.slug}`} aria-current={pathname === `/products/${product.slug}` ? 'page' : undefined} style={{ ['--accent' as string]: product.accent }}>
+                      <Icon name={product.icon} size={20} />
+                      {product.name}
                     </Link>
                   </li>
                 ))}

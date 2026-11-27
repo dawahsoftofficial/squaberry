@@ -28,7 +28,7 @@ export default async function WorkPage() {
 
   return (
     <main id="main">
-      <JsonLd data={breadcrumbSchema([{ name: 'Projects', path: '/work' }])} />
+      <JsonLd data={breadcrumbSchema([{ name: 'Our Work', path: '/work' }])} />
       <PageHero
         label="Selected work"
         title={<>Work we’re<br />proud of.</>}
