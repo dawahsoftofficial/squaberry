@@ -83,7 +83,7 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 
 .btn{display:inline-flex;align-items:center;gap:14px;min-height:52px;padding:6px 6px 6px 24px;border:1px solid transparent;border-radius:14px;background:#fff;color:var(--ink-1);font-size:16px;font-weight:600;line-height:1;white-space:nowrap;transition:background .3s var(--ease-soft),transform .3s var(--ease-soft),color .3s}
 .btn-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:10px;background:var(--ink-1);color:#fff;transition:transform .4s var(--ease-soft),background .3s,color .3s}
-.btn:hover{background:var(--grad) border-box;color:#fff;transform:translateY(-2px)}
+.btn:hover{background:var(--grad) border-box;color:#fff}
 .btn-icon svg{transition:transform .35s var(--ease-soft)}
 .btn:hover .btn-icon svg{transform:translate(2px,-2px)}
 .btn.is-accent{background:var(--grad) border-box;color:#fff}
@@ -321,19 +321,16 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .story-main{display:grid;gap:clamp(28px,3vw,40px)}
 .story-statement{max-width:22ch;font-family:var(--font-display);font-size:clamp(28px,3.1vw,46px);font-weight:500;letter-spacing:-.015em;line-height:1.12}
 .story-text{max-width:46ch;color:var(--fg-2);font-size:clamp(17px,1.35vw,20px);line-height:1.6}
-.story-pair{display:grid;gap:16px}
-.story-card{display:grid;gap:14px;padding:clamp(24px,2.6vw,34px);border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(160deg,var(--surface-2),var(--surface));transition:transform .6s var(--ease-soft),border-color .4s}
-.story-card.is-berry{margin-left:clamp(0px,4vw,56px)}
-.story-card:hover{border-color:var(--border-2);transform:translateY(-4px)}
-.story-shape{width:48px;height:48px;box-shadow:0 0 22px -2px color-mix(in srgb,currentColor 45%,transparent);transition:transform .8s var(--ease-soft),box-shadow .5s var(--ease-soft)}
-.story-card:hover .story-shape{box-shadow:0 0 30px 0 color-mix(in srgb,currentColor 60%,transparent)}
-.story-card.is-square .story-shape{border-radius:12px;background:linear-gradient(150deg,#d3cbff,var(--lav));color:var(--lav)}
-.story-card.is-berry .story-shape{border-radius:50%;background:radial-gradient(circle at 32% 28%,#ffc2e3 0%,#d4479c 52%,#7c55f7 100%);color:#d4479c}
-.story-card.is-square:hover .story-shape{transform:rotate(90deg)}
-.story-card.is-berry:hover .story-shape{transform:scale(1.12)}
-.story-card h3{font-size:clamp(22px,1.9vw,27px)}
-.story-card p{color:var(--fg-2)}
-.story-card .tag{border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--fg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+/* The journey: a short timeline on a gradient line, each stop marked with a soft square. */
+.story-timeline{position:relative;display:grid;gap:clamp(18px,2vw,24px);margin:0;padding:0 0 0 34px;list-style:none}
+.story-timeline::before{content:"";position:absolute;top:14px;bottom:14px;left:8px;width:2px;border-radius:2px;background:linear-gradient(180deg,var(--lav),#d4479c 62%,#f58a3d)}
+.story-step{position:relative;display:grid;gap:8px;padding:clamp(20px,2.2vw,28px);border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(160deg,var(--surface-2),var(--surface));transition:border-color .4s}
+.story-step:hover{border-color:var(--border-2)}
+.story-step::before{content:"";position:absolute;top:calc(clamp(20px,2.2vw,28px) + 2px);left:-33px;width:16px;height:16px;border-radius:5px;background:var(--grad);box-shadow:0 0 0 5px var(--bg)}
+.story-step.is-now::before{box-shadow:0 0 0 5px var(--bg),0 0 20px 3px color-mix(in srgb,#d4479c 55%,transparent)}
+.story-when{color:var(--spark)}
+.story-step h3{font-size:clamp(21px,1.8vw,26px)}
+.story-step p{color:var(--fg-2)}
 /* About: team groups (photos are placeholders until real portraits are added in lib/team.ts) */
 .team-group{display:grid;gap:clamp(22px,2.6vw,32px);margin-top:clamp(48px,6vw,80px)}
 .team-group+.team-group{margin-top:clamp(56px,7vw,96px)}
@@ -468,7 +465,7 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .topic-card{display:flex;align-items:center;gap:12px;height:100%;min-height:58px;padding:14px 16px;border:1px solid var(--border-2);border-radius:16px;background:rgba(255,255,255,.03);cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .3s var(--ease-soft)}
 .topic-card .mono{flex:none;color:var(--fg-3);letter-spacing:.04em}
 .topic-name{font-size:15px;font-weight:600;line-height:1.25}
-.topic-option:hover .topic-card{border-color:var(--fg-2);transform:translateY(-1px)}
+.topic-option:hover .topic-card{border-color:var(--fg-2)}
 .topic-option input:checked+.topic-card{border-color:transparent;background:var(--grad) border-box;color:#fff}
 .topic-option input:checked+.topic-card .mono{color:rgba(255,255,255,.78)}
 .topic-option input:focus-visible+.topic-card{outline:2px solid var(--lav);outline-offset:3px}
@@ -497,7 +494,7 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .step-review-message{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:pre-wrap;overflow-wrap:anywhere}
 .step-actions{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:26px}
 .step-form .button{display:inline-flex;align-items:center;gap:12px;min-height:52px;padding:0 24px;border:0;border-radius:14px;background:#fff;color:var(--ink-1);font-size:16px;font-weight:600;transition:background .3s,transform .3s var(--ease-soft)}
-.step-form .button:hover{background:var(--grad) border-box;color:#fff;transform:translateY(-2px)}
+.step-form .button:hover{background:var(--grad) border-box;color:#fff}
 .step-form .button:disabled{opacity:.6;cursor:progress;transform:none}
 .step-form .arrow{display:inline-block;transition:transform .3s var(--ease-soft)}
 .step-form .button:hover .arrow{transform:translateX(3px)}
@@ -717,7 +714,6 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
   .menu-toggle{display:inline-flex}
   .home-hero{grid-template-columns:minmax(0,1fr)}
   .story{grid-template-columns:minmax(0,1fr)}
-  .story-card.is-berry{margin-left:0}
   .split-hero{grid-template-columns:minmax(0,1fr);align-items:start}
   .hero-form{justify-self:start;max-width:640px}
   .bento{grid-template-columns:repeat(2,minmax(0,1fr))}

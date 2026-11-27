@@ -31,6 +31,14 @@ const promises = [
   { label: 'In it for the long run', icon: 'evolve', accent: '#ffb38a', text: 'Launch is a beginning. We stay on hand to support and improve what we build.' },
 ];
 
+// The journey, told simply (no meaning read into the logo).
+const journey = [
+  { when: '15 years ago', title: 'It started with a few clients', text: 'A small team with a simple aim: make technology feel clear and useful for the people who rely on it.' },
+  { when: 'The hard years', title: 'Trying, failing, learning', text: 'Not every idea worked. Each setback taught us something, and every project made the next one better.' },
+  { when: 'Finding our feet', title: 'Doing what we do best', text: 'We brought design, development, digital marketing and IT support under one roof, so clients have one team to talk to.' },
+  { when: 'Today', title: '500+ projects around the globe', text: 'More than 500 projects delivered for organisations around the world, and still curious about the next one.', now: true },
+];
+
 export default function AboutPage() {
   return (
     <main id="main">
@@ -49,28 +57,19 @@ export default function AboutPage() {
 
       <section className="container section story" aria-labelledby="storyTitle">
         <div className="story-main">
-          <SectionIntro label="Our story" title="Square roots. Fresh thinking." id="storyTitle" />
-          <p className="story-statement text-reveal">Square gives us structure. Berry gives us character. Together, they’re a reminder that good technology takes clear thinking and a bit of imagination.</p>
+          <SectionIntro label="Our story" title="Fifteen years in the making." id="storyTitle" />
+          <p className="story-statement text-reveal">We didn’t get it right first time. We tried, we failed, we learned, and we kept going.</p>
           <p className="story-text reveal">Whether it’s a new website, a campaign that brings in new customers or support that keeps your team running, we treat it as part of a bigger picture: your organisation, and where it’s heading.</p>
         </div>
-        <div className="story-pair">
-          <article className="story-card is-square reveal">
-            <span className="story-shape" aria-hidden="true" />
-            <h3>The square</h3>
-            <p>The logic underneath everything we build: sound engineering, sensible security and systems that hold up.</p>
-            <ul className="tag-row" aria-label="The square stands for">
-              <li className="tag">Engineering</li><li className="tag">Security</li><li className="tag">Reliable systems</li>
-            </ul>
-          </article>
-          <article className="story-card is-berry reveal">
-            <span className="story-shape" aria-hidden="true" />
-            <h3>The berry</h3>
-            <p>The part people feel: design with personality, experiences that are easy to use, and ideas that make work a little more enjoyable.</p>
-            <ul className="tag-row" aria-label="The berry stands for">
-              <li className="tag">Design</li><li className="tag">Experience</li><li className="tag">Ideas</li>
-            </ul>
-          </article>
-        </div>
+        <ol className="story-timeline">
+          {journey.map(step => (
+            <li className={`story-step reveal${step.now ? ' is-now' : ''}`} key={step.title}>
+              <span className="mono story-when">{step.when}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="container section team" aria-labelledby="teamTitle">
