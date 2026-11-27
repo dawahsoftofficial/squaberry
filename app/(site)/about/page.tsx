@@ -102,7 +102,7 @@ export default function AboutPage() {
         <ul className="feature-grid cols-4">
           {promises.map(promise => (
             <li className="feature-card reveal" key={promise.label} style={{ ['--accent' as string]: promise.accent }}>
-              <span className="feature-icon"><Icon name={promise.icon} size={28} /></span>
+              <span className="feature-icon"><Icon name={promise.icon} size={40} /></span>
               <h3>{promise.label}</h3>
               <p>{promise.text}</p>
             </li>
@@ -125,7 +125,7 @@ export default function AboutPage() {
           {services.map(service => (
             <li key={service.slug}>
               <Link href={`/services/${service.slug}`} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
-                <span className="link-icon"><Icon name={serviceStyle[service.slug].icon} size={22} /></span>
+                <span className="link-icon"><Icon name={serviceStyle[service.slug].icon} size={32} /></span>
                 <span className="link-name">{service.name}</span>
                 <span className="link-go" aria-hidden="true"><Icon name="arrow-up-right" size={18} /></span>
               </Link>

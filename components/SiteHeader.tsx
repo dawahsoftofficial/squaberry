@@ -235,7 +235,7 @@ export default function SiteHeader() {
                 return (
                   <li key={service.slug}>
                     <Link href={`/services/${service.slug}`} className="mega-feature" style={{ ['--accent' as string]: style.accent }}>
-                      <span className="mega-feature-icon"><Icon name={style.icon} size={22} /></span>
+                      <span className="mega-feature-icon"><Icon name={style.icon} size={34} /></span>
                       <span className="mega-feature-text">
                         <span className="mega-feature-title">{service.name}</span>
                         <span className="mega-feature-sub"><em>{highlight}</em> {rest}</span>
@@ -282,7 +282,7 @@ export default function SiteHeader() {
               {products.map(product => (
                 <li key={product.slug}>
                   <Link href={`/products/${product.slug}`} className="mega-feature" style={{ ['--accent' as string]: product.accent }}>
-                    <span className="mega-feature-icon"><Icon name={product.icon} size={22} /></span>
+                    <span className="mega-feature-icon"><Icon name={product.icon} size={34} /></span>
                     <span className="mega-feature-text">
                       <span className="mega-feature-title">{product.name}</span>
                       <span className="mega-feature-sub">{product.category}</span>
@@ -293,7 +293,7 @@ export default function SiteHeader() {
               ))}
               <li>
                 <Link href="/products" className="mega-feature">
-                  <span className="mega-feature-icon"><Icon name="grid" size={22} /></span>
+                  <span className="mega-feature-icon"><Icon name="grid" size={34} /></span>
                   <span className="mega-feature-text">
                     <span className="mega-feature-title">All products</span>
                     <span className="mega-feature-sub">Compare them side by side</span>
@@ -330,7 +330,7 @@ export default function SiteHeader() {
                 {services.map(service => (
                   <li key={service.slug}>
                     <Link href={`/services/${service.slug}`} aria-current={pathname === `/services/${service.slug}` ? 'page' : undefined} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
-                      <Icon name={serviceStyle[service.slug].icon} size={20} />
+                      <Icon name={serviceStyle[service.slug].icon} size={24} />
                       {service.name}
                     </Link>
                   </li>
@@ -343,7 +343,7 @@ export default function SiteHeader() {
                 {products.map(product => (
                   <li key={product.slug}>
                     <Link href={`/products/${product.slug}`} aria-current={pathname === `/products/${product.slug}` ? 'page' : undefined} style={{ ['--accent' as string]: product.accent }}>
-                      <Icon name={product.icon} size={20} />
+                      <Icon name={product.icon} size={24} />
                       {product.name}
                     </Link>
                   </li>

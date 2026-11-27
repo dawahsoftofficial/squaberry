@@ -125,7 +125,7 @@ export default async function ProductPage({ params }: Props) {
             <ul className={`feature-grid${product.features.length % 4 === 0 ? ' cols-4' : ''}`}>
               {product.features.map(feature => (
                 <li className="feature-card reveal" key={feature.title}>
-                  <span className="feature-icon"><Icon name={feature.icon} size={26} /></span>
+                  <span className="feature-icon"><Icon name={feature.icon} size={40} /></span>
                   <h3>{feature.title}</h3>
                   <p>{feature.text}</p>
                 </li>
@@ -162,7 +162,7 @@ export default async function ProductPage({ params }: Props) {
               {onboardingSteps.map((step, index) => (
                 <li className="feature-card reveal" key={step.title}>
                   <span className="feature-top">
-                    <span className="feature-icon"><Icon name={step.icon} size={26} /></span>
+                    <span className="feature-icon"><Icon name={step.icon} size={40} /></span>
                     <span className="feature-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                   </span>
                   <h3><span className="visually-hidden">Step {index + 1}: </span>{step.title}</h3>

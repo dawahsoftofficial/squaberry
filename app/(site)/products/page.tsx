@@ -43,7 +43,7 @@ export default function ProductsPage() {
             {products.map(product => (
               <li key={product.slug}>
                 <Link href={`/products/${product.slug}`} style={{ ['--accent' as string]: product.accent }}>
-                  <span className="hero-svc-icon"><Icon name={product.icon} size={18} /></span>
+                  <span className="hero-svc-icon"><Icon name={product.icon} size={26} /></span>
                   {product.name}
                 </Link>
               </li>
@@ -65,7 +65,7 @@ export default function ProductsPage() {
         <ul className="feature-grid">
           {reasons.map(reason => (
             <li className="feature-card reveal" key={reason.title} style={{ ['--accent' as string]: reason.accent }}>
-              <span className="feature-icon"><Icon name={reason.icon} size={26} /></span>
+              <span className="feature-icon"><Icon name={reason.icon} size={40} /></span>
               <h3>{reason.title}</h3>
               <p>{reason.text}</p>
             </li>

@@ -1,61 +1,11 @@
-import {
-  Bell,
-  Bot,
-  Calculator,
-  CalendarCheck,
-  Coins,
-  FileSpreadsheet,
-  HandHeart,
-  LayoutGrid,
-  ReceiptPoundSterling,
-  ChartColumn,
-  ClipboardList,
-  CreditCard,
-  Dumbbell,
-  Handshake,
-  Languages,
-  MessageCircleMore,
-  Minus,
-  Package,
-  Plus,
-  UserCheck,
-  Users,
-  UtensilsCrossed,
-  AppWindow,
-  Headset,
-  LayoutDashboard,
-  PenLine,
-  Search,
-  ShoppingBag,
-  Sparkles,
-  Zap,
-  ArrowDown,
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Layers,
-  ChevronDown,
-  Cloud,
-  Mail,
-  Megaphone,
-  Menu,
-  MessageCircle,
-  MonitorSmartphone,
-  Palette,
-  Rocket,
-  ScanSearch,
-  Shapes,
-  ShieldCheck,
-  Target,
-  UserRound,
-  Workflow,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronDown, Menu, Minus, Plus, X, type LucideIcon } from 'lucide-react';
+import { brandIconVersion, brandIcons } from './brand-icons';
 
-// Site icons come from Lucide (lucide-react). Call sites use these short names, so swapping an
-// icon only means changing this map. Decorative by default: pass `label` to expose one.
-const icons = {
+// Brand and content icons are Squaberry's own hand-drawn set: drawn in scripts/build-icons.mjs and
+// served as one sprite (public/icons.svg). They take the text colour; carved details use
+// --icon-ink (set it to the tile's background). Lucide only supplies the small utility glyphs.
+// Decorative by default: pass `label` to expose one.
+const utility = {
   'arrow-up-right': ArrowUpRight,
   'arrow-right': ArrowRight,
   'arrow-down': ArrowDown,
@@ -63,71 +13,21 @@ const icons = {
   menu: Menu,
   close: X,
   check: Check,
-  mail: Mail,
-  chat: MessageCircle,
-  person: UserRound,
-  // Services
-  web: MonitorSmartphone,
-  design: Palette,
-  marketing: Megaphone,
-  security: ShieldCheck,
-  cloud: Cloud,
-  automation: Workflow,
-  strategy: Target,
-  // Footer strip
-  apps: AppWindow,
-  shop: ShoppingBag,
-  ui: LayoutDashboard,
-  seo: Search,
-  content: PenLine,
-  support: Headset,
-  sparkle: Sparkles,
-  bolt: Zap,
-  // Products
-  dumbbell: Dumbbell,
-  food: UtensilsCrossed,
-  whatsapp: MessageCircleMore,
-  bot: Bot,
-  members: Users,
-  calendar: CalendarCheck,
-  payments: CreditCard,
-  attendance: UserCheck,
-  language: Languages,
-  orders: ClipboardList,
-  menu_items: UtensilsCrossed,
-  inventory: Package,
-  bell: Bell,
-  chart: ChartColumn,
-  handover: Handshake,
-  charity: HandHeart,
-  grid: LayoutGrid,
-  calculator: Calculator,
-  funds: Coins,
-  import: FileSpreadsheet,
-  'gift-aid': ReceiptPoundSterling,
   plus: Plus,
   minus: Minus,
-  // How we work
-  discover: ScanSearch,
-  shape: Shapes,
-  build: Layers,
-  evolve: Rocket,
 } satisfies Record<string, LucideIcon>;
 
-type Props = { name: keyof typeof icons | string; label?: string; className?: string; size?: number };
+type Props = { name: string; label?: string; className?: string; size?: number };
 
 export default function Icon({ name, label, className, size = 24 }: Props) {
-  const Glyph = (icons as Record<string, LucideIcon>)[name];
-  if (!Glyph) return null;
-  return (
-    <Glyph
-      className={className}
-      size={size}
-      strokeWidth={1.75}
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : true}
-      focusable="false"
-    />
-  );
+  const a11y = { role: label ? 'img' : undefined, 'aria-label': label, 'aria-hidden': label ? undefined : true, focusable: 'false' as const };
+  if (brandIcons.has(name)) {
+    return (
+      <svg className={className ? `brand-icon ${className}` : 'brand-icon'} width={size} height={size} viewBox="0 0 24 24" {...a11y}>
+        <use href={`/icons.svg?v=${brandIconVersion}#${name}`} />
+      </svg>
+    );
+  }
+  const Glyph = (utility as Record<string, LucideIcon>)[name];
+  return Glyph ? <Glyph className={className} size={size} strokeWidth={1.75} {...a11y} /> : null;
 }

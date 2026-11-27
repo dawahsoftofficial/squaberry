@@ -8,7 +8,7 @@ export default function ProcessSteps() {
       {processSteps.map((step, index) => (
         <li className="feature-card reveal" key={step.name} style={{ ['--accent' as string]: step.accent }}>
           <span className="feature-top">
-            <span className="feature-icon"><Icon name={step.icon} size={26} /></span>
+            <span className="feature-icon"><Icon name={step.icon} size={40} /></span>
             <span className="feature-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
           </span>
           <h3><span className="visually-hidden">Step {index + 1}: </span>{step.name}</h3>

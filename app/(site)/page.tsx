@@ -38,7 +38,7 @@ export default async function HomePage() {
             {services.map(service => (
               <li key={service.slug}>
                 <Link href={`/services/${service.slug}`} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
-                  <span className="hero-svc-icon"><Icon name={serviceStyle[service.slug].icon} size={18} /></span>
+                  <span className="hero-svc-icon"><Icon name={serviceStyle[service.slug].icon} size={26} /></span>
                   {service.shortName === 'IT' ? 'IT support' : service.shortName.charAt(0).toUpperCase() + service.shortName.slice(1)}
                 </Link>
               </li>
@@ -99,7 +99,7 @@ export default async function HomePage() {
             {services.map(service => (
               <Link href={`/services/${service.slug}`} className="svc-card reveal" key={service.slug} style={{ ['--accent' as string]: serviceStyle[service.slug].accent }}>
                 <span className="svc-top">
-                  <span className="svc-icon"><Icon name={serviceStyle[service.slug].icon} size={26} /></span>
+                  <span className="svc-icon"><Icon name={serviceStyle[service.slug].icon} size={38} /></span>
                   <span className="svc-num">{service.number}</span>
                 </span>
                 <h3>{service.name}</h3>

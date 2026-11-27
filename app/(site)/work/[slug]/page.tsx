@@ -185,8 +185,8 @@ export default async function ProjectPage({ params }: Props) {
           {helpColumns.map(item => (
             <li key={item.slug} className="reveal" style={{ ['--accent' as string]: serviceStyle[item.slug]?.accent }}>
               <Link href={`/services/${item.slug}`} className="case-help-title">
-                <span className="case-help-icon"><Icon name={serviceStyle[item.slug]?.icon ?? 'web'} size={22} /></span>
-                {item.name}
+                <span className="case-help-icon"><Icon name={serviceStyle[item.slug]?.icon ?? 'web'} size={34} /></span>
+                <span>{item.name}</span>
               </Link>
               <ul>
                 {item.deliverables.slice(0, 5).map(deliverable => <li key={deliverable.title}>{deliverable.title}</li>)}

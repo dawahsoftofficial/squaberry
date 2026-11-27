@@ -118,7 +118,7 @@ export default async function ServicePage({ params }: Props) {
           </div>
         ) : (
           <div className="empty-card reveal">
-            <span className="feature-icon" style={{ ['--accent' as string]: style.accent }}><Icon name={style.icon} size={28} /></span>
+            <span className="feature-icon" style={{ ['--accent' as string]: style.accent }}><Icon name={style.icon} size={40} /></span>
             <div>
               <h3>New work is on its way.</h3>
               <p>Ask for examples when you get in touch and we’ll share work relevant to you, or <Link className="text-link" href="/work">browse all projects</Link>.</p>
@@ -144,7 +144,7 @@ export default async function ServicePage({ params }: Props) {
           {others.map(other => (
             <li key={other.slug}>
               <Link href={`/services/${other.slug}`} style={{ ['--accent' as string]: serviceStyle[other.slug].accent }}>
-                <span className="link-icon"><Icon name={serviceStyle[other.slug].icon} size={22} /></span>
+                <span className="link-icon"><Icon name={serviceStyle[other.slug].icon} size={32} /></span>
                 <span className="link-name">{other.name}</span>
                 <span className="link-go" aria-hidden="true"><Icon name="arrow-up-right" size={18} /></span>
               </Link>

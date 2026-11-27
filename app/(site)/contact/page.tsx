@@ -38,11 +38,11 @@ export default function ContactPage() {
             <p className="lead">Pick a topic, add a few lines, and tell us where to reply.</p>
             <div className="info-cards">
               <div className="info-card">
-                <span className="info-icon"><Icon name="mail" size={22} /></span>
+                <span className="info-icon"><Icon name="mail" size={32} /></span>
                 <p><strong>Prefer email?</strong><span><a href="mailto:hello@squaberry.co.uk?subject=Hello%20Squaberry">hello@squaberry.co.uk</a></span></p>
               </div>
               <div className="info-card">
-                <span className="info-icon"><Icon name="chat" size={22} /></span>
+                <span className="info-icon"><Icon name="chat" size={32} /></span>
                 <p><strong>What to include</strong><span>Your goals, questions or a rough idea</span></p>
               </div>
               <div className="info-card">

@@ -29,7 +29,7 @@ function TileRow({ tiles, reverse = false }: { tiles: Tile[]; reverse?: boolean 
     <div className="marquee-group" aria-hidden={hidden || undefined}>
       {[...tiles, ...tiles].map((tile, index) => (
         <span className={`strip-tile${tile.tone ? ` is-${tile.tone}` : ''}`} key={`${tile.label}-${index}`} style={tile.accent ? { ['--accent' as string]: tile.accent } : undefined}>
-          <span className="strip-icon"><Icon name={tile.icon} size={22} /></span>
+          <span className="strip-icon"><Icon name={tile.icon} size={36} /></span>
           {tile.label}
         </span>
       ))}

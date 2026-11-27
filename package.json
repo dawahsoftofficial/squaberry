@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/migrate.mjs",
     "db:portfolio": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-portfolio.mjs",
+    "icons:build": "node scripts/build-icons.mjs",
     "media:upload": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/upload-media.mjs"
   },
   "engines": {

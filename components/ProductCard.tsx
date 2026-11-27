@@ -15,7 +15,7 @@ export default function ProductCard({ product, className = '', priority = false 
         </div>
         <div className="project-meta">
           <div className="project-text">
-            <p className="project-name product-name"><span className="product-icon"><Icon name={product.icon} size={16} /></span>{product.name}</p>
+            <p className="project-name product-name"><span className="product-icon"><Icon name={product.icon} size={22} /></span>{product.name}</p>
             <h3>{product.headline}</h3>
           </div>
           <div className="project-foot">

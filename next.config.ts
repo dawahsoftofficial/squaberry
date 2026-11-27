@@ -66,6 +66,8 @@ const nextConfig: NextConfig = {
         source,
         headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }],
       })),
+      // The brand icon sprite; its URL carries a content version, so it can be cached for good.
+      { source: '/icons.svg', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
     ];
   },
 };
