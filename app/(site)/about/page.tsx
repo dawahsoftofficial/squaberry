@@ -12,7 +12,7 @@ import { services, serviceStyle } from '@/lib/services';
 import { teamGroups } from '@/lib/team';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'About us',
+  title: 'About us: a digital studio for web, apps and IT',
   description: 'Meet Squaberry: a digital studio that brings structure and character to technology, with thoughtful design, careful engineering and a human touch.',
   path: '/about',
   og: 'about',

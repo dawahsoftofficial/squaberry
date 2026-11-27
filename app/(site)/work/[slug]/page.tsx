@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { Metadata } from 'next';
-import { absoluteUrl, pageMetadata } from '@/lib/seo';
+import { absoluteUrl, clip, pageMetadata } from '@/lib/seo';
 import { mediaUrl } from '@/lib/media-url';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +17,7 @@ import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { displayDomain, galleryImages, lines, paragraphs, type GalleryImage } from '@/lib/case-study';
 import { projectBySlug, relatedProjects, safeAllProjects } from '@/lib/portfolio';
+import { productForCaseStudy } from '@/lib/products';
 import { getService, services, serviceStyle } from '@/lib/services';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -27,14 +28,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = await loadProject(slug).catch(() => null);
   if (!project) return { title: 'Project not found' };
-  const description = project.intro || project.summary || `A ${project.client ?? ''} project by Squaberry.`;
+  const description = clip(project.intro || project.summary || `A ${project.client ?? ''} project by Squaberry.`);
   // A pre-rendered share card if there is one, else the first gallery screenshot or the cover.
   const card = `work-${project.slug}`;
   const og = existsSync(path.join(process.cwd(), 'public', 'og', `${card}.jpg`))
     ? card
     : galleryImages(project.gallery)[0]?.src ?? project.image_url ?? 'work';
+  const service = getService(project.service_slug);
   return pageMetadata({
-    title: `${project.title} case study`,
+    title: service ? `${project.title} case study: ${service.name}` : `${project.title} case study`,
     description,
     path: `/work/${project.slug}`,
     og,
@@ -72,6 +74,7 @@ export default async function ProjectPage({ params }: Props) {
   if (!project) notFound();
 
   const service = getService(project.service_slug);
+  const product = productForCaseStudy(slug);
   const scope = lines(project.scope);
   const gallery = galleryImages(project.gallery);
   const [wide, tall, side, ...more] = gallery;
@@ -110,7 +113,7 @@ export default async function ProjectPage({ params }: Props) {
       />
       <PageHero
         label={<><Link href="/work">Projects</Link> <span aria-hidden="true">/</span> {project.title}</>}
-        title={project.summary || project.title}
+        title={project.summary ? <><span className="visually-hidden">{project.title}: </span>{project.summary}</> : project.title}
         size="l"
         lead={project.intro}
         actions={visit}
@@ -139,6 +142,7 @@ export default async function ProjectPage({ params }: Props) {
             <dl className="case-facts">
               {project.client && <div><dt>Industry</dt><dd>{project.client}</dd></div>}
               {service && <div><dt>Service</dt><dd><Link href={`/services/${service.slug}`}>{service.name}</Link></dd></div>}
+              {product && <div className="is-wide"><dt>Built on</dt><dd><Link href={`/products/${product.slug}`}>{product.name}</Link></dd></div>}
               {scope.length > 0 && (
                 <div className="is-wide">
                   <dt>What we did</dt>
@@ -179,7 +183,7 @@ export default async function ProjectPage({ params }: Props) {
 
       <section className="container section" aria-labelledby="helpTitle">
         <SectionIntro label="How we can help" title="Planning something similar?" id="helpTitle">
-          <p>{service ? `This project was led by our ${service.name.toLowerCase()} team. ` : ''}Here’s everything we can bring to yours.</p>
+          <p>{service ? `This project was led by our ${service.name.toLowerCase()} team. ` : ''}{product && <>The site runs on our <Link className="text-link" href={`/products/${product.slug}`}>{product.name}</Link>, which we can set up for you too. </>}Here’s everything we can bring to yours.</p>
         </SectionIntro>
         <ul className="case-help">
           {helpColumns.map(item => (

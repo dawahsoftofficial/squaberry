@@ -32,6 +32,10 @@ export type Product = {
   audience: string[];
   /** What the buyer is called in the page title and signup form (“for your charity”). Defaults to “business”. */
   organisation?: string;
+  /** The service this product belongs to: linked from the product page, and the product is listed on that service page. */
+  service?: string;
+  /** The case study of a live site built on this product (cross-linked both ways). */
+  caseStudy?: { slug: string; title: string };
   faqs: { question: string; answer: string }[];
 };
 
@@ -63,6 +67,8 @@ export const products: Product[] = [
       { src: '/assets/work/fit-track-gym-3.jpg', alt: 'Fit Track Gym equipment section on desktop' },
     ],
     liveExample: { label: 'fittrackgym.com', url: 'https://fittrackgym.com/' },
+    service: 'web-app-development',
+    caseStudy: { slug: 'fit-track-gym', title: 'Fit Track Gym' },
     audience: ['Gyms', 'Fitness studios', 'Women-only gyms', 'Personal trainers'],
     faqs: [
       { question: 'Can I use my own domain and branding?', answer: 'Yes. The site is set up in your brand, on your own domain, with your photos, programmes and pricing.' },
@@ -98,6 +104,8 @@ export const products: Product[] = [
       { src: '/assets/work/chips-n-chops-3.jpg', alt: 'Chips n Chops menu and deals on desktop' },
     ],
     liveExample: { label: 'chipsnchops.com', url: 'https://chipsnchops.com/' },
+    service: 'web-app-development',
+    caseStudy: { slug: 'chips-n-chops', title: 'Chips n Chops' },
     audience: ['Fast food brands', 'Takeaways', 'Cloud kitchens', 'Cafés'],
     faqs: [
       { question: 'Do my customers get an app?', answer: 'Yes. Along with the ordering website there are customer apps for iPhone and Android, published under your brand.' },
@@ -119,6 +127,7 @@ export const products: Product[] = [
     icon: 'charity',
     accent: '#ff8fc8',
     organisation: 'charity',
+    service: 'web-app-development',
     cover: { src: '/assets/products/amanah-ai.jpg', alt: 'Amanah AI back office showing a Zakat donation record, beside the donor checkout on a phone, with sample data' },
     highlights: ['Your own donor website, on your own domain', 'Zakat, Sadaqah and every other fund recorded on each gift', 'Donations go straight into your own Stripe and GoCardless accounts'],
     features: [
@@ -202,6 +211,7 @@ export const products: Product[] = [
       { src: '/assets/products/chatbot-integration-3.jpg', alt: 'Chatbot training screen with documents and a test chat' },
     ],
     audience: ['Service businesses', 'Online shops', 'Agencies', 'Education'],
+    service: 'web-app-development',
     faqs: [
       { question: 'Will it work with my website?', answer: 'In most cases, yes: it’s added with a small snippet that works on WordPress, Shopify, custom sites and more.' },
       { question: 'Where do its answers come from?', answer: 'From the content you approve: your website pages, documents and FAQs. You can update this at any time.' },
@@ -214,6 +224,12 @@ export const products: Product[] = [
 export function getProduct(slug: string): Product | undefined {
   return products.find(product => product.slug === slug);
 }
+
+/** Products that belong to a service (listed on that service page). */
+export const productsForService = (serviceSlug: string) => products.filter(product => product.service === serviceSlug);
+
+/** The product a case study's live site is built on, if any. */
+export const productForCaseStudy = (projectSlug: string) => products.find(product => product.caseStudy?.slug === projectSlug);
 
 /** The four steps from signup to launch, shown on every product page. */
 export const onboardingSteps = [

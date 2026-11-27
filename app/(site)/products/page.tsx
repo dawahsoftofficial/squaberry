@@ -52,7 +52,8 @@ export default function ProductsPage() {
         )}
       />
 
-      <section className="container section-tight" aria-label="All products">
+      <section className="container section-tight" aria-labelledby="productsTitle">
+        <h2 id="productsTitle" className="visually-hidden">All products</h2>
         <div className="bento">
           {products.map((product, index) => <ProductCard key={product.slug} product={product} className={productSpan(index)} priority={index < 2} />)}
         </div>

@@ -42,7 +42,7 @@ export default function ServicesPage() {
       <section className="panel panel-lav section" aria-labelledby="listTitle">
         <div className="container">
           <SectionIntro label={`${services.length} services`} title="Built around how you work." id="listTitle" tone="light">
-            <p>Each service stands on its own, and they work best together: one team that understands the whole picture.</p>
+            <p>Each service stands on its own, and they work best together: one team that understands the whole picture. Prefer something ready-made? <Link className="text-link" href="/products">See our software products</Link>.</p>
           </SectionIntro>
           <div className="svc-grid">
             {services.map(service => (

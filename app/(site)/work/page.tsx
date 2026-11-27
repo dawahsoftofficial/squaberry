@@ -12,7 +12,7 @@ import { services } from '@/lib/services';
 import { toCardProject } from '@/lib/case-study';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Projects & case studies',
+  title: 'Our work: web, app and e-commerce case studies',
   description: 'Websites, apps and digital products Squaberry has designed and built for charities, food delivery, e-commerce, education and more.',
   path: '/work',
   og: 'work',
@@ -42,7 +42,8 @@ export default async function WorkPage() {
         )}
       />
 
-      <section className="container section-tight" aria-label="Projects">
+      <section className="container section-tight" aria-labelledby="projectsTitle">
+        <h2 id="projectsTitle" className="visually-hidden">All projects</h2>
         {projects.length ? (
           <ProjectsBrowser filters={filters} projects={projects} />
         ) : (

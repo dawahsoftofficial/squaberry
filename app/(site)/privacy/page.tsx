@@ -4,7 +4,7 @@ import LegalPage from '@/components/LegalPage';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Privacy policy',
-  description: 'How squaberry.co.uk handles personal information when you visit, use our enquiry forms or email us.',
+  description: 'How squaberry.co.uk handles personal information when you visit the site, use our enquiry forms or email us, and the choices you have about it.',
   path: '/privacy',
 });
 
@@ -26,6 +26,7 @@ export default function PrivacyPage() {
       title="Privacy policy."
       lead="A plain-language overview of the information involved when you visit this website, send a message through one of our enquiry forms or email Squaberry."
       sections={sections}
+      crumb={{ name: 'Privacy policy', path: '/privacy' }}
     >
       <section id="overview"><h2>Who is responsible?</h2><p>Squaberry is responsible for personal information described in this policy. For privacy questions, contact <a href="mailto:hello@squaberry.co.uk">hello@squaberry.co.uk</a>.</p><p className="note"><strong>Business identity to add:</strong> The full legal name and business address of the data controller were not included in the supplied materials. Confirm and add these details before launch, along with any applicable privacy contact details.</p></section>
       <section id="visit"><h2>When you visit this website</h2><p>This website has no public account sign-in, advertising pixels or analytics in the files currently provided. It does not set optional tracking cookies. The only information it collects directly is what you choose to send through an enquiry form, described below.</p><p>The company hosting the site may process technical information such as IP address, request time and browser details in server or security logs. What is collected, where it is stored and how long it is kept depends on the hosting provider and its configuration. Confirm those details with your host and update this policy if needed.</p><p>Images on this site are delivered from DigitalOcean Spaces, a file storage service with a content delivery network. To send an image to your browser, it receives the standard technical details of that request, such as your IP address, the image requested and your browser details. Fonts are served from our own site, so no other third parties are contacted when you visit.</p></section>

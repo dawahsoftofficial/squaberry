@@ -11,7 +11,7 @@ export default function ProductCard({ product, className = '', priority = false 
     <article className={`project-card product-card tilt-in ${className}`} style={{ ['--accent' as string]: product.accent }}>
       <Link href={`/products/${product.slug}`} aria-label={`${product.name}: ${product.headline}. Learn more`}>
         <div className="project-media">
-          <Image src={product.cover.src} alt="" fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 640px" priority={priority} />
+          <Image src={product.cover.src} alt={product.cover.alt} fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 640px" priority={priority} />
         </div>
         <div className="project-meta">
           <div className="project-text">

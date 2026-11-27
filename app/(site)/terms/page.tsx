@@ -25,6 +25,7 @@ export default function TermsPage() {
       title="Terms & conditions."
       lead="These terms explain the basic rules for using this website. Any services we provide will be covered by a separate written agreement."
       sections={sections}
+      crumb={{ name: 'Terms & conditions', path: '/terms' }}
     >
       <section id="using"><h2>Using this site</h2><p>By using squaberry.co.uk, you agree to use it lawfully and in a way that does not damage, disable or interfere with the site or other people’s use of it. Do not attempt to gain unauthorised access to the site, its hosting environment or related systems.</p></section>
       <section id="content"><h2>Website content</h2><p>We aim to keep the information on this site clear and current. It is general information about Squaberry and the kinds of work we may offer; it is not professional, technical, security or business advice for your particular situation.</p><p>Unless we agree otherwise in writing, the site’s text, visual identity and original design are owned by or licensed to Squaberry. You may view and share links to the site for personal or business reference. Please ask before copying substantial parts or reusing our branding.</p></section>

@@ -11,6 +11,7 @@ import SectionIntro from '@/components/SectionIntro';
 import { getProduct, onboardingSteps, products, type ProductImage } from '@/lib/products';
 import { breadcrumbSchema, faqSchema, productSchema } from '@/lib/schema';
 import { absoluteUrl, clip, ogImage, pageMetadata } from '@/lib/seo';
+import { getService } from '@/lib/services';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -47,6 +48,7 @@ export default async function ProductPage({ params }: Props) {
   const others = products.filter(item => item.slug !== product.slug);
   const style = { ['--accent' as string]: product.accent };
   const organisation = product.organisation ?? 'business';
+  const service = product.service ? getService(product.service) : undefined;
   // Four related cards sit two by two; three stay in one row (no card alone on a row).
   // Sidebar links, in page order (the gallery only when there are screenshots).
   const sections = [
@@ -68,7 +70,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="container product-hero" aria-labelledby="pageTitle">
         <div className="product-hero-main">
           <span className="eyebrow rise"><Link href="/products">Products</Link> <span aria-hidden="true">/</span> {product.name}</span>
-          <h1 id="pageTitle" className="display-l rise d1">{product.tagline}</h1>
+          <h1 id="pageTitle" className="display-l rise d1"><span className="visually-hidden">{product.name}: </span>{product.tagline}</h1>
           <p className="lead rise d2">{product.intro}</p>
           <ul className="product-highlights rise d2">
             {product.highlights.map(item => (
@@ -112,6 +114,12 @@ export default async function ProductPage({ params }: Props) {
                   <dd><a href={product.liveExample.url} target="_blank" rel="noopener noreferrer">{product.liveExample.label}<span className="visually-hidden"> (opens in a new tab)</span></a></dd>
                 </div>
               )}
+              {product.caseStudy && (
+                <div className="is-wide"><dt>Case study</dt><dd><Link href={`/work/${product.caseStudy.slug}`}>{product.caseStudy.title}</Link></dd></div>
+              )}
+              {service && (
+                <div className="is-wide"><dt>Service</dt><dd><Link href={`/services/${service.slug}`}>{service.name}</Link></dd></div>
+              )}
             </dl>
             <a className="btn is-accent" href="#signup"><span>Get started</span><span className="btn-icon"><Icon name="arrow-up-right" size={18} /></span></a>
           </div>
@@ -137,7 +145,7 @@ export default async function ProductPage({ params }: Props) {
             <section id="gallery" aria-labelledby="galleryTitle">
               <SectionIntro label="See it in action" title={product.liveExample ? 'Already running for real customers.' : 'A closer look.'} id="galleryTitle">
                 {product.liveExample ? (
-                  <p>These screens are from <a className="text-link" href={product.liveExample.url} target="_blank" rel="noopener noreferrer">{product.liveExample.label}</a>, built on {product.name}.</p>
+                  <p>These screens are from <a className="text-link" href={product.liveExample.url} target="_blank" rel="noopener noreferrer">{product.liveExample.label}<span className="visually-hidden"> (opens in a new tab)</span></a>, built on {product.name}.{product.caseStudy && <> Read the <Link className="text-link" href={`/work/${product.caseStudy.slug}`}>{product.caseStudy.title} case study</Link>.</>}</p>
                 ) : (
                   <p>Illustrations of how {product.name} looks and works.</p>
                 )}
@@ -174,7 +182,7 @@ export default async function ProductPage({ params }: Props) {
 
           <section id="faq" className="product-faq-section" aria-labelledby="faqTitle">
             <SectionIntro label="Questions" title="Good to know." id="faqTitle">
-              <p>Can’t see your question? Ask it in the form and we’ll reply by email.</p>
+              <p>Can’t see your question? Ask it in the form and we’ll reply by email.{service && <> Need something more custom? See our <Link className="text-link" href={`/services/${service.slug}`}>{service.name.toLowerCase()} service</Link>.</>}</p>
             </SectionIntro>
             <div className="product-faq">
               {product.faqs.map((faq, index) => (

@@ -21,9 +21,9 @@ export default function ProjectCard({ project, className = '', priority = false,
     <>
       <div className="project-media">
         {project.image_url?.startsWith('/') ? (
-          <Image src={project.image_url} alt="" fill sizes={sizes} priority={priority} />
+          <Image src={project.image_url} alt={`${project.title} project artwork`} fill sizes={sizes} priority={priority} />
         ) : project.image_url ? (
-          <img src={project.image_url} alt="" loading="lazy" />
+          <img src={project.image_url} alt={`${project.title} project artwork`} loading="lazy" />
         ) : null}
       </div>
       <div className="project-meta">

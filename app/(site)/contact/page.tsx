@@ -8,8 +8,8 @@ import JsonLd from '@/components/JsonLd';
 import { breadcrumbSchema } from '@/lib/schema';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Contact us',
-  description: 'Start a project with Squaberry. Tell us about your website, app, marketing or IT needs and we will reply within one working day.',
+  title: 'Contact us: start a website, app or IT project',
+  description: 'Start a project with Squaberry. Tell us about your website, app, marketing or IT needs in three quick steps, and we’ll reply by email.',
   path: '/contact',
   og: 'contact',
 });

@@ -9,7 +9,8 @@ import Icon from '@/components/Icon';
 import PageHero from '@/components/PageHero';
 import JsonLd from '@/components/JsonLd';
 import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
-import { absoluteUrl, ogImage } from '@/lib/seo';
+import { absoluteUrl, clip, ogImage } from '@/lib/seo';
+import { productsForService } from '@/lib/products';
 import ProjectCard from '@/components/ProjectCard';
 import SectionIntro from '@/components/SectionIntro';
 import { safeServiceProjects } from '@/lib/portfolio';
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!service) return {};
   return pageMetadata({
     title: `${service.name} services`,
-    description: service.summary,
+    description: clip(service.description ?? service.summary),
     path: `/services/${service.slug}`,
     og: `service-${service.slug}`,
   });
@@ -44,6 +45,7 @@ export default async function ServicePage({ params }: Props) {
   await connection(); // Render per request so new portfolio items appear without a rebuild.
   const projects = await safeServiceProjects(service.slug);
   const others = services.filter(other => other.slug !== service.slug);
+  const related = productsForService(service.slug);
   const style = serviceStyle[service.slug];
 
   return (
@@ -70,7 +72,7 @@ export default async function ServicePage({ params }: Props) {
       <section className="container section-tight" aria-labelledby="overviewTitle">
         <div className="split">
           <figure className="visual-card tilt-in">
-            <Image src={`/assets/services/${service.slug}.png`} alt="" width={896} height={1120} sizes="(max-width: 960px) 90vw, 45vw" priority />
+            <Image src={`/assets/services/${service.slug}.png`} alt={service.imageAlt ?? `${service.name} illustration`} width={896} height={1120} sizes="(max-width: 960px) 90vw, 45vw" priority />
             <ul className="tag-row">{service.tags.map(tag => <li className="tag" key={tag}>{tag}</li>)}</ul>
           </figure>
           <div className="overview">
@@ -137,6 +139,25 @@ export default async function ServicePage({ params }: Props) {
           <EnquiryForm defaultTopic={service.name} source={`Service: ${service.name}`} />
         </div>
       </section>
+
+      {related.length > 0 && (
+        <nav className="container section" aria-labelledby="productsTitle">
+          <SectionIntro label="Ready-made products" title="Or start from a proven product." id="productsTitle">
+            <p>Software we’ve already built and run, set up in your brand by the same team.</p>
+          </SectionIntro>
+          <ul className="link-list">
+            {related.map(product => (
+              <li key={product.slug}>
+                <Link href={`/products/${product.slug}`} style={{ ['--accent' as string]: product.accent }}>
+                  <span className="link-icon"><Icon name={product.icon} size={32} /></span>
+                  <span className="link-name">{product.name}</span>
+                  <span className="link-go" aria-hidden="true"><Icon name="arrow-up-right" size={18} /></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
       <nav className="container section" aria-labelledby="othersTitle">
         <SectionIntro label="Keep exploring" title="More ways we can help." id="othersTitle" />

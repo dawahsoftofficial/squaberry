@@ -14,6 +14,10 @@ export type Service = {
   /** Service page hero: two short lines, the second shown in the accent style. */
   headline: [string, string];
   intro: string;
+  /** Meta description for the service page (under 160 characters); defaults to `summary`. */
+  description?: string;
+  /** Alt text for the service illustration in public/assets/services/<slug>.png. */
+  imageAlt?: string;
   deliverables: { title: string; text: string }[];
   fit: string[];
   /** Hidden services are kept here but not shown, linked or offered as a form topic. */
@@ -28,6 +32,8 @@ const allServices: Service[] = [
     shortName: 'web & apps',
     summary: 'Fast websites, intuitive apps and custom software, thoughtfully designed around the people who use them.',
     tags: ['Websites', 'E-commerce', 'Custom software'],
+    description: 'Websites, online shops, web apps and custom software from Squaberry: quick to load, easy to use and built around the people who use them.',
+    imageAlt: 'Illustration of a desktop browser, a web app window and a phone screen',
     headline: ['Websites and apps', 'that pull their weight.'],
     intro: 'From a sharp marketing site to the custom software running your operations, we design and build digital products that are quick to load, easy to use and simple to keep improving.',
     deliverables: [
@@ -47,6 +53,8 @@ const allServices: Service[] = [
     shortName: 'design',
     summary: 'From a brand with personality to a product that feels natural, we connect how it looks with how it works.',
     tags: ['Brand identity', 'UI & UX', 'Product design'],
+    description: 'Brand identity, UI and UX and product design from Squaberry, so the way your website or app looks and the way it works tell the same story.',
+    imageAlt: 'Illustration of soft design shapes: an arch, a grid, a quarter circle and a rounded square',
     headline: ['Design with character,', 'built to be used.'],
     intro: 'Good design is more than a nice surface. We shape brands, interfaces and journeys so that the way something looks and the way it works tell the same story.',
     deliverables: [
@@ -66,6 +74,8 @@ const allServices: Service[] = [
     shortName: 'marketing',
     summary: 'Get found, get chosen. SEO, paid campaigns and social that bring the right people to you, measured so you know what works.',
     tags: ['SEO', 'Paid search & social', 'Content & email'],
+    description: 'SEO, paid search and social, content and email marketing from Squaberry, planned around your audience and measured so you know what works.',
+    imageAlt: 'Illustration of a megaphone with speech bubbles, a target and a rising bar chart',
     headline: ['Be seen by the people', 'who are looking for you.'],
     intro: 'A great website only works if people find it. We plan and run marketing that puts you in front of the right audience, then measure every step so your budget goes where it earns its keep.',
     deliverables: [
@@ -125,6 +135,8 @@ const allServices: Service[] = [
     shortName: 'IT',
     summary: 'Keep your technology moving with sensible security, ongoing maintenance and people you can talk to.',
     tags: ['IT support', 'Maintenance', 'Cybersecurity'],
+    description: 'IT support, maintenance and cybersecurity from Squaberry: we look after your devices, accounts and systems, keep them secure and help when needed.',
+    imageAlt: 'Illustration of a padlock and a shield in front of a laptop',
     headline: ['Technology that keeps', 'moving with you.'],
     intro: 'Dependable IT shouldn’t need constant attention from you. We look after devices, accounts and systems, keep things secure and up to date, and are on hand when you need help.',
     deliverables: [
