@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProduct((await params).slug);
   if (!product) return { title: 'Product not found' };
   return pageMetadata({
-    title: `${product.name} for your business`,
+    title: `${product.name} for your ${product.organisation ?? 'business'}`,
     description: clip(product.intro, 158),
     path: `/products/${product.slug}`,
     og: `product-${product.slug}`,
@@ -45,6 +45,8 @@ export default async function ProductPage({ params }: Props) {
   const [wide, tall, side] = product.gallery;
   const others = products.filter(item => item.slug !== product.slug);
   const style = { ['--accent' as string]: product.accent };
+  const organisation = product.organisation ?? 'business';
+  // Four related cards sit two by two; three stay in one row (no card alone on a row).
 
   return (
     <main id="main" className="product-page" style={style}>
@@ -77,7 +79,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
         <div className="product-hero-form rise d2" id="signup">
-          <ProductSignupForm product={product.slug} productName={product.name} />
+          <ProductSignupForm product={product.slug} productName={product.name} organisation={product.organisation} />
         </div>
       </section>
 
@@ -89,7 +91,7 @@ export default async function ProductPage({ params }: Props) {
 
       <section className="container section" aria-labelledby="featuresTitle">
         <SectionIntro label="What’s included" title="Everything you need, ready on day one." id="featuresTitle">
-          <p>{product.name} comes set up for your business, with the features below and room to grow.</p>
+          <p>{product.name} comes set up for your {organisation}, with the features below and room to grow.</p>
         </SectionIntro>
         <ul className={`feature-grid${product.features.length % 4 === 0 ? ' cols-4' : ''}`}>
           {product.features.map(feature => (
@@ -126,7 +128,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="panel panel-lav section" aria-labelledby="stepsTitle">
         <div className="container">
           <SectionIntro label="Getting started" title="Live in four simple steps." id="stepsTitle" tone="light">
-            <p>We handle the setup, so you can keep running your business while we get you ready.</p>
+            <p>We handle the setup, so you can keep running your {organisation} while we get you ready.</p>
           </SectionIntro>
           <ol className="feature-grid cols-4 steps-grid">
             {onboardingSteps.map((step, index) => (
@@ -173,7 +175,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="container section" aria-labelledby="moreTitle">
         <SectionIntro label="More products" title="Explore the rest." id="moreTitle" />
         <div className="bento case-related">
-          {others.map(item => <ProductCard key={item.slug} product={item} className="span-4" />)}
+          {others.map(item => <ProductCard key={item.slug} product={item} className={others.length % 3 === 0 ? 'span-4' : 'span-6'} />)}
         </div>
       </section>
     </main>

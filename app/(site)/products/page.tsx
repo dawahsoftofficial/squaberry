@@ -10,8 +10,8 @@ import SectionIntro from '@/components/SectionIntro';
 import { products } from '@/lib/products';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Software for gyms, takeaways & AI assistants',
-  description: 'Ready-made software from Squaberry: gym management, fast food ordering, a WhatsApp AI assistant and website chatbots, set up in your brand.',
+  title: 'Software for gyms, takeaways, charities & AI',
+  description: 'Ready-made software from Squaberry: gym management, food ordering, a charity donation platform, WhatsApp AI and website chatbots, set up in your brand.',
   path: '/products',
   og: 'products',
 });
@@ -21,6 +21,14 @@ const reasons = [
   { icon: 'design', title: 'In your brand', text: 'Your name, colours, logo and domain, so it feels like your own product from day one.', accent: '#ffb38a' },
   { icon: 'support', title: 'Supported after launch', text: 'Training for your team, updates and a real person to talk to when you need help.', accent: '#9fe6b8' },
 ];
+
+// An even count sits two by two. An odd count opens with a pair, then rows of three; in the
+// two-column tablet grid the last card spans the row so it never sits alone.
+function productSpan(index: number) {
+  if (products.length % 2 === 0) return 'span-6';
+  if (index < 2) return 'span-6';
+  return index === products.length - 1 ? 'span-4 is-wide' : 'span-4';
+}
 
 export default function ProductsPage() {
   return (
@@ -46,7 +54,7 @@ export default function ProductsPage() {
 
       <section className="container section-tight" aria-label="All products">
         <div className="bento">
-          {products.map((product, index) => <ProductCard key={product.slug} product={product} className="span-6" priority={index < 2} />)}
+          {products.map((product, index) => <ProductCard key={product.slug} product={product} className={productSpan(index)} priority={index < 2} />)}
         </div>
       </section>
 

@@ -1,8 +1,9 @@
 // Squaberry's products: the /products page and one onboarding page each (/products/[slug]).
 // Signups on those pages are saved as product enquiries (enquiries.product = slug).
 //
-// DRAFT COPY: the Fast Food system's features come from the Chips n Chops platform's code; the gym,
-// WhatsApp AI and chatbot features are a first draft. Confirm every claim before relying on it.
+// DRAFT COPY: the Fast Food system's features come from the Chips n Chops platform's code; Amanah AI's
+// come from its own specification (checked against the platform in October 2026); the gym, WhatsApp AI
+// and chatbot features are a first draft. Confirm every claim before relying on it.
 
 export type ProductFeature = { icon: string; title: string; text: string };
 export type ProductImage = { src: string; alt: string };
@@ -29,6 +30,8 @@ export type Product = {
   liveExample?: { label: string; url: string };
   /** Who it suits (shown as tags). */
   audience: string[];
+  /** What the buyer is called in the page title and signup form (“for your charity”). Defaults to “business”. */
+  organisation?: string;
   faqs: { question: string; answer: string }[];
 };
 
@@ -101,6 +104,45 @@ export const products: Product[] = [
       { question: 'Can I take card payments?', answer: 'Yes, through an online payment gateway, alongside cash on delivery. We’ll help connect the gateway you use.' },
       { question: 'Can several staff use it?', answer: 'Yes. Give each person their own sign-in with the right role: admin, manager or order handler.' },
       { question: 'How much does it cost?', answer: 'It depends on your menu, locations and which apps you need. Choose “Get pricing” in the form and we’ll send you a quote.' },
+    ],
+  },
+  {
+    // Copy follows Amanah's own rules: one charity uses it, no AI features are live, no mobile apps,
+    // it never submits Gift Aid to HMRC and sends no emailed donor receipts. Don't name the charity
+    // running it until they agree in writing. Images are Amanah's own product views with sample data.
+    slug: 'amanah-ai',
+    name: 'Amanah AI',
+    headline: 'Donor website, back office and Gift Aid for UK Islamic charities',
+    category: 'Charities',
+    tagline: 'Donations, donors and Gift Aid, in one system.',
+    intro: 'A donor website and back office for UK Islamic charities: appeals and checkout on your own domain, the fund type recorded on every gift, from Zakat and Sadaqah to Fidyah and Qurbani, and Gift Aid tracked on each donation.',
+    icon: 'charity',
+    accent: '#ff8fc8',
+    organisation: 'charity',
+    cover: { src: '/assets/products/amanah-ai.jpg', alt: 'Amanah AI back office showing a Zakat donation record, beside the donor checkout on a phone, with sample data' },
+    highlights: ['Your own donor website, on your own domain', 'Zakat, Sadaqah and every other fund recorded on each gift', 'Donations go straight into your own Stripe and GoCardless accounts'],
+    features: [
+      { icon: 'web', title: 'Donor website and checkout', text: 'Appeals, events, news and pages on your domain, with a basket that pays for several appeals at once by card, Apple Pay, Google Pay or Direct Debit.' },
+      { icon: 'calculator', title: 'Zakat where you allow it', text: 'Donors choose General, Sadaqah or Zakat on projects you mark Zakat-eligible, and a Zakat calculator adds what they owe to the basket.' },
+      { icon: 'funds', title: 'A fund on every gift', text: '13 fund types, from Zakat al-Maal and Zakat al-Fitr to Fidyah, Qurbani and Aqiqah, recorded on every donation wherever it came from.' },
+      { icon: 'members', title: 'Donor records', text: 'Each donor’s gifts, Direct Debit mandates, contact preferences and change history in one place, with duplicates merged safely.' },
+      { icon: 'payments', title: 'Regular and phone giving', text: 'Monthly card and Direct Debit gifts, and phone gifts your staff take on your own site, tagged by how they came in.' },
+      { icon: 'import', title: 'Imports with an undo', text: 'Bring in JustGiving and LaunchGood payouts, collections and cheques by spreadsheet, with a preview first and an undo afterwards.' },
+      { icon: 'gift-aid', title: 'Gift Aid on every donation', text: 'Declarations and claim status on each gift, and claim files your team checks and submits through HMRC Charities Online.' },
+      { icon: 'security', title: 'Roles and secure sign-in', text: 'Three staff roles, an authenticator code at every back-office sign-in and a record of who changed what.' },
+    ],
+    gallery: [
+      { src: '/assets/products/amanah-ai-1.jpg', alt: 'Amanah AI analytics: donation totals, Gift Aid claimed and claimable, and income by fund type, with sample data' },
+      { src: '/assets/products/amanah-ai-2.jpg', alt: 'Donation box on a phone with General, Sadaqah and Zakat options, with sample data' },
+      { src: '/assets/products/amanah-ai-3.jpg', alt: 'Gift Aid export screen choosing a date range and claim options, with sample data' },
+    ],
+    audience: ['UK Islamic charities', 'Relief and development charities', 'Zakat and Sadaqah appeals'],
+    faqs: [
+      { question: 'Can we keep our current website?', answer: 'No. Amanah AI replaces your donor website, on your own domain: appeals, news, events and pages as well as the checkout. Redirects send your old web addresses to the new pages.' },
+      { question: 'Does it submit our Gift Aid claim to HMRC?', answer: 'No. It records Gift Aid on every donation and builds claim files. Your team checks them, submits the claim through HMRC Charities Online and records what HMRC pays.' },
+      { question: 'Can we bring our donors and their giving history?', answer: 'Yes, by spreadsheet import, with a preview before it runs and an undo afterwards. Whether your Direct Debit mandates can move depends on who holds them today, and you’ll know before you sign.' },
+      { question: 'Is there AI in Amanah AI?', answer: 'Not yet. The name is where the product is going. No AI features are live today, and no AI touches your donor data.' },
+      { question: 'How much does it cost?', answer: 'A one-off setup fee and a monthly fee, quoted in writing for your charity. Donations go straight into your own Stripe and GoCardless accounts. Choose “Get pricing” in the form and we’ll send you a quote.' },
     ],
   },
   {

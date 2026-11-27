@@ -38,7 +38,7 @@ export async function submitProductSignup(_previous: ProductSignupState, formDat
   const errors: ProductSignupState['errors'] = {};
   if (!name) errors.name = 'Please tell us your name.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) errors.email = 'Please enter a valid email address.';
-  if (!company) errors.company = 'Please tell us your business name.';
+  if (!company) errors.company = `Please tell us your ${product.organisation ?? 'business'} name.`;
   if (phone && !/^\+?[\d\s()-]{7,20}$/.test(phone)) errors.phone = 'Please enter a valid phone number, or leave it empty.';
   if (!(signupInterests as readonly string[]).includes(interest)) errors.interest = 'Please choose what you’d like.';
   if (message.length > 3000) errors.message = 'Please keep your message under 3,000 characters.';

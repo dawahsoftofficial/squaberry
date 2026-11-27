@@ -645,6 +645,8 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 @media (max-width:960px){
   .product-hero{grid-template-columns:minmax(0,1fr)}
   .product-hero-form{max-width:640px}
+  /* Stacked, the form can reach the page edge: keep its glow within its own width. */
+  .product-hero-form::before{inset:-8% 0}
 }
 @media (max-width:640px){
   .product-fields{grid-template-columns:minmax(0,1fr)}
@@ -758,7 +760,7 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
   .team-photo{aspect-ratio:5/4}
 }
 @media (min-width:641px) and (max-width:960px){
-  .case-related>:nth-child(3){display:none}
+  .case-related>:nth-child(3):last-child{display:none}
 }
 @media (max-width:560px){
   .case-help{grid-template-columns:minmax(0,1fr)}

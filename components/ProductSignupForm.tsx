@@ -11,7 +11,8 @@ const initialState: ProductSignupState = { status: 'idle', message: '', errors: 
 type Values = { name: string; email: string; company: string; phone: string; interest: string; message: string };
 
 /** Product page signup card. Saved as a product enquiry; the visitor gets an email confirmation. */
-export default function ProductSignupForm({ product, productName }: { product: string; productName: string }) {
+export default function ProductSignupForm({ product, productName, organisation = 'business' }: { product: string; productName: string; organisation?: string }) {
+  const Organisation = organisation.charAt(0).toUpperCase() + organisation.slice(1);
   const [state, formAction, pending] = useActionState(submitProductSignup, initialState);
   const [values, setValues] = useState<Values>({ name: '', email: '', company: '', phone: '', interest: signupInterests[0], message: '' });
   const [token, setToken] = useState('');
@@ -54,7 +55,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
   return (
     <form className="step-form product-form" action={formAction} onSubmit={onSubmit} aria-labelledby={fid('title')}>
       <p className="step-form-kicker eyebrow">Get started</p>
-      <h2 id={fid('title')} className="product-form-title">Get {productName} for your business</h2>
+      <h2 id={fid('title')} className="product-form-title">Get {productName} for your {organisation}</h2>
 
       <input type="hidden" name="product" value={product} />
 
@@ -83,7 +84,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
           {error('email')}
         </div>
         <div className="field">
-          <label htmlFor={fid('company')}>Business name *</label>
+          <label htmlFor={fid('company')}>{Organisation} name *</label>
           <input id={fid('company')} name="company" autoComplete="organization" required maxLength={120} value={values.company} onChange={set('company')} aria-invalid={state.errors.company ? true : undefined} aria-describedby={described('company')} />
           {error('company')}
         </div>
@@ -93,7 +94,7 @@ export default function ProductSignupForm({ product, productName }: { product: s
           {error('phone')}
         </div>
         <div className="field field-wide">
-          <label htmlFor={fid('message')}>Tell us about your business <span className="optional">(optional)</span></label>
+          <label htmlFor={fid('message')}>Tell us about your {organisation} <span className="optional">(optional)</span></label>
           <textarea id={fid('message')} name="message" rows={3} maxLength={3000} value={values.message} onChange={set('message')} aria-invalid={state.errors.message ? true : undefined} aria-describedby={described('message')} />
           {error('message')}
         </div>
