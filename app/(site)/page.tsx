@@ -59,7 +59,7 @@ export default async function HomePage() {
           <p>Charities, shops, apps and platforms we’ve designed and built. <Link className="text-link" href="/work">See all {projects.length || ''} projects</Link></p>
         </SectionIntro>
         <div className="bento">
-          {p0 && <ProjectCard project={p0} className="span-12" featured priority />}
+          {p0 && <ProjectCard project={p0} className="span-12" featured />}
           {p1 && <ProjectCard project={p1} className="span-6" />}
           {p2 && <ProjectCard project={p2} className="span-6" />}
           {p3 && <ProjectCard project={p3} className="span-6" />}

@@ -16,7 +16,8 @@ type Props = {
 export default function ProjectCard({ project, className = '', priority = false, featured = false }: Props) {
   const service = getService(project.service_slug);
   const target = projectHref(project);
-  const sizes = featured ? '(max-width: 960px) 100vw, 60vw' : '(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 45vw';
+  // Cards sit inside the page gutters and a 10px frame, so on phones the image is about 60px narrower than the screen.
+  const sizes = featured ? '(max-width: 960px) calc(100vw - 60px), 60vw' : '(max-width: 700px) calc(100vw - 60px), (max-width: 1100px) 50vw, 45vw';
   const content = (
     <>
       <div className="project-media">

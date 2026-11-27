@@ -1,5 +1,8 @@
 /* Squaberry public site: soft, dark, rounded design system (reference: i3media.net).
    Admin pages also use these tokens, fonts and base styles, plus app/admin/admin-base.css + admin.css. */
+/* Times New Roman sized to match Fraunces while the heading font loads (the metrics next/font/google
+   generated), so headings don't reflow when it swaps in. The font itself is loaded in app/layout.tsx. */
+@font-face{font-family:'Fraunces Fallback';src:local('Times New Roman');ascent-override:84.71%;descent-override:22.09%;line-gap-override:0%;size-adjust:115.45%}
 
 :root{
   --bg:#1c1c1c;
@@ -676,12 +679,14 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
    Load-in: .rise (hero) and .page-enter (every page, from app/(site)/template.tsx).
    Scroll reveals: components/RevealObserver.tsx adds .is-in as elements enter (staggered when they
    arrive together) and .is-done once finished. Hidden states only apply under html.js-reveal, which the
-   root layout sets unless reduced motion is on, so content is never hidden without the script. */
+   root layout sets unless reduced motion is on, so content is never hidden without the script.
+   The load-ins start at opacity .01, not 0: it looks the same, but Chrome skips anything first painted
+   fully transparent when it picks the Largest Contentful Paint, which left the hero uncounted. */
 .rise{animation:rise 1s var(--ease-soft) both}
 .rise.d1{animation-delay:.08s}.rise.d2{animation-delay:.16s}.rise.d3{animation-delay:.24s}.rise.d4{animation-delay:.32s}
-@keyframes rise{from{opacity:0;transform:translateY(28px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes rise{from{opacity:.01;transform:translateY(28px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
 .page-enter{animation:page-in .7s var(--ease-soft) both}
-@keyframes page-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes page-in{from{opacity:.01;transform:translateY(16px)}to{opacity:1;transform:none}}
 .dock{animation:dock-in .9s var(--ease-soft) both}
 @keyframes dock-in{from{opacity:0;transform:translateY(-18px) scale(.98)}to{opacity:1;transform:none}}
 
@@ -826,10 +831,13 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .svc-icon{width:48px;height:48px}
 /* Line boil: each brand icon flicks between its two hand-drawn frames (two <use> layers, see
    components/Icon.tsx) at 2.5 frames a second. steps() swaps opacity only, no layout; each icon
-   gets its own --boil-delay so they don't flick together. Still (frame a) under reduced motion. */
+   gets its own --boil-delay so they don't flick together. SVG layers can't animate off the main
+   thread, so only icons on screen boil: RevealObserver adds .is-live while an icon is in view (the
+   page has 80+ icons, mostly in the footer strip and menus). Still (frame a) under reduced motion. */
 .brand-icon .boil-b{opacity:0}
-.brand-icon use{animation:icon-boil .8s steps(2,jump-none) infinite;animation-delay:var(--boil-delay,0s)}
-.brand-icon .boil-a{animation-direction:reverse}
+.brand-icon.is-live use{animation:icon-boil .8s steps(2,jump-none) infinite;animation-delay:var(--boil-delay,0s)}
+.brand-icon.is-live .boil-a{animation-direction:reverse}
+.mega:not(.is-open) .brand-icon use{animation:none} /* closed menu panels are only visibility:hidden */
 @keyframes icon-boil{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.brand-icon use{animation:none}}
 .feature-icon{width:52px;height:52px}

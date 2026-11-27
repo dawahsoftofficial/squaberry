@@ -1,13 +1,24 @@
 import type { Metadata, Viewport } from 'next';
-import { Figtree, Fraunces } from 'next/font/google';
-import Script from 'next/script';
+import { Figtree } from 'next/font/google';
+import localFont from 'next/font/local';
 import { mediaBase } from '@/lib/media-url';
 import { siteDescription, siteName, siteUrl } from '@/lib/seo';
 import './globals.css';
 
-// Self-hosted at build time by next/font: no requests to Google from visitors' browsers.
-// Headings: Fraunces with its soft, slightly wonky forms (the SOFT/WONK axes are switched on in globals.css).
-const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap', axes: ['SOFT', 'WONK', 'opsz'] });
+// Self-hosted by next/font: no requests to Google from visitors' browsers.
+// Headings: Fraunces with its soft, slightly wonky forms. The site only ever uses SOFT 100 and WONK 1, so
+// app/fonts holds the Latin variable font with those two axes pinned (scripts/build-fraunces.py): the same
+// glyphs at half the size (62kb instead of 121kb). Weight and optical size are still variable.
+const fraunces = localFont({
+  src: './fonts/fraunces-latin-soft-wonk.woff2',
+  weight: '100 900',
+  style: 'normal',
+  variable: '--font-fraunces',
+  display: 'swap',
+  // The fallback face (metrics from next/font/google, tuned to the regular weight) is in globals.css.
+  adjustFontFallback: false,
+  fallback: ['Fraunces Fallback'],
+});
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree', display: 'swap' });
 
 export const metadata: Metadata = {
@@ -26,7 +37,8 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 };
 
-// Runs before first paint.
+// Runs before first paint: a plain inline <script> in <head>, not next/script's beforeInteractive, which
+// in the App Router only runs once Next's async runtime has loaded, often after the first paint.
 // - js-form: step forms show only their opening step until they hydrate, so the page doesn't jump when
 //   the full no-JS form collapses into steps. If a form still hasn't hydrated after 6s, all steps show.
 // - js-reveal: lets scroll reveals hide content until it animates in. Skipped under reduced motion; if
@@ -44,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {mediaBase && <link rel="preconnect" href={new URL(mediaBase).origin} />}
         {mediaBase && <link rel="dns-prefetch" href={new URL(mediaBase).origin} />}
-        <Script id="reveal-setup" strategy="beforeInteractive">{revealScript}</Script>
+        <script id="reveal-setup" dangerouslySetInnerHTML={{ __html: revealScript }} />
       </head>
       <body>
         <a className="skip" href="#main">Skip to content</a>
