@@ -27,7 +27,7 @@
   background:#181818;
 }
 .admin-brand{display:flex;align-items:center;width:fit-content;min-height:48px;margin:0 10px 26px}
-.admin-brand img{display:block;width:136px;height:auto;filter:brightness(0) invert(1)}
+.admin-brand img{display:block;width:140px;height:auto}
 .admin-mobile-brand{display:none}
 .admin-nav{display:grid;gap:4px}
 .admin-nav a,.admin-view-site{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 12px;border-radius:12px;color:var(--a-muted);font-size:15px;font-weight:500;transition:background .25s,color .25s}
@@ -161,7 +161,7 @@
 /* ---------- Sign in ---------- */
 .admin-login{display:grid;place-items:center;min-height:100vh;padding:24px;background:radial-gradient(45% 45% at 20% 15%,rgba(179,168,255,.18),transparent 70%),radial-gradient(40% 40% at 85% 90%,rgba(245,138,61,.12),transparent 70%),var(--bg)}
 .admin-login-card{width:min(100%,430px);padding:40px 36px;border:1px solid var(--a-border);border-radius:28px;background:linear-gradient(170deg,var(--surface-2),var(--surface));box-shadow:0 40px 100px -40px rgba(0,0,0,.8)}
-.admin-login-logo{display:block;width:140px;height:auto;margin-bottom:30px;filter:brightness(0) invert(1)}
+.admin-login-logo{display:block;width:150px;height:auto;margin-bottom:30px}
 .admin-login-card .mono{display:flex;align-items:center;gap:10px}
 .admin-login-card .mono::before{content:'';width:8px;height:8px;border-radius:2px;background:var(--grad) border-box}
 .admin-login-card h1{margin:12px 0 8px;font-size:44px}
@@ -217,9 +217,8 @@
     border-bottom:1px solid var(--admin-border);
   }
   .admin-brand,.admin-context-root{display:none}
-  .admin-mobile-brand{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--grad) border-box}
-  .admin-mobile-brand img{filter:brightness(0) invert(1)}
-  .admin-mobile-brand img{width:19px;height:auto}
+  .admin-mobile-brand{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;border:1px solid var(--a-border);background:var(--bg)}
+  .admin-mobile-brand img{width:17px;height:auto}
   .admin-nav{display:flex;gap:4px}
   .admin-nav a,.admin-view-site{min-height:44px}
   .admin-nav a[aria-current=page]::after{display:none}
