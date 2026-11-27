@@ -213,14 +213,17 @@ def _mix(a, b, t):
 # Wordmark: Bricolage Grotesque outlines (the site's display face), set as paths.
 # ---------------------------------------------------------------------------
 
-def wordmark(text, wght, track, size):
-    """Returns (path_d, width) for text set at `size` units, baseline at y=0."""
-    gs = FONT.getGlyphSet(location={"wght": wght})
-    scale = size / UPM
+def wordmark(text, wght, track, size, font=None, axes=None):
+    """Returns (path_d, width) for text set at `size` units, baseline at y=0.
+    font/axes: another variable font and extra axis values (default: Bricolage, weight only)."""
+    font = font or FONT
+    cmap = font.getBestCmap()
+    gs = font.getGlyphSet(location={"wght": wght, **(axes or {})})
+    scale = size / font["head"].unitsPerEm
     x = 0.0
     parts = []
     for ch in text:
-        gname = CMAP[ord(ch)]
+        gname = cmap[ord(ch)]
         g = gs[gname]
         pen = SVGPathPen(gs, ntos=lambda v: f(v))
         tp = TransformPen(pen, (scale, 0, 0, -scale, x, 0))

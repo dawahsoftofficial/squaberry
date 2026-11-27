@@ -2,7 +2,7 @@
 
 Run from the repo root:  python design/logo-concepts/build_final.py
 Writes:
-  public/assets/squaberry-logo-tonal.svg   lock-up for dark backgrounds (header, footer, admin)
+  public/assets/squaberry-logo-fraunces.svg   lock-up for dark backgrounds (header, footer, admin)
   app/icon.svg, app/favicon.ico, app/apple-icon.png, public/icon-192.png, public/icon-512.png
   design/logo-concepts/final/              lock-ups for dark and light, marks, icons
 Needs Playwright (Chromium) to measure the lock-up and rasterise the PNG icons, and Pillow for the .ico.
@@ -10,6 +10,7 @@ Needs Playwright (Chromium) to measure the lock-up and rasterise the PNG icons, 
 import io
 from pathlib import Path
 
+from fontTools.ttLib import TTFont
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
@@ -22,15 +23,20 @@ FINAL = B.HERE / "final"
 TONAL = next(t for t in C.TREATMENTS if t["id"] == "tonal")
 LOGO = C.concept(TONAL)
 TILE = "#1C1C1C"
+# Wordmark in the site's heading face: Fraunces 600 with its soft, wonky forms (as h1-h4 in globals.css).
+WORD_FONT = TTFont(B.HERE / "fonts" / "fraunces-latin.woff2")
+WORD_AXES = {"SOFT": 100, "WONK": 1, "opsz": 72}
+WORD = ("squaberry", 600, -30)  # tracking in font units: -0.015em, as the headings
+WORD_SIZE = 58  # x-height matches the old Bricolage wordmark at 54
 
 
 def lockup_inner(mode, word_ink):
     """Mark (0-100 box) + wordmark, in lock-up units; returns (inner svg, width)."""
-    text, wght, track = LOGO["word"]
-    size = LOGO["word_size"]
-    d, tw = B.wordmark(text, wght, track, size)
+    text, wght, track = WORD
+    size = WORD_SIZE
+    d, tw = B.wordmark(text, wght, track, size, font=WORD_FONT, axes=WORD_AXES)
     gap = 22
-    xh = B.FONT["OS/2"].sxHeight * size / B.UPM
+    xh = WORD_FONT["OS/2"].sxHeight * size / WORD_FONT["head"].unitsPerEm
     baseline = 50 + xh / 2 + 1
     m = LOGO["fn"](B.uid("t"), mode=mode, ink=word_ink)
     inner = f'<g>{m}</g><path transform="translate({f(100 + gap)} {f(baseline)})" d="{d}" fill="{word_ink}"/>'
@@ -84,7 +90,7 @@ def main():
         page = b.new_page()
         dark, ratio = lockup_svg(page, "dark", WHITE)
         light, _ = lockup_svg(page, "light", CHARCOAL)
-        (ROOT / "public/assets/squaberry-logo-tonal.svg").write_text(dark + "\n", encoding="utf-8")
+        (ROOT / "public/assets/squaberry-logo-fraunces.svg").write_text(dark + "\n", encoding="utf-8")
         (FINAL / "squaberry-logo-dark.svg").write_text(dark + "\n", encoding="utf-8")
         (FINAL / "squaberry-logo-light.svg").write_text(light + "\n", encoding="utf-8")
         mark_tight = B.svg(LOGO["fn"](B.uid("m"), mode="dark"), vb="15 9.5 69.5 85.5", title="Squaberry")

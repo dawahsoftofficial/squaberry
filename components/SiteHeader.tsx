@@ -179,7 +179,7 @@ export default function SiteHeader() {
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${mega ? ' is-mega' : ''}`} onPointerLeave={event => event.pointerType === 'mouse' && mega && closeMegaSoon()}>
       <div className="dock">
         <Link href="/" className="brand" aria-label="Squaberry home" onPointerEnter={() => mega && closeMegaSoon()}>
-          <img src={mediaUrl('/assets/squaberry-logo-tonal.svg')} alt="Squaberry" width={137} height={32} />
+          <img src={mediaUrl('/assets/squaberry-logo-fraunces.svg')} alt="Squaberry" width={137} height={32} />
         </Link>
         <span className="dock-divider" aria-hidden="true" />
 

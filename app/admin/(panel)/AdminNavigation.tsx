@@ -21,7 +21,7 @@ export function AdminSidebar() {
   return (
     <aside className="admin-sidebar">
       <Link href="/admin" className="admin-brand" aria-label="Squaberry admin home">
-        <img src="/assets/squaberry-logo-tonal.svg" alt="" />
+        <img src="/assets/squaberry-logo-fraunces.svg" alt="" />
       </Link>
       <nav className="admin-nav" aria-label="Admin navigation">
         {sections.map(item => (
