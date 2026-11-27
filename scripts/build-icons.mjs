@@ -9,6 +9,7 @@ import { writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 let seed = 1;
+let boil = 0; // extra point jitter for the second "line boil" frame
 const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
 const f = (n) => String(Math.round(n * 10) / 10 || 0);
 const rad = (d) => (d * Math.PI) / 180;
@@ -115,7 +116,7 @@ function inset(pts, d) {
 // ---- marks ----------------------------------------------------------------------------------
 // A brush stroke: a filled outline whose width swells in the middle and tapers at both ends.
 function brush(pts, w, { a = 0.35, b = 0.45, j = 0.06, step = 1.6 } = {}) {
-  const s = prep(pts, false, step).map(([x, y]) => [x + rnd() * j, y + rnd() * j]);
+  const s = prep(pts, false, step).map(([x, y]) => [x + rnd() * (j + boil), y + rnd() * (j + boil)]);
   const n = s.length, L = [], R = [];
   for (let i = 0; i < n; i++) {
     const p0 = s[Math.max(0, i - 1)], p1 = s[Math.min(n - 1, i + 1)];
@@ -128,7 +129,7 @@ function brush(pts, w, { a = 0.35, b = 0.45, j = 0.06, step = 1.6 } = {}) {
   return smooth([...L, ...R.reverse()], true);
 }
 const blob = (pts, { j = 0.07, dx = 0, dy = 0, step = 1.6 } = {}) =>
-  smooth(prep(pts, true, step).map(([x, y]) => [x + dx + rnd() * j, y + dy + rnd() * j]), true);
+  smooth(prep(pts, true, step).map(([x, y]) => [x + dx + rnd() * (j + boil), y + dy + rnd() * (j + boil)]), true);
 
 let cur;
 const layer = (name, d) => d && cur[name].push(d);
@@ -363,13 +364,20 @@ const icons = {
 };
 
 // ---- output -----------------------------------------------------------------------------------
-const symbols = Object.entries(icons).map(([name, draw]) => {
-  seed = (parseInt(createHash('md5').update(name).digest('hex').slice(0, 8), 16) % 2147483646) + 1;
+// Every icon is drawn twice: frame a, and frame b from another seed with a little more jitter.
+// The site flicks between them (a two-frame "line boil"); frame a is the still icon.
+const BOIL = Number(process.env.ICON_BOIL ?? 0.14);
+const draw = (name, key, extra) => {
+  seed = (parseInt(createHash('md5').update(key).digest('hex').slice(0, 8), 16) % 2147483646) + 1;
+  boil = extra;
   cur = { fill: [], accent: [], ink: [], top: [] };
-  draw();
+  icons[name]();
   const p = (d, ink) => d.length ? `<path ${ink ? 'style="fill:var(--icon-ink,#1c1c1c)"' : 'fill="currentColor"'} d="${d.join('')}"/>` : '';
-  return `<symbol id="${name}" viewBox="0 0 24 24">${p(cur.fill)}${p(cur.accent)}${p(cur.ink, true)}${p(cur.top)}</symbol>`;
-});
+  return `${p(cur.fill)}${p(cur.accent)}${p(cur.ink, true)}${p(cur.top)}`;
+};
+const symbols = Object.keys(icons).map((name) =>
+  `<symbol id="${name}" viewBox="0 0 24 24">${draw(name, name, 0)}</symbol>` +
+  `<symbol id="${name}-b" viewBox="0 0 24 24">${draw(name, `${name}~b`, BOIL)}</symbol>`);
 const sprite = `<svg xmlns="http://www.w3.org/2000/svg">${symbols.join('')}</svg>\n`;
 const version = createHash('md5').update(sprite).digest('hex').slice(0, 8);
 const root = new URL('..', import.meta.url);

@@ -827,6 +827,14 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .svc-icon{color:var(--ink-1)!important;--icon-ink:#ecebf3}
 .mega-feature-icon,.link-list .link-icon,.info-card .info-icon{width:40px;height:40px}
 .svc-icon{width:48px;height:48px}
+/* Line boil: each brand icon flicks between its two hand-drawn frames (two <use> layers, see
+   components/Icon.tsx) at 2.5 frames a second. steps() swaps opacity only, no layout; each icon
+   gets its own --boil-delay so they don't flick together. Still (frame a) under reduced motion. */
+.brand-icon .boil-b{opacity:0}
+.brand-icon use{animation:icon-boil .8s steps(2,jump-none) infinite;animation-delay:var(--boil-delay,0s)}
+.brand-icon .boil-a{animation-direction:reverse}
+@keyframes icon-boil{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.brand-icon use{animation:none}}
 .feature-icon{width:52px;height:52px}
 .case-help-icon{width:44px;height:44px}
 .case-help-title>span:last-child{padding-top:9px}
