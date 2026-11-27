@@ -106,6 +106,7 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .site-header.is-scrolled .dock,.site-header.is-mega .dock,.site-header.is-open .dock{border-color:rgba(255,255,255,.11);background:rgba(30,30,30,.92);box-shadow:0 18px 50px -20px rgba(0,0,0,.7)}
 .brand{display:flex;flex:none;align-items:center}
 .brand img{width:137px;height:auto}
+.logo-pic{display:contents} /* <picture> around the logo (components/Logo.tsx) adds no box */
 .dock-divider{flex:none;width:1px;height:26px;margin:0 12px 0 20px;background:rgba(255,255,255,.14)}
 .dock-nav{display:flex;align-items:center;gap:2px;margin-right:auto}
 .dock-link{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border:0;border-radius:12px;background:none;color:var(--fg-2);font:inherit;font-size:15px;font-weight:500;line-height:1;cursor:pointer;transition:background .25s,color .25s}

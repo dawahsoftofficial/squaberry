@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { logout } from '../actions';
 import AdminIcon from './AdminIcon';
+import Logo from '@/components/Logo';
 
 const sections = [
   { href: '/admin', label: 'Enquiries', icon: 'inbox' },
@@ -21,7 +22,7 @@ export function AdminSidebar() {
   return (
     <aside className="admin-sidebar">
       <Link href="/admin" className="admin-brand" aria-label="Squaberry admin home">
-        <img src="/assets/squaberry-logo-hand.svg" alt="" />
+        <Logo local alt="" />
       </Link>
       <nav className="admin-nav" aria-label="Admin navigation">
         {sections.map(item => (
@@ -83,7 +84,7 @@ export function AdminHeader({ newEnquiries }: { newEnquiries: number | null }) {
       <div className="admin-bar-inner">
         <div className="admin-context">
           <Link href="/admin" className="admin-mobile-brand" aria-label="Squaberry admin home">
-            <img src="/assets/squaberry-mark-hand.svg" alt="" />
+            <Logo variant="mark" local alt="" />
           </Link>
           <span className="admin-context-root">Admin <AdminIcon name="right" /></span>
           <strong>{section.label}</strong>

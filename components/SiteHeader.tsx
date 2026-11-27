@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Icon from './Icon';
-import { mediaUrl } from '@/lib/media-url';
 import { products } from '@/lib/products';
 import { services, serviceStyle } from '@/lib/services';
+import Logo from '@/components/Logo';
 
 const links = [
   { href: '/work', label: 'Our Work' },
@@ -179,7 +179,7 @@ export default function SiteHeader() {
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${mega ? ' is-mega' : ''}`} onPointerLeave={event => event.pointerType === 'mouse' && mega && closeMegaSoon()}>
       <div className="dock">
         <Link href="/" className="brand" aria-label="Squaberry home" onPointerEnter={() => mega && closeMegaSoon()}>
-          <img src={mediaUrl('/assets/squaberry-logo-hand.svg')} alt="Squaberry" width={137} height={32} />
+          <Logo width={137} height={32} />
         </Link>
         <span className="dock-divider" aria-hidden="true" />
 

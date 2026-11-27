@@ -2,8 +2,9 @@
 // writes every logo file the site uses.
 //   node scripts/build-logo.mjs   (npm run logo:build)
 // Writes:
-//   public/assets/squaberry-logo-hand.svg   lock-up for dark backgrounds (header, footer, admin)
-//   public/assets/squaberry-mark-hand.svg   mark on its own, tight to the drawing (admin)
+//   public/assets/squaberry-logo-boil.svg   lock-up for dark backgrounds (header, footer, admin), boiling
+//   public/assets/squaberry-mark-boil.svg   mark on its own, tight to the drawing (admin), boiling
+//   public/assets/squaberry-logo-hand.svg, squaberry-mark-hand.svg   the same, still (reduced motion)
 //   app/icon.svg, app/favicon.ico, app/apple-icon.png, public/icon-hand-192.png, public/icon-hand-512.png
 //   design/logo-concepts/final/             lock-ups and marks for dark and light, favicon, 512px app icon
 // The mark is five of the icon set's signature soft squares (3-2-1, the top-right one popped out as a
@@ -11,6 +12,11 @@
 // scripts/build-icons.mjs (which writes files when imported). The wordmark is the Fraunces outline in
 // design/logo-concepts/wordmark-fraunces.svg. Output is deterministic. Give changed files new names:
 // the CDN caches /assets for a year.
+// Like the icons, the site's mark "boils": the two files above hold two hand-drawn frames of the mark
+// (frame b from another seed with a little more jitter) and flick between them at 2.5 frames a second
+// with CSS inside the SVG. components/Logo.tsx shows them and swaps in the still -hand files under
+// reduced motion (the SVG's own media query isn't reliably applied inside an <img>).
+// The wordmark stays still. Favicons, app icons and design/logo-concepts/final/ are frame a only.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
@@ -20,6 +26,8 @@ const file = (p) => new URL(p, root);
 
 // ---- primitives (from scripts/build-icons.mjs) -----------------------------------------------
 let seed = 1;
+let boil = 0; // extra point jitter for the second frame, as in build-icons.mjs
+const BOIL = 0.14;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
 const reseed = (s) => { seed = (parseInt(createHash('md5').update(s).digest('hex').slice(0, 8), 16) % 2147483646) + 1; };
 const rad = (d) => (d * Math.PI) / 180;
@@ -77,7 +85,7 @@ function smooth(pts, closed) {
   return d + nums(segs) + (closed ? 'z' : '');
 }
 function brush(pts, w, { a = 0.35, b = 0.45, j = 0.06, step = 1.6 } = {}) {
-  const s = prep(pts, false, step).map(([x, y]) => [x + rnd() * j, y + rnd() * j]);
+  const s = prep(pts, false, step).map(([x, y]) => [x + rnd() * (j + boil), y + rnd() * (j + boil)]);
   const n = s.length, L = [], R = [];
   for (let i = 0; i < n; i++) {
     const p0 = s[Math.max(0, i - 1)], p1 = s[Math.min(n - 1, i + 1)];
@@ -89,7 +97,7 @@ function brush(pts, w, { a = 0.35, b = 0.45, j = 0.06, step = 1.6 } = {}) {
   }
   return smooth([...L, ...R.reverse()], true);
 }
-const blob = (pts, { j = 0.07, step = 1.6 } = {}) => smooth(prep(pts, true, step).map(([x, y]) => [x + rnd() * j, y + rnd() * j]), true);
+const blob = (pts, { j = 0.07, step = 1.6 } = {}) => smooth(prep(pts, true, step).map(([x, y]) => [x + rnd() * (j + boil), y + rnd() * (j + boil)]), true);
 
 // ---- the mark (24px grid) --------------------------------------------------------------------
 const PALETTES = {
@@ -105,9 +113,10 @@ function leaf(cx, cy, s, tilt) {
     ...arc(cx - h + rs, cy + h - rs, rs, 90, 180), ...arc(cx - h + rb, cy - h + rb, rb, 180, 270)], cx, cy, tilt);
 }
 // small: the favicon cut, with bigger squares, a bigger leaf and no carved highlights so it holds at 16px.
-function drawMark(mode, small = false) {
+function drawMark(mode, small = false, frame = 'a') {
   const pal = PALETTES[mode];
-  reseed(`stamped${small ? '-s' : ''}`);
+  reseed(`stamped${small ? '-s' : ''}${frame === 'b' ? '~b' : ''}`);
+  boil = frame === 'b' ? BOIL : 0;
   bounds = [Infinity, Infinity, -Infinity, -Infinity];
   const layers = [];
   const put = (fill, d) => { const last = layers[layers.length - 1]; if (last?.fill === fill) last.d.push(d); else layers.push({ fill, d: [d] }); };
@@ -133,18 +142,28 @@ const TITLE = '<title>Squaberry</title>';
 const INK = { dark: '#FFFFFD', light: '#1C1C1C' };
 const wordPath = readFileSync(file('design/logo-concepts/wordmark-fraunces.svg'), 'utf8').match(/<path [^>]*\/>/)[0];
 
-function markSvg(mode) {
-  const { body, box: [x0, y0, x1, y1] } = drawMark(mode);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${r2(x0)} ${r2(y0)} ${r2(x1 - x0)} ${r2(y1 - y0)}" role="img">${TITLE}${body}</svg>\n`;
+// The mark's drawing: frame a alone, or both frames with the boil (box covers both frames).
+const BOIL_CSS = '<style>.b{opacity:0}.f{animation:boil .8s steps(2,jump-none) infinite}.a{animation-direction:reverse}' +
+  '@keyframes boil{from{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){.f{animation:none}}</style>';
+function mark(mode, animated) {
+  const a = drawMark(mode);
+  if (!animated) return a;
+  const b = drawMark(mode, false, 'b');
+  const box = [Math.min(a.box[0], b.box[0]), Math.min(a.box[1], b.box[1]), Math.max(a.box[2], b.box[2]), Math.max(a.box[3], b.box[3])];
+  return { box, style: BOIL_CSS, body: `<g class="f a">${a.body}</g><g class="f b">${b.body}</g>` };
+}
+function markSvg(mode, animated = false) {
+  const { body, style = '', box: [x0, y0, x1, y1] } = mark(mode, animated);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${r2(x0)} ${r2(y0)} ${r2(x1 - x0)} ${r2(y1 - y0)}" role="img">${TITLE}${style}${body}</svg>\n`;
 }
 // Lock-up in the wordmark's units: the mark fills the 85.5-unit height, its right edge 37.5 units
 // before the word (the spacing of the previous logo).
-function lockupSvg(mode) {
-  const { body, box: [x0, y0, x1, y1] } = drawMark(mode);
+function lockupSvg(mode, animated = false) {
+  const { body, style = '', box: [x0, y0, x1, y1] } = mark(mode, animated);
   const k = 85.5 / (y1 - y0), tx = 84.5 - x1 * k, ty = 9.5 - y0 * k, left = tx + x0 * k;
   const word = wordPath.replace(/fill="[^"]*"/, `fill="${INK[mode]}"`);
   return { ratio: (381.18 - left) / 85.5,
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${r2(left)} 9.5 ${r2(381.18 - left)} 85.5" role="img">${TITLE}` +
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${r2(left)} 9.5 ${r2(381.18 - left)} 85.5" role="img">${TITLE}${style}` +
       `<g transform="translate(${r2(tx)} ${r2(ty)}) scale(${r2(k)})">${body}</g>${word}</svg>\n` };
 }
 // Charcoal tile with the mark centred on its drawn shape; `fill` is the share of the tile the mark's
@@ -173,6 +192,9 @@ function ico(images) {
 }
 
 const dark = lockupSvg('dark');
+const live = lockupSvg('dark', true);
+writeFileSync(file('public/assets/squaberry-logo-boil.svg'), live.svg);
+writeFileSync(file('public/assets/squaberry-mark-boil.svg'), markSvg('dark', true));
 writeFileSync(file('public/assets/squaberry-logo-hand.svg'), dark.svg);
 writeFileSync(file('public/assets/squaberry-mark-hand.svg'), markSvg('dark'));
 writeFileSync(file('design/logo-concepts/final/squaberry-logo-dark.svg'), dark.svg);
@@ -189,4 +211,4 @@ writeFileSync(file('app/favicon.ico'), ico(await Promise.all([16, 32, 48].map(as
 writeFileSync(file('app/apple-icon.png'), await png(iconSvg(180, 0.64), 180));
 for (const px of [192, 512]) writeFileSync(file(`public/icon-hand-${px}.png`), await png(iconSvg(px, 0.54, { small: false }), px));
 writeFileSync(file('design/logo-concepts/final/app-icon-512.png'), await png(iconSvg(512, 0.54, { small: false }), 512));
-console.log(`logo: lock-up ratio ${dark.ratio.toFixed(4)} (width / height)`);
+console.log(`logo: lock-up ratio ${dark.ratio.toFixed(4)}, boiling ${live.ratio.toFixed(4)} (width / height)`);
