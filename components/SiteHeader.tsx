@@ -320,7 +320,7 @@ export default function SiteHeader() {
         </div>
       </div>
 
-      <div className="mobile-menu" id="mobile-menu" hidden={!open}>
+      <div className="mobile-menu" id="mobile-menu" hidden={!open} data-lenis-prevent>
         <nav aria-label="Mobile navigation">
           <ul>
             <li><Link href="/" aria-current={pathname === '/' ? 'page' : undefined}>Home</Link></li>
