@@ -54,14 +54,19 @@ def lockup_svg(page, mode, word_ink, title="Squaberry"):
             bw / bh)
 
 
-def icon_svg(size, scale, rx=0, small=True):
-    """Square charcoal tile with the mark centred. scale = share of the tile the mark's 100-unit box fills."""
+def icon_svg(page, size, fill, rx=0, small=True):
+    """Square charcoal tile with the mark centred on its drawn shape (not its 100-unit box, which it overhangs).
+    fill = share of the tile the mark's taller side takes, so the padding is even on every side."""
     m = LOGO["fn"](B.uid("i"), mode="dark", small=small)
-    box = size * scale
-    off = (size - box) / 2
+    page.set_content(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400">'
+                     f'<g id="m">{m}</g></svg>')
+    x, y, bw, bh = page.evaluate("(() => { const b = document.getElementById('m').getBBox(); return [b.x, b.y, b.width, b.height]; })()")
+    k = size * fill / max(bw, bh)
+    tx = size / 2 - (x + bw / 2) * k
+    ty = size / 2 - (y + bh / 2) * k
     tile = f'<rect width="{size}" height="{size}"{f" rx={chr(34)}{f(rx)}{chr(34)}" if rx else ""} fill="{TILE}"/>'
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}">{tile}'
-            f'<g transform="translate({f(off)} {f(off)}) scale({f(box / 100)})">{m}</g></svg>')
+            f'<g transform="translate({f(tx)} {f(ty)}) scale({f(k)})">{m}</g></svg>')
 
 
 def png(page, svg_text, px):
@@ -87,17 +92,17 @@ def main():
         (FINAL / "squaberry-mark-dark.svg").write_text(B.mark(LOGO, "dark", title="Squaberry") + "\n", encoding="utf-8")
         (FINAL / "squaberry-mark-light.svg").write_text(B.mark(LOGO, "light", title="Squaberry") + "\n", encoding="utf-8")
 
-        # Favicon: rounded charcoal tile, chunkier small cut of the mark.
-        fav = icon_svg(64, 0.84, rx=15)
+        # Favicon: rounded charcoal tile, chunkier small cut of the mark, even padding all round.
+        fav = icon_svg(page, 64, 0.74, rx=15)
         (ROOT / "app/icon.svg").write_text(fav + "\n", encoding="utf-8")
         (FINAL / "favicon.svg").write_text(fav + "\n", encoding="utf-8")
         ico = [png(page, fav, s) for s in (16, 32, 48)]
         ico[-1].save(ROOT / "app/favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)], append_images=ico[:-1])
         # Full-bleed tiles: iOS and Android mask the corners themselves; the mark stays inside the safe zone.
-        png(page, icon_svg(180, 0.66), 180).save(ROOT / "app/apple-icon.png")
+        png(page, icon_svg(page, 180, 0.64), 180).save(ROOT / "app/apple-icon.png")
         for s in (192, 512):
-            png(page, icon_svg(s, 0.62, small=False), s).save(ROOT / f"public/icon-{s}.png")
-        png(page, icon_svg(512, 0.62, small=False), 512).save(FINAL / "app-icon-512.png")
+            png(page, icon_svg(page, s, 0.54, small=False), s).save(ROOT / f"public/icon-{s}.png")
+        png(page, icon_svg(page, 512, 0.54, small=False), 512).save(FINAL / "app-icon-512.png")
         b.close()
     print(f"lock-up ratio {ratio:.4f} (width / height)")
 
