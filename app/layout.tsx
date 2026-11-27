@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Bricolage_Grotesque, Figtree } from 'next/font/google';
+import { Figtree, Fraunces } from 'next/font/google';
 import Script from 'next/script';
 import { mediaBase } from '@/lib/media-url';
 import { siteDescription, siteName, siteUrl } from '@/lib/seo';
 import './globals.css';
 
 // Self-hosted at build time by next/font: no requests to Google from visitors' browsers.
-const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
+// Headings: Fraunces with its soft, slightly wonky forms (the SOFT/WONK axes are switched on in globals.css).
+const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap', axes: ['SOFT', 'WONK', 'opsz'] });
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree', display: 'swap' });
 
 export const metadata: Metadata = {
@@ -39,7 +40,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${bricolage.variable} ${figtree.variable}`} suppressHydrationWarning>
+    <html lang="en-GB" className={`${fraunces.variable} ${figtree.variable}`} suppressHydrationWarning>
       <head>
         {mediaBase && <link rel="preconnect" href={new URL(mediaBase).origin} />}
         {mediaBase && <link rel="dns-prefetch" href={new URL(mediaBase).origin} />}

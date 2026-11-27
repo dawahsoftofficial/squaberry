@@ -1,5 +1,5 @@
 /* Admin shell and surfaces, in the public site's style: dark surfaces, soft-square controls,
-   lavender and gradient accents, Bricolage headings. Base controls are in admin-base.css. */
+   lavender and gradient accents, Fraunces headings. Base controls are in admin-base.css. */
 
 .admin{
   --admin-border:var(--a-border);
