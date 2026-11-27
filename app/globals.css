@@ -644,7 +644,23 @@ a.chip:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
 .faq-item[open] .faq-toggle{background:var(--accent,var(--lav));color:var(--ink-1);transform:rotate(45deg)}
 .faq-item p{max-width:70ch;padding:0 22px 22px;color:var(--fg-2);line-height:1.65}
 
+/* Product page sections sit beside a sticky "On this page" sidebar (the project page's .case-layout and CaseNav). */
+.product-layout{padding-top:clamp(56px,7vw,104px)}
+.product-article{display:grid;gap:clamp(80px,9vw,128px);min-width:0}
+.product-article .panel{margin-inline:0;padding:clamp(28px,4vw,52px)}
+/* The narrower column: section intros stack, at the project page's heading size. */
+.product-article .intro.has-text{grid-template-columns:minmax(0,1fr);row-gap:20px}
+.product-article .intro .display-l{max-width:20ch;font-size:clamp(32px,3.8vw,54px)}
+.product-article .intro-text{max-width:62ch}
+@media (min-width:641px){
+  .product-article .feature-grid,.product-article .feature-grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1181px){
+  .product-article .feature-grid:not(.cols-4){grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
 @media (max-width:960px){
+  .product-side{display:none}
   .product-hero{grid-template-columns:minmax(0,1fr)}
   .product-hero-form{max-width:640px}
   /* Stacked, the form can reach the page edge: keep its glow within its own width. */
