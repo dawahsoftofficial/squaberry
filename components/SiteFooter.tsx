@@ -55,7 +55,7 @@ export default function SiteFooter() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <img src={mediaUrl('/assets/squaberry-logo-fraunces.svg')} alt="Squaberry" width={154} height={36} loading="lazy" />
+            <img src={mediaUrl('/assets/squaberry-logo-hand.svg')} alt="Squaberry" width={155} height={36} loading="lazy" />
             <p>Fresh ideas and solid tech: design, development, marketing and IT, under one roof.</p>
           </div>
           <nav className="footer-col" aria-label="Footer: pages">

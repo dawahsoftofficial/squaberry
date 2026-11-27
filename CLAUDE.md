@@ -17,6 +17,7 @@ npm run typecheck    # tsc --noEmit (delete .next first if it complains about mo
 npm run db:migrate   # apply db/schema.sql and add any newer columns (safe to re-run)
 npm run db:portfolio # upsert the 10 showcase projects and their case-study copy (matched by site URL)
 npm run icons:build  # redraw the hand-drawn icon set into public/icons.svg (+ components/brand-icons.ts)
+npm run logo:build   # redraw the hand-drawn logo, favicon and app icons (scripts/build-logo.mjs)
 npm run media:upload # upload new/changed files in public/assets and public/og to DigitalOcean Spaces (+ resized WebP copies)
 ```
 
@@ -69,7 +70,7 @@ Next.js 16 App Router, TypeScript, React 19, MySQL via `mysql2`. No CSS framewor
 
 - Every public page builds its metadata with `pageMetadata()` from `lib/seo.ts` (title, description, canonical, Open Graph, Twitter card); keep titles about 60 characters and descriptions under 160 (`clip()` trims long ones). Share cards are pre-rendered 1200×630 JPEGs in `public/og/<key>.jpg` (`home`, `about`, `services`, `work`, `products`, `contact`, `service-<slug>`, `product-<slug>`, `work-<slug>`) in the site's own design; a project without a card falls back to its first gallery image. Re-render and upload a card when its page's headline changes, and add one for new projects.
 - Structured data (`lib/schema.ts`, rendered by `components/JsonLd.tsx`): Organization and WebSite on every page (from the `(site)` layout), BreadcrumbList on subpages, Service, SoftwareApplication + FAQPage, and CreativeWork on service, product and project pages.
-- Icons: `app/icon.svg` (charcoal rounded square with the violet Pop mark; regenerate it and the PNGs with `python design/logo-concepts/build_final.py`), `app/favicon.ico`, `app/apple-icon.png`, `public/icon-192.png`/`icon-512.png` (manifest, and the Organization logo) and `app/manifest.ts`. `app/sitemap.ts` lists every visible page and project; `app/robots.ts` blocks `/admin`.
+- Icons: `app/icon.svg` (charcoal rounded square with the hand-drawn violet Pop mark; regenerate it, the PNGs and the logo files with `npm run logo:build`), `app/favicon.ico`, `app/apple-icon.png`, `public/icon-hand-192.png`/`icon-hand-512.png` (manifest, and the Organization logo) and `app/manifest.ts`. `app/sitemap.ts` lists every visible page and project; `app/robots.ts` blocks `/admin`.
 - Speed: public portfolio reads are cached for 10 minutes (`unstable_cache`, tag `portfolio` in `lib/portfolio.ts`) and admin saves call `updateTag` so changes show at once. Step forms show only their opening step before hydration (`js-form` class set by the inline script in `app/layout.tsx`, with spacing that matches the hydrated form) so pages don't jump; if a form hasn't hydrated within 6s all steps show.
 
 ### Styles

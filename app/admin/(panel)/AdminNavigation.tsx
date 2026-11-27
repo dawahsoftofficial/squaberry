@@ -21,7 +21,7 @@ export function AdminSidebar() {
   return (
     <aside className="admin-sidebar">
       <Link href="/admin" className="admin-brand" aria-label="Squaberry admin home">
-        <img src="/assets/squaberry-logo-fraunces.svg" alt="" />
+        <img src="/assets/squaberry-logo-hand.svg" alt="" />
       </Link>
       <nav className="admin-nav" aria-label="Admin navigation">
         {sections.map(item => (
@@ -83,7 +83,7 @@ export function AdminHeader({ newEnquiries }: { newEnquiries: number | null }) {
       <div className="admin-bar-inner">
         <div className="admin-context">
           <Link href="/admin" className="admin-mobile-brand" aria-label="Squaberry admin home">
-            <img src="/assets/squaberry-mark-tonal.svg" alt="" />
+            <img src="/assets/squaberry-mark-hand.svg" alt="" />
           </Link>
           <span className="admin-context-root">Admin <AdminIcon name="right" /></span>
           <strong>{section.label}</strong>

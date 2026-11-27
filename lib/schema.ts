@@ -15,7 +15,7 @@ export function siteSchema(): Thing[] {
       '@id': organizationId,
       name: siteName,
       url: siteUrl,
-      logo: { '@type': 'ImageObject', url: absoluteUrl('/icon-512.png'), width: 512, height: 512 },
+      logo: { '@type': 'ImageObject', url: absoluteUrl('/icon-hand-512.png'), width: 512, height: 512 },
       image: absoluteUrl('/og/home.jpg'),
       email: siteEmail,
       description: siteDescription,

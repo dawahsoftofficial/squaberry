@@ -11,6 +11,7 @@
     "db:migrate": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/migrate.mjs",
     "db:portfolio": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-portfolio.mjs",
     "icons:build": "node scripts/build-icons.mjs",
+    "logo:build": "node scripts/build-logo.mjs",
     "media:upload": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/upload-media.mjs"
   },
   "engines": {
