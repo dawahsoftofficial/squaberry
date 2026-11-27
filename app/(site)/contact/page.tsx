@@ -46,7 +46,7 @@ export default function ContactPage() {
                 <p><strong>What to include</strong><span>Your goals, questions or a rough idea</span></p>
               </div>
               <div className="info-card">
-                <span className="info-icon"><Icon name="check" size={22} /></span>
+                <span className="info-icon"><Icon name="reply" size={32} /></span>
                 <p><strong>What happens next</strong><span>We read every message and reply by email</span></p>
               </div>
             </div>
