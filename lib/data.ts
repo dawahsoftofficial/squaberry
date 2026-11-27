@@ -141,6 +141,14 @@ export async function listAllPublishedPortfolio(): Promise<PortfolioItem[]> {
   return rows.map(toItem);
 }
 
+/** Page slug and last edit of every published project with a page, for the sitemap's lastModified. */
+export async function listPublishedProjectDates(): Promise<{ slug: string; updated_at: Date }[]> {
+  const [rows] = await db().query<Row<{ slug: string; updated_at: Date }>[]>(
+    'SELECT slug, updated_at FROM portfolio_items WHERE published = 1 AND slug IS NOT NULL',
+  );
+  return rows.map(({ slug, updated_at }) => ({ slug, updated_at }));
+}
+
 export async function getPortfolioItem(id: number): Promise<PortfolioItem | null> {
   const [rows] = await db().execute<Row<PortfolioItem>[]>(`SELECT ${portfolioColumns} FROM portfolio_items WHERE id = ?`, [id]);
   return rows[0] ? toItem(rows[0]) : null;
